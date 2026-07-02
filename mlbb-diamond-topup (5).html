@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>King Diamond Store | MLBB Diamond Top-up</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Noto+Sans+Myanmar:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+<style>
+  :root{
+    --bg-void:#090b16;
+    --bg-void-2:#0d1128;
+    --panel:rgba(22,27,51,0.62);
+    --panel-solid:#141a34;
+    --border-glass:rgba(255,255,255,0.09);
+    --input-bg:rgba(9,11,22,0.55);
+    --accent-blue:#5b7fff;
+    --accent-cyan:#4ce0e8;
+    --accent-gold:#ffc857;
+    --text-primary:#edeff7;
+    --text-muted:#8d93b0;
+    --success:#34d399;
+    --danger:#fb7185;
+    --font-display:'Rajdhani',sans-serif;
+    --font-body:'Noto Sans Myanmar','Rajdhani',sans-serif;
+    --radius:18px;
+  }
+  html[data-theme="light"]{
+    --bg-void:#f3f5fb;
+    --bg-void-2:#e8ecf7;
+    --panel:rgba(255,255,255,0.72);
+    --panel-solid:#ffffff;
+    --border-glass:rgba(20,26,46,0.10);
+    --input-bg:rgba(20,26,46,0.045);
+    --text-primary:#161b2e;
+    --text-muted:#666f8a;
+  }
+  html[data-theme="light"] body{
+    background:
+      radial-gradient(circle at 15% 0%, rgba(91,127,255,0.10), transparent 45%),
+      radial-gradient(circle at 90% 15%, rgba(76,224,232,0.09), transparent 40%),
+      radial-gradient(circle at 50% 100%, rgba(255,200,87,0.08), transparent 40%),
+      linear-gradient(180deg, var(--bg-void) 0%, var(--bg-void-2) 100%);
+  }
+  html[data-theme="light"] .particle{opacity:0.16;}
+  html[data-theme="light"] .card{box-shadow:0 8px 26px rgba(30,40,70,0.08), inset 0 1px 0 rgba(255,255,255,0.6);}
+  html[data-theme="light"] .submit-btn{color:#04070f;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  body{
+    font-family:var(--font-body);
+    color:var(--text-primary);
+    background:
+      radial-gradient(circle at 15% 0%, rgba(91,127,255,0.20), transparent 45%),
+      radial-gradient(circle at 90% 15%, rgba(76,224,232,0.14), transparent 40%),
+      radial-gradient(circle at 50% 100%, rgba(255,200,87,0.08), transparent 40%),
+      linear-gradient(180deg, var(--bg-void) 0%, var(--bg-void-2) 100%);
+    min-height:100%;
+    padding:24px 16px 60px;
+    position:relative;
+    overflow-x:hidden;
+    transition:background .35s ease, color .35s ease;
+  }
+  /* floating diamond particles */
+  .particle{
+    position:fixed; pointer-events:none; opacity:0.35;
+    background:linear-gradient(135deg,var(--accent-cyan),var(--accent-blue));
+    clip-path:polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+    filter:blur(0.3px);
+    animation:float 14s ease-in-out infinite;
+  }
+  @keyframes float{
+    0%,100%{transform:translateY(0) rotate(0deg);}
+    50%{transform:translateY(-30px) rotate(12deg);}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .particle{animation:none;}
+    *{animation-duration:0.01ms !important;}
+  }
+
+  .wrap{max-width:560px;margin:0 auto;position:relative;z-index:1;padding-top:44px;}
+
+  /* HERO */
+  .hero{text-align:center;margin-bottom:26px;}
+  .hero-badge{
+    display:inline-flex;align-items:center;gap:8px;
+    background:var(--panel);border:1px solid var(--border-glass);
+    padding:6px 14px;border-radius:999px;font-size:12px;color:var(--accent-cyan);
+    letter-spacing:0.06em;backdrop-filter:blur(10px);
+    margin-bottom:14px;
+  }
+  .hero-badge svg{width:12px;height:12px;}
+  .hero h1{
+    font-family:var(--font-display);
+    font-weight:700;font-size:clamp(28px,7vw,38px);
+    letter-spacing:0.02em;
+    background:linear-gradient(100deg,#fff 10%, var(--accent-cyan) 40%, var(--accent-gold) 55%, #fff 75%);
+    background-size:220% 100%;
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    line-height:1.15;
+    animation:shimmer 6s ease-in-out infinite;
+  }
+  @keyframes shimmer{
+    0%{background-position:0% 0%;}
+    50%{background-position:100% 0%;}
+    100%{background-position:0% 0%;}
+  }
+  .hero p{color:var(--text-muted);margin-top:8px;font-size:14.5px;}
+
+  /* CARD */
+  .card{
+    background:var(--panel);
+    border:1px solid var(--border-glass);
+    border-radius:var(--radius);
+    backdrop-filter:blur(16px);
+    -webkit-backdrop-filter:blur(16px);
+    padding:22px;
+    margin-bottom:18px;
+    box-shadow:0 8px 30px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.04);
+    position:relative;
+    overflow:hidden;
+    transition:background .35s ease, border-color .35s ease;
+  }
+  .card::before{
+    content:"";position:absolute;top:0;left:0;right:0;height:1px;
+    background:linear-gradient(90deg, transparent, rgba(255,200,87,0.55), rgba(76,224,232,0.55), transparent);
+  }
+  .section-label{
+    font-family:var(--font-display);
+    font-size:13px;font-weight:700;letter-spacing:0.08em;
+    color:var(--accent-gold);text-transform:uppercase;
+    display:flex;align-items:center;gap:8px;margin-bottom:14px;
+  }
+  .section-label .num{
+    width:20px;height:20px;border-radius:50%;
+    background:rgba(255,200,87,0.15);border:1px solid rgba(255,200,87,0.4);
+    display:flex;align-items:center;justify-content:center;
+    font-size:11px;color:var(--accent-gold);
+  }
+  .section-label::after{
+    content:"";flex:1;height:1px;
+    background:linear-gradient(90deg, rgba(255,200,87,0.35), transparent);
+    margin-left:4px;
+  }
+
+  .row{display:flex;gap:12px;}
+  .field{flex:1;margin-bottom:14px;}
+  .field label{
+    display:block;font-size:13px;color:var(--text-muted);margin-bottom:6px;
+  }
+  .field input[type=text], .field select{
+    width:100%;
+    background:var(--input-bg);
+    border:1px solid var(--border-glass);
+    color:var(--text-primary);
+    padding:12px 14px;border-radius:12px;
+    font-family:var(--font-body);font-size:15px;
+    outline:none;transition:border-color .15s, box-shadow .15s, background .35s;
+    appearance:none;-webkit-appearance:none;
+  }
+  .field select{
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'><path d='M1 1l6 6 6-6' stroke='%238d93b0' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    background-repeat:no-repeat;background-position:right 14px center;
+    padding-right:36px;cursor:pointer;
+  }
+  .field input:focus, .field select:focus{
+    border-color:var(--accent-cyan);
+    box-shadow:0 0 0 3px rgba(76,224,232,0.15);
+  }
+  .field select option{background:var(--panel-solid);color:var(--text-primary);}
+  .field select optgroup{background:var(--panel-solid);color:var(--accent-gold);font-weight:700;}
+
+  /* Diamond ticket - signature element */
+  .ticket{
+    position:relative;
+    border-radius:16px;
+    padding:18px 20px;
+    margin-top:6px;
+    background:linear-gradient(135deg, rgba(91,127,255,0.16), rgba(76,224,232,0.10));
+    border:1px solid rgba(76,224,232,0.35);
+    display:flex;align-items:center;justify-content:space-between;
+    gap:12px;
+    overflow:hidden;
+    transition:box-shadow .25s, border-color .25s;
+  }
+  .ticket.filled{
+    border-color:rgba(255,200,87,0.55);
+    box-shadow:0 0 0 1px rgba(255,200,87,0.15), 0 8px 24px rgba(255,200,87,0.12);
+    animation:pulseGlow 1.8s ease-out 1;
+  }
+  @keyframes pulseGlow{
+    0%{box-shadow:0 0 0 0 rgba(255,200,87,0.45);}
+    100%{box-shadow:0 0 0 14px rgba(255,200,87,0);}
+  }
+  .ticket::before{
+    content:"";position:absolute;left:-14px;top:50%;transform:translateY(-50%);
+    width:28px;height:28px;background:var(--bg-void-2);border-radius:50%;
+    border:1px solid var(--border-glass);
+  }
+  .ticket::after{
+    content:"";position:absolute;right:-14px;top:50%;transform:translateY(-50%);
+    width:28px;height:28px;background:var(--bg-void-2);border-radius:50%;
+    border:1px solid var(--border-glass);
+  }
+  .ticket-left{display:flex;align-items:center;gap:12px;min-width:0;}
+  .ticket-diamond{
+    width:34px;height:34px;flex-shrink:0;
+    background:linear-gradient(135deg,var(--accent-cyan),var(--accent-blue));
+    clip-path:polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+  }
+  .ticket-label{font-size:13px;color:var(--text-muted);}
+  .ticket-pack{
+    font-family:var(--font-display);font-weight:700;font-size:16px;
+    color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .ticket-price{
+    font-family:var(--font-display);font-weight:700;font-size:22px;
+    color:var(--accent-gold);white-space:nowrap;
+  }
+  .ticket-price small{font-size:13px;color:var(--text-muted);font-weight:600;margin-left:4px;}
+
+  /* Upload */
+  .upload-box{
+    border:1.5px dashed var(--border-glass);
+    border-radius:14px;padding:20px;text-align:center;
+    cursor:pointer;transition:border-color .15s, background .15s;
+    position:relative;
+  }
+  .upload-box:hover{border-color:var(--accent-cyan);background:rgba(76,224,232,0.05);}
+  .upload-box.has-file{border-color:var(--success);border-style:solid;}
+  .upload-box input{position:absolute;inset:0;opacity:0;cursor:pointer;}
+  .upload-icon{font-size:26px;margin-bottom:6px;}
+  .upload-text{font-size:13.5px;color:var(--text-muted);}
+  .upload-preview{
+    margin-top:12px;max-width:100%;max-height:180px;border-radius:10px;
+    display:none;
+  }
+
+  .pay-methods{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:16px;}
+  @media (max-width:420px){.pay-methods{grid-template-columns:repeat(2,1fr);}}
+  @media (max-width:480px){
+    .field select{font-size:13px;padding:11px 12px;padding-right:32px;}
+    .field select option, .field select optgroup{font-size:13px;}
+  }
+  .pay-chip{
+    text-align:center;padding:11px 6px;border-radius:12px;
+    border:1px solid var(--border-glass);background:var(--input-bg);
+    font-family:var(--font-display);font-size:13.5px;font-weight:600;letter-spacing:0.02em;
+    cursor:pointer;color:var(--text-muted);
+    transition:all .18s;position:relative;
+  }
+  .pay-chip:hover{border-color:rgba(255,200,87,0.35);color:var(--text-primary);}
+  .pay-chip.active{
+    border-color:var(--accent-gold);color:var(--accent-gold);
+    background:linear-gradient(180deg, rgba(255,200,87,0.14), rgba(255,200,87,0.05));
+    box-shadow:0 0 0 1px rgba(255,200,87,0.15), 0 4px 14px rgba(255,200,87,0.12);
+  }
+
+  /* Payment phone / copy widget */
+  .pay-number{
+    display:flex;align-items:center;justify-content:space-between;
+    gap:10px;
+    background:linear-gradient(135deg, rgba(255,200,87,0.10), rgba(91,127,255,0.06));
+    border:1px solid rgba(255,200,87,0.28);
+    border-radius:14px;padding:13px 16px;margin-bottom:18px;
+  }
+  .pay-number-left{display:flex;align-items:center;gap:11px;min-width:0;}
+  .pay-number-icon{
+    width:36px;height:36px;border-radius:10px;flex-shrink:0;
+    background:rgba(255,200,87,0.14);border:1px solid rgba(255,200,87,0.3);
+    display:flex;align-items:center;justify-content:center;font-size:16px;
+  }
+  .pay-number-label{font-size:11.5px;color:var(--text-muted);letter-spacing:0.03em;}
+  .pay-number-value{
+    font-family:var(--font-display);font-weight:700;font-size:18px;
+    letter-spacing:0.03em;color:var(--text-primary);
+  }
+  .copy-btn{
+    flex-shrink:0;
+    display:flex;align-items:center;gap:6px;
+    background:rgba(255,200,87,0.14);border:1px solid rgba(255,200,87,0.4);
+    color:var(--accent-gold);
+    padding:9px 14px;border-radius:10px;font-size:13px;font-weight:600;
+    font-family:var(--font-body);cursor:pointer;
+    transition:transform .12s, background .15s;
+  }
+  .copy-btn:active{transform:scale(0.94);}
+  .copy-btn.copied{background:rgba(52,211,153,0.16);border-color:rgba(52,211,153,0.5);color:var(--success);}
+
+  .submit-btn{
+    width:100%;padding:16px;border:none;border-radius:14px;
+    background:linear-gradient(90deg,var(--accent-blue),var(--accent-cyan));
+    color:#04070f;font-family:var(--font-display);font-weight:700;font-size:17px;
+    letter-spacing:0.03em;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    transition:transform .12s, opacity .12s, box-shadow .2s;
+    margin-top:6px;
+    position:relative;overflow:hidden;
+    box-shadow:0 6px 20px rgba(76,224,232,0.18);
+  }
+  .submit-btn::after{
+    content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;
+    background:linear-gradient(120deg, transparent, rgba(255,255,255,0.45), transparent);
+    transform:skewX(-20deg);
+    transition:left .6s ease;
+  }
+  .submit-btn:hover::after{left:130%;}
+  .submit-btn:hover{box-shadow:0 8px 26px rgba(76,224,232,0.3);}
+  .submit-btn:active{transform:scale(0.985);}
+  .submit-btn:disabled{opacity:0.6;cursor:not-allowed;}
+  .spinner{
+    width:16px;height:16px;border:2.5px solid rgba(4,7,15,0.35);
+    border-top-color:#04070f;border-radius:50%;animation:spin .7s linear infinite;
+    display:none;
+  }
+  .submit-btn.loading .spinner{display:inline-block;}
+  .submit-btn.loading .btn-text{display:none;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .hint{font-size:12px;color:var(--text-muted);text-align:center;margin-top:10px;line-height:1.6;}
+  .hint b{color:var(--accent-gold);}
+  .upload-progress-wrap{
+    display:none;width:100%;height:6px;border-radius:999px;
+    background:var(--input-bg);overflow:hidden;margin-top:10px;
+  }
+  .upload-progress-wrap.active{display:block;}
+  .upload-progress-bar{
+    height:100%;width:0%;border-radius:999px;
+    background:linear-gradient(90deg,var(--accent-blue),var(--accent-cyan));
+    transition:width .15s ease;
+  }
+  .upload-progress-label{
+    display:none;text-align:center;font-size:12px;color:var(--text-muted);margin-top:6px;
+  }
+  .upload-progress-label.active{display:block;}
+  .tg-contact{
+    display:flex;align-items:center;justify-content:center;gap:6px;
+    margin-top:8px;padding-top:8px;border-top:1px dashed var(--border-glass);
+    flex-wrap:wrap;
+  }
+  .tg-contact a{color:#29a9eb;font-weight:600;text-decoration:none;}
+  .tg-contact a:hover{text-decoration:underline;}
+
+  .toast{
+    position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(120%);
+    background:var(--panel-solid);border:1px solid var(--border-glass);
+    padding:14px 20px;border-radius:14px;font-size:14px;max-width:90vw;
+    display:flex;align-items:center;gap:10px;z-index:50;
+    transition:transform .3s ease;box-shadow:0 10px 30px rgba(0,0,0,0.4);
+  }
+  .toast.show{transform:translateX(-50%) translateY(0);}
+  .toast.success{border-color:rgba(52,211,153,0.5);}
+  .toast.error{border-color:rgba(251,113,133,0.5);}
+
+  .success-panel{display:none;text-align:center;padding:10px 4px;}
+  .success-panel .check{
+    width:58px;height:58px;border-radius:50%;
+    background:rgba(52,211,153,0.15);border:1.5px solid var(--success);
+    display:flex;align-items:center;justify-content:center;margin:0 auto 14px;
+    font-size:26px;color:var(--success);
+  }
+  .success-panel h3{font-family:var(--font-display);font-size:20px;margin-bottom:6px;}
+  .success-panel .order-id{
+    display:inline-block;background:rgba(255,200,87,0.12);color:var(--accent-gold);
+    padding:6px 14px;border-radius:999px;font-family:var(--font-display);font-weight:700;
+    letter-spacing:0.04em;margin:8px 0 14px;
+  }
+  .success-panel p{color:var(--text-muted);font-size:13.5px;line-height:1.7;margin-bottom:16px;}
+  .new-order-btn{
+    background:transparent;border:1px solid var(--border-glass);color:var(--text-primary);
+    padding:11px 22px;border-radius:12px;font-family:var(--font-body);font-size:14px;
+    cursor:pointer;
+  }
+
+  footer{text-align:center;margin-top:20px;color:var(--text-muted);font-size:12px;}
+
+  /* Theme toggle */
+  .theme-toggle{
+    position:fixed;top:18px;right:18px;z-index:40;
+    display:flex;align-items:center;gap:6px;
+    background:var(--panel);border:1px solid var(--border-glass);
+    border-radius:999px;padding:5px;backdrop-filter:blur(12px);
+    box-shadow:0 4px 16px rgba(0,0,0,0.2);
+  }
+  .theme-toggle button{
+    width:32px;height:32px;border:none;border-radius:50%;
+    background:transparent;color:var(--text-muted);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:background .2s, color .2s;
+  }
+  .theme-toggle button svg{width:16px;height:16px;}
+  .theme-toggle button.active{
+    background:linear-gradient(135deg,var(--accent-blue),var(--accent-cyan));
+    color:#04070f;
+  }
+  .icon{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+</style>
+</head>
+<body>
+
+<div class="theme-toggle" id="themeToggle">
+  <button type="button" id="darkBtn" title="Dark mode" aria-label="Dark mode">
+    <svg class="icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+  </button>
+  <button type="button" id="lightBtn" title="Light mode" aria-label="Light mode">
+    <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+  </button>
+</div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="hero-badge">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M12 2l10 8-10 12L2 10 12 2z" fill="#4ce0e8"/></svg>
+      MOBILE LEGENDS: BANG BANG
+    </div>
+    <h1>King Diamond Store</h1>
+    <p>Diamond Top-up ကို အမြန်ဆုံး၊ စိတ်ချရဆုံး ဝန်ဆောင်မှု</p>
+  </div>
+
+  <!-- FORM CARD -->
+  <form class="card" id="orderForm">
+
+    <div class="section-label"><span class="num">1</span> ကစားသမား အချက်အလက်</div>
+    <div class="row">
+      <div class="field">
+        <label for="playerId">Player ID</label>
+        <input type="text" id="playerId" inputmode="numeric" pattern="[0-9]{6,12}" maxlength="12" placeholder="ဥပမာ 123456789" required>
+      </div>
+      <div class="field">
+        <label for="zoneId">Zone ID</label>
+        <input type="text" id="zoneId" inputmode="numeric" pattern="[0-9]{3,5}" maxlength="5" placeholder="ဥပမာ 2222" required>
+      </div>
+    </div>
+
+    <div class="section-label"><span class="num">2</span> Diamond Pack ရွေးရန်</div>
+    <div class="field" style="margin-bottom:10px;">
+      <select id="packSelect" required>
+        <option value="" disabled selected>-- Pack ရွေးချယ်ပါ --</option>
+      </select>
+    </div>
+    <div class="ticket" id="ticket">
+      <div class="ticket-left">
+        <div class="ticket-diamond"></div>
+        <div>
+          <div class="ticket-label">ရွေးချယ်ထားသော Pack</div>
+          <div class="ticket-pack" id="ticketPack">မရွေးရသေးပါ</div>
+        </div>
+      </div>
+      <div class="ticket-price" id="ticketPrice">0<small>Ks</small></div>
+    </div>
+
+    <div class="section-label" style="margin-top:20px;"><span class="num">3</span> ငွေလွှဲ အထောက်အထား</div>
+    <div class="pay-methods">
+      <div class="pay-chip active" data-method="KBZPay">KBZPay</div>
+      <div class="pay-chip" data-method="WavePay">Wave Pay</div>
+      <div class="pay-chip" data-method="AYAPay">AYA Pay</div>
+      <div class="pay-chip" data-method="UABPay">UAB Pay</div>
+    </div>
+
+    <div class="pay-number">
+      <div class="pay-number-left">
+        <div class="pay-number-icon">
+          <svg class="icon" viewBox="0 0 24 24" style="width:17px;height:17px;"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+        </div>
+        <div>
+          <div class="pay-number-label">ငွေလွှဲရန် ဖုန်းနံပါတ်</div>
+          <div class="pay-number-value" id="payNumber">09 446 627 892</div>
+        </div>
+      </div>
+      <button type="button" class="copy-btn" id="copyBtn">
+        <span id="copyIcon" style="display:flex;">
+          <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        </span> <span id="copyLabel">Copy</span>
+      </button>
+    </div>
+
+    <div class="upload-box" id="uploadBox">
+      <input type="file" id="screenshot" accept="image/*" required>
+      <div class="upload-icon">
+        <svg class="icon" viewBox="0 0 24 24" style="width:24px;height:24px;margin:0 auto;stroke:var(--accent-cyan);"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+      </div>
+      <div class="upload-text" id="uploadText">ငွေလွှဲပြေစာ Screenshot ကို နှိပ်ပြီး တင်ပါ</div>
+      <img class="upload-preview" id="uploadPreview" alt="preview">
+    </div>
+
+    <button type="submit" class="submit-btn" id="submitBtn">
+      <span class="spinner"></span>
+      <span class="btn-text">Order တင်မည်</span>
+    </button>
+    <div class="upload-progress-wrap" id="uploadProgressWrap">
+      <div class="upload-progress-bar" id="uploadProgressBar"></div>
+    </div>
+    <div class="upload-progress-label" id="uploadProgressLabel"></div>
+    <div class="hint">Order တင်ပြီးနောက် <b>၅-၁၀ မိနစ်</b> အတွင်း Diamond ဖြည့်ပေးပါမည်။<br>ပြေစာမှားယွင်းပါက Order နောက်ကျနိုင်ပါသည်။
+      <div class="tg-contact">
+        <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;fill:#29a9eb;flex-shrink:0;"><path d="M21.94 4.11c.27-1.13-.86-2.06-1.9-1.62L2.4 10.13c-1.16.5-1.15 2.16.02 2.64l4.4 1.8 1.86 5.7c.24.73 1.14.96 1.7.44l2.6-2.42 4.5 3.36c.86.64 2.1.18 2.34-.87l3.12-16.67zM8.53 13.32l9.9-6.94c.3-.2.63.2.37.44l-8.15 7.55c-.3.28-.5.65-.55 1.06l-.28 2.2-1.29-4.3z"/></svg>
+        <span>၁၀ မိနစ်အတွင်း Diamond မရောက်သေးပါက Telegram — <a href="https://t.me/kopethaung778" target="_blank" rel="noopener">@kopethaung778</a></span>
+      </div>
+    </div>
+  </form>
+
+  <!-- SUCCESS CARD -->
+  <div class="card success-panel" id="successPanel">
+    <div class="check"><svg class="icon" viewBox="0 0 24 24" style="width:26px;height:26px;stroke-width:2.2;"><path d="M20 6L9 17l-5-5"/></svg></div>
+    <h3>Order တင်ပြီးပါပြီ</h3>
+    <div class="order-id" id="orderIdDisplay">#KDS00000000</div>
+    <p>သင့် Order ကို လက်ခံရရှိပါပြီ။ Admin မှ စစ်ဆေးပြီး Diamond ကို အမြန်ဆုံး ဖြည့်ပေးပါမည်။ ပြသနာရှိပါက Player ID / Zone ID ကို ပြန်စစ်ပေးပါ။</p>
+    <button type="button" class="new-order-btn" id="newOrderBtn">နောက် Order တစ်ခု တင်မည်</button>
+  </div>
+
+  <footer>© King Diamond Store — Powered by King Travel Group</footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- Theme toggle (dark default, in-memory only) ---------- */
+const htmlEl = document.documentElement;
+const darkBtn = document.getElementById('darkBtn');
+const lightBtn = document.getElementById('lightBtn');
+function setTheme(mode){
+  if (mode === 'light') { htmlEl.setAttribute('data-theme', 'light'); }
+  else { htmlEl.removeAttribute('data-theme'); }
+  darkBtn.classList.toggle('active', mode !== 'light');
+  lightBtn.classList.toggle('active', mode === 'light');
+}
+darkBtn.addEventListener('click', () => setTheme('dark'));
+lightBtn.addEventListener('click', () => setTheme('light'));
+setTheme('dark');
+
+/* ---------- Firebase ---------- */
+const firebaseConfig = {
+  apiKey: "AIzaSyAJLqhPU-51twgJw0fp5Q-u9iBwHFx7xA8",
+  authDomain: "king-pos-and-tickets.firebaseapp.com",
+  projectId: "king-pos-and-tickets",
+  storageBucket: "king-pos-and-tickets.firebasestorage.app",
+  messagingSenderId: "870841528478",
+  appId: "1:870841528478:web:a8d145acc8df8073888b8f",
+  measurementId: "G-TRP931BEBD"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+/* ---------- Telegram (via secure proxy — token no longer exposed here) ---------- */
+const TG_PROXY_URL = "https://petazon--56c32efe75f511f186e31607ee4eb77e.web.val.run";
+
+/* ---------- Pack data ---------- */
+const PACKS = [
+  { group: "2X Diamond ✨", items: [
+    { label: "50+50 Diamond", price: 4000 },
+    { label: "150+150 Diamond", price: 11000 },
+    { label: "250+250 Diamond", price: 17500 },
+    { label: "500+500 Diamond", price: 34500 },
+  ]},
+  { group: "Normal Diamond 💎", items: [
+    { label: "11 Diamond", price: 1000 },
+    { label: "22 Diamond", price: 2000 },
+    { label: "33 Diamond", price: 3000 },
+    { label: "44 Diamond", price: 4000 },
+    { label: "56 Diamond", price: 4300 },
+    { label: "86 Diamond", price: 5800 },
+    { label: "112 Diamond", price: 8000 },
+    { label: "172 Diamond", price: 11000 },
+    { label: "257 Diamond", price: 16000 },
+    { label: "343 Diamond", price: 21500 },
+    { label: "429 Diamond", price: 26800 },
+    { label: "514 Diamond", price: 32000 },
+    { label: "600 Diamond", price: 37500 },
+    { label: "706 Diamond", price: 42500 },
+    { label: "878 Diamond", price: 53000 },
+    { label: "1050 Diamond", price: 63500 },
+    { label: "1412 Diamond", price: 85000 },
+    { label: "2195 Diamond", price: 128000 },
+    { label: "3688 Diamond", price: 215000 },
+    { label: "5532 Diamond", price: 320000 },
+    { label: "9288 Diamond", price: 525000 },
+  ]},
+  { group: "Pass & Bundle 🎫", items: [
+    { label: "Weekly Pass", price: 6600 },
+    { label: "Twilight Pass", price: 35500 },
+    { label: "Weekly Elite Bundle", price: 3800 },
+    { label: "Monthly Epic Bundle", price: 17500 },
+  ]},
+  { group: "MM Special Server 🇲🇲", items: [
+    { label: "Weekly Pass (MM)", price: 6300 },
+    { label: "202 Diamond (MM)", price: 11800 },
+    { label: "404 Diamond (MM)", price: 21500 },
+    { label: "829 Diamond (MM)", price: 41000 },
+    { label: "2157 Diamond (MM)", price: 98500 },
+    { label: "3489 Diamond (MM)", price: 156500 },
+    { label: "4362 Diamond (MM)", price: 197000 },
+    { label: "6598 Diamond (MM)", price: 297000 },
+    { label: "8796 Diamond (MM)", price: 395000 },
+    { label: "9625 Diamond (MM)", price: 445000 },
+  ]},
+];
+
+/* ---------- Build dropdown ---------- */
+const packSelect = document.getElementById('packSelect');
+PACKS.forEach((grp, gi) => {
+  const og = document.createElement('optgroup');
+  og.label = grp.group;
+  grp.items.forEach((item, ii) => {
+    const opt = document.createElement('option');
+    opt.value = `${gi}-${ii}`;
+    opt.textContent = `${item.label} — ${item.price.toLocaleString()} Ks`;
+    og.appendChild(opt);
+  });
+  packSelect.appendChild(og);
+});
+
+const ticket = document.getElementById('ticket');
+const ticketPack = document.getElementById('ticketPack');
+const ticketPrice = document.getElementById('ticketPrice');
+
+packSelect.addEventListener('change', () => {
+  const [gi, ii] = packSelect.value.split('-').map(Number);
+  const item = PACKS[gi].items[ii];
+  ticketPack.textContent = item.label;
+  ticketPrice.innerHTML = `${item.price.toLocaleString()}<small>Ks</small>`;
+  ticket.classList.remove('filled');
+  void ticket.offsetWidth; // restart animation
+  ticket.classList.add('filled');
+});
+
+/* ---------- Payment method chips ---------- */
+let selectedMethod = "KBZPay";
+document.querySelectorAll('.pay-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.pay-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    selectedMethod = chip.dataset.method;
+  });
+});
+
+/* ---------- Copy phone number ---------- */
+const copyBtn = document.getElementById('copyBtn');
+const copyLabel = document.getElementById('copyLabel');
+const copyIcon = document.getElementById('copyIcon');
+copyBtn.addEventListener('click', async () => {
+  const number = document.getElementById('payNumber').textContent.trim();
+  try {
+    await navigator.clipboard.writeText(number);
+  } catch (e) {
+    // fallback for older browsers / non-secure context
+    const ta = document.createElement('textarea');
+    ta.value = number;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  }
+  copyBtn.classList.add('copied');
+  copyIcon.innerHTML = '<svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;"><path d="M20 6L9 17l-5-5"/></svg>';
+  copyLabel.textContent = 'ကူးပြီး';
+  showToast('ဖုန်းနံပါတ် Copy ပြီးပါပြီ', 'success');
+  setTimeout(() => {
+    copyBtn.classList.remove('copied');
+    copyIcon.innerHTML = '<svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>';
+    copyLabel.textContent = 'Copy';
+  }, 2000);
+});
+
+/* ---------- Upload preview + validation + compression ---------- */
+const screenshotInput = document.getElementById('screenshot');
+const uploadBox = document.getElementById('uploadBox');
+const uploadPreview = document.getElementById('uploadPreview');
+const uploadText = document.getElementById('uploadText');
+
+const MAX_UPLOAD_MB = 8;
+let compressedFile = null; // holds the file actually sent
+
+// Compress an image file down to a max dimension/quality to speed up upload
+function compressImage(file, maxDim = 1600, quality = 0.82) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let { width, height } = img;
+      if (width > maxDim || height > maxDim) {
+        const scale = maxDim / Math.max(width, height);
+        width = Math.round(width * scale);
+        height = Math.round(height * scale);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      canvas.toBlob(blob => {
+        if (!blob) { reject(new Error('COMPRESS_FAILED')); return; }
+        resolve(new File([blob], file.name.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' }));
+      }, 'image/jpeg', quality);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('IMAGE_LOAD_FAILED')); };
+    img.src = url;
+  });
+}
+
+screenshotInput.addEventListener('change', async () => {
+  const file = screenshotInput.files[0];
+  if (!file) return;
+
+  if (!file.type.startsWith('image/')) {
+    showToast("ပုံဖိုင် (Image) သာ တင်ပေးပါ", "error");
+    screenshotInput.value = '';
+    compressedFile = null;
+    return;
+  }
+  if (file.size > MAX_UPLOAD_MB * 1024 * 1024) {
+    showToast(`ပုံဖိုင်အရွယ်အစား ${MAX_UPLOAD_MB}MB အောက်သာ တင်ပေးပါ`, "error");
+    screenshotInput.value = '';
+    compressedFile = null;
+    return;
+  }
+
+  uploadBox.classList.add('has-file');
+  uploadText.textContent = 'ပုံပြင်ဆင်နေသည်...';
+
+  try {
+    compressedFile = await compressImage(file);
+  } catch (err) {
+    console.error(err);
+    compressedFile = file; // fallback to original if compression fails
+  }
+
+  uploadText.textContent = file.name;
+  const reader = new FileReader();
+  reader.onload = e => {
+    uploadPreview.src = e.target.result;
+    uploadPreview.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+});
+
+/* ---------- Toast ---------- */
+function showToast(msg, type = "success") {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.className = `toast show ${type}`;
+  setTimeout(() => toast.classList.remove('show'), type === "error" ? 9000 : 3800);
+}
+
+/* ---------- Submit ---------- */
+const form = document.getElementById('orderForm');
+const submitBtn = document.getElementById('submitBtn');
+const progressWrap = document.getElementById('uploadProgressWrap');
+const progressBar = document.getElementById('uploadProgressBar');
+const progressLabel = document.getElementById('uploadProgressLabel');
+
+const ID_PATTERN = /^[0-9]{6,12}$/;
+const ZONE_PATTERN = /^[0-9]{3,5}$/;
+const COOLDOWN_MS = 20000; // minimum gap between two orders, prevents spam/duplicate submits
+let lastOrderAt = 0;
+
+function setProgress(pct, label) {
+  progressWrap.classList.add('active');
+  progressLabel.classList.add('active');
+  progressBar.style.width = pct + '%';
+  progressLabel.textContent = label;
+}
+function resetProgress() {
+  progressWrap.classList.remove('active');
+  progressLabel.classList.remove('active');
+  progressBar.style.width = '0%';
+  progressLabel.textContent = '';
+}
+
+// Sends the photo to our secure proxy (which holds the bot token) so we can
+// still show real upload progress, without exposing the token to the browser
+function sendToTelegramWithProgress(fd) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', TG_PROXY_URL);
+    xhr.upload.onprogress = (evt) => {
+      if (evt.lengthComputable) {
+        const pct = Math.round((evt.loaded / evt.total) * 100);
+        setProgress(pct, `ငွေလွှဲပြေစာ ပို့နေသည်... ${pct}%`);
+      }
+    };
+    xhr.onload = () => {
+      try { resolve(JSON.parse(xhr.responseText)); }
+      catch (e) { reject(new Error('TELEGRAM_PARSE')); }
+    };
+    xhr.onerror = () => reject(new Error('TELEGRAM_NETWORK'));
+    xhr.send(fd);
+  });
+}
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const playerId = document.getElementById('playerId').value.trim();
+  const zoneId = document.getElementById('zoneId').value.trim();
+  const file = compressedFile || screenshotInput.files[0];
+
+  // Client-side validation
+  if (!ID_PATTERN.test(playerId)) { showToast("Player ID မှားနေပါသည် — ဂဏန်း ၆-၁၂ လုံးသာ ထည့်ပါ", "error"); return; }
+  if (!ZONE_PATTERN.test(zoneId)) { showToast("Zone ID မှားနေပါသည် — ဂဏန်း ၃-၅ လုံးသာ ထည့်ပါ", "error"); return; }
+  if (!packSelect.value) { showToast("Diamond Pack ရွေးချယ်ပေးပါ", "error"); return; }
+  if (!file) { showToast("ငွေလွှဲပြေစာ Screenshot တင်ပေးပါ", "error"); return; }
+
+  // Spam / duplicate-submit guard
+  const now = Date.now();
+  if (now - lastOrderAt < COOLDOWN_MS) {
+    const waitSec = Math.ceil((COOLDOWN_MS - (now - lastOrderAt)) / 1000);
+    showToast(`ခဏစောင့်ပေးပါ — ${waitSec} စက္ကန့်အကြာမှ ထပ်တင်နိုင်ပါမည်`, "error");
+    return;
+  }
+
+  const [gi, ii] = packSelect.value.split('-').map(Number);
+  const item = PACKS[gi].items[ii];
+  const orderId = "KDS" + Date.now().toString().slice(-8);
+
+  submitBtn.classList.add('loading');
+  submitBtn.disabled = true;
+  setProgress(0, 'Order စာရင်းသွင်းနေသည်...');
+
+  try {
+    // 1) Save order to Firestore FIRST — this is the source of truth.
+    //    If this fails, nothing else happens and the user sees a clear error.
+    try {
+      await db.collection("orders").add({
+        orderId,
+        playerId,
+        zoneId,
+        packLabel: item.label,
+        packPrice: item.price,
+        paymentMethod: selectedMethod,
+        status: "pending",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    } catch (fsErr) {
+      throw new Error("FIRESTORE: " + fsErr.message);
+    }
+
+    // 2) Notify admin via Telegram — best effort. If this fails, the order
+    //    still exists in Firestore, so we don't block success on it.
+    const caption =
+      `🆕 Order အသစ် #${orderId}\n` +
+      `👤 Player ID: ${playerId}\n` +
+      `🌍 Zone ID: ${zoneId}\n` +
+      `💎 Pack: ${item.label}\n` +
+      `💰 ဈေးနှုန်း: ${item.price.toLocaleString()} Ks\n` +
+      `💳 ငွေလွှဲနည်း: ${selectedMethod}\n` +
+      `🕒 ${new Date().toLocaleString('en-GB', { timeZone: 'Asia/Yangon' })}`;
+
+    const fd = new FormData();
+    fd.append("caption", caption);
+    fd.append("photo", file);
+
+    try {
+      const tgJson = await sendToTelegramWithProgress(fd);
+      if (!tgJson.ok) console.error("TELEGRAM_API:", tgJson.description || "unknown");
+    } catch (tgErr) {
+      console.error("Telegram notify failed (order already saved):", tgErr);
+    }
+
+    // 3) Show success
+    lastOrderAt = Date.now();
+    document.getElementById('orderIdDisplay').textContent = "#" + orderId;
+    form.style.display = 'none';
+    document.getElementById('successPanel').style.display = 'block';
+
+  } catch (err) {
+    console.error(err);
+    showToast("အမှား: " + err.message, "error");
+  } finally {
+    submitBtn.classList.remove('loading');
+    submitBtn.disabled = false;
+    resetProgress();
+  }
+});
+
+document.getElementById('newOrderBtn').addEventListener('click', () => {
+  form.reset();
+  form.style.display = 'block';
+  document.getElementById('successPanel').style.display = 'none';
+  uploadBox.classList.remove('has-file');
+  uploadPreview.style.display = 'none';
+  uploadText.textContent = 'ငွေလွှဲပြေစာ Screenshot ကို နှိပ်ပြီး တင်ပါ';
+  compressedFile = null;
+  ticket.classList.remove('filled');
+  ticketPack.textContent = 'မရွေးရသေးပါ';
+  ticketPrice.innerHTML = '0<small>Ks</small>';
+  document.querySelectorAll('.pay-chip').forEach(c => c.classList.remove('active'));
+  document.querySelector('.pay-chip[data-method="KBZPay"]').classList.add('active');
+  selectedMethod = "KBZPay";
+});
+
+/* ---------- Ambient floating diamonds ---------- */
+for (let i = 0; i < 6; i++) {
+  const p = document.createElement('div');
+  p.className = 'particle';
+  const size = 10 + Math.random() * 18;
+  p.style.width = size + 'px';
+  p.style.height = size + 'px';
+  p.style.left = Math.random() * 100 + 'vw';
+  p.style.top = Math.random() * 100 + 'vh';
+  p.style.animationDelay = (Math.random() * 8) + 's';
+  p.style.animationDuration = (10 + Math.random() * 10) + 's';
+  document.body.appendChild(p);
+}
+</script>
+</body>
+</html>
