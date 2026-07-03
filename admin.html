@@ -122,6 +122,7 @@
   }
   .act-btn.approve{background:var(--success);color:#06251a;}
   .act-btn.reject{background:var(--danger);color:#2b0810;}
+  .act-btn.delete{background:transparent;color:var(--danger);border:1px solid var(--danger);}
   .act-btn:disabled{opacity:.5;cursor:not-allowed;}
   .empty-state{text-align:center;padding:60px 20px;color:var(--text-muted);}
 
@@ -318,13 +319,29 @@
           ` : `
             <button class="act-btn approve" data-action="pending" data-id="${o.id}">↺ Re-open</button>
           `}
+          <button class="act-btn delete" data-delete-id="${o.id}" data-order-label="#${o.orderId || o.id.slice(0,8)}">🗑 Delete</button>
         </div>
       </div>
     `).join('');
 
-    list.querySelectorAll('.act-btn').forEach(btn => {
+    list.querySelectorAll('.act-btn[data-action]').forEach(btn => {
       btn.addEventListener('click', () => updateStatus(btn.dataset.id, btn.dataset.action, btn));
     });
+    list.querySelectorAll('.act-btn.delete').forEach(btn => {
+      btn.addEventListener('click', () => deleteOrder(btn.dataset.deleteId, btn.dataset.orderLabel, btn));
+    });
+  }
+
+  async function deleteOrder(docId, label, btn) {
+    if (!confirm(`Order ${label} ကို အပြီးဖျက်မှာ သေချာလား? ဒါကို ပြန်ရအောင်လုပ်လို့ မရတော့ပါဘူး။`)) return;
+    btn.disabled = true;
+    try {
+      await db.collection('orders').doc(docId).delete();
+    } catch (err) {
+      console.error(err);
+      alert("Delete fail ဖြစ်ပါတယ်: " + err.message);
+      btn.disabled = false;
+    }
   }
 
   async function updateStatus(docId, newStatus, btn) {
