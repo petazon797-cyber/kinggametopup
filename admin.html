@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — Diamond Orders</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Noto+Sans+Myanmar:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-void:#090b16;
+    --bg-void-2:#0d1128;
+    --panel:rgba(22,27,51,0.62);
+    --panel-solid:#141a34;
+    --border-glass:rgba(255,255,255,0.09);
+    --input-bg:rgba(9,11,22,0.55);
+    --accent-blue:#5b7fff;
+    --accent-cyan:#4ce0e8;
+    --accent-gold:#ffc857;
+    --text-primary:#edeff7;
+    --text-muted:#8d93b0;
+    --success:#34d399;
+    --danger:#fb7185;
+    --font-display:'Rajdhani',sans-serif;
+    --font-body:'Noto Sans Myanmar','Rajdhani',sans-serif;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:var(--font-body);
+    background:linear-gradient(180deg, var(--bg-void) 0%, var(--bg-void-2) 100%);
+    color:var(--text-primary);
+    min-height:100vh;
+    padding:24px 16px 60px;
+  }
+  .wrap{max-width:1100px;margin:0 auto;}
+
+  /* ---------- Login ---------- */
+  #loginScreen{
+    max-width:380px;margin:14vh auto 0;
+    background:var(--panel);border:1px solid var(--border-glass);
+    border-radius:var(--radius);padding:32px 28px;
+    backdrop-filter:blur(14px);
+  }
+  #loginScreen h1{
+    font-family:var(--font-display);font-size:22px;font-weight:700;
+    margin-bottom:6px;text-align:center;
+  }
+  #loginScreen p.sub{color:var(--text-muted);font-size:13px;text-align:center;margin-bottom:22px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:13px;color:var(--text-muted);margin-bottom:6px;}
+  .field input{
+    width:100%;padding:11px 12px;border-radius:10px;
+    background:var(--input-bg);border:1px solid var(--border-glass);
+    color:var(--text-primary);font-family:var(--font-body);font-size:14.5px;
+    outline:none;
+  }
+  .field input:focus{border-color:var(--accent-cyan);}
+  .btn{
+    width:100%;padding:12px;border-radius:10px;border:none;cursor:pointer;
+    font-family:var(--font-display);font-weight:700;font-size:15px;letter-spacing:.3px;
+    background:linear-gradient(135deg,var(--accent-cyan),var(--accent-blue));
+    color:#06111f;
+  }
+  .btn:disabled{opacity:.6;cursor:not-allowed;}
+  #loginError{
+    color:var(--danger);font-size:13px;text-align:center;margin-top:12px;display:none;
+  }
+
+  /* ---------- Dashboard shell ---------- */
+  #dashboard{display:none;}
+  header.top{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:22px;flex-wrap:wrap;gap:12px;
+  }
+  header.top h1{font-family:var(--font-display);font-size:24px;font-weight:700;}
+  header.top .who{color:var(--text-muted);font-size:13px;}
+  .logout-btn{
+    padding:8px 16px;border-radius:999px;border:1px solid var(--border-glass);
+    background:var(--panel);color:var(--text-primary);font-size:13px;cursor:pointer;
+  }
+
+  /* ---------- Stats ---------- */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+  .stat-card{
+    background:var(--panel);border:1px solid var(--border-glass);
+    border-radius:14px;padding:16px;text-align:center;
+  }
+  .stat-card .num{font-family:var(--font-display);font-size:26px;font-weight:700;}
+  .stat-card .lbl{color:var(--text-muted);font-size:12px;margin-top:2px;}
+  .stat-card.pending .num{color:var(--accent-gold);}
+  .stat-card.completed .num{color:var(--success);}
+  .stat-card.rejected .num{color:var(--danger);}
+
+  /* ---------- Filter tabs ---------- */
+  .tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+  .tab{
+    padding:8px 16px;border-radius:999px;font-size:13px;cursor:pointer;
+    background:var(--panel);border:1px solid var(--border-glass);color:var(--text-muted);
+  }
+  .tab.active{background:linear-gradient(135deg,var(--accent-cyan),var(--accent-blue));color:#06111f;font-weight:600;border-color:transparent;}
+
+  /* ---------- Order cards ---------- */
+  #ordersList{display:flex;flex-direction:column;gap:12px;}
+  .order-card{
+    background:var(--panel);border:1px solid var(--border-glass);
+    border-radius:14px;padding:16px 18px;
+    display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;
+  }
+  .order-main{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;align-items:center;}
+  .order-main .col .k{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;}
+  .order-main .col .v{font-size:14.5px;font-weight:600;margin-top:2px;}
+  .badge{
+    display:inline-block;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:600;
+  }
+  .badge.pending{background:rgba(255,200,87,.15);color:var(--accent-gold);}
+  .badge.completed{background:rgba(52,211,153,.15);color:var(--success);}
+  .badge.rejected{background:rgba(251,113,133,.15);color:var(--danger);}
+  .order-actions{display:flex;gap:8px;}
+  .act-btn{
+    padding:8px 14px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:600;
+  }
+  .act-btn.approve{background:var(--success);color:#06251a;}
+  .act-btn.reject{background:var(--danger);color:#2b0810;}
+  .act-btn:disabled{opacity:.5;cursor:not-allowed;}
+  .empty-state{text-align:center;padding:60px 20px;color:var(--text-muted);}
+
+  @media (max-width:800px){
+    .stats{grid-template-columns:repeat(2,1fr);}
+    .order-card{grid-template-columns:1fr;}
+    .order-main{grid-template-columns:repeat(2,1fr);}
+    .order-actions{justify-content:flex-end;}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- ---------- Login ---------- -->
+  <div id="loginScreen">
+    <h1>🔐 Admin Login</h1>
+    <p class="sub">Diamond Order Dashboard</p>
+    <div class="field">
+      <label for="loginEmail">Email</label>
+      <input type="email" id="loginEmail" autocomplete="username" placeholder="admin@example.com">
+    </div>
+    <div class="field">
+      <label for="loginPassword">Password</label>
+      <input type="password" id="loginPassword" autocomplete="current-password" placeholder="••••••••">
+    </div>
+    <button class="btn" id="loginBtn">Login</button>
+    <div id="loginError"></div>
+  </div>
+
+  <!-- ---------- Dashboard ---------- -->
+  <div id="dashboard">
+    <header class="top">
+      <div>
+        <h1>💎 Diamond Orders</h1>
+        <div class="who" id="whoAmI"></div>
+      </div>
+      <button class="logout-btn" id="logoutBtn">Logout</button>
+    </header>
+
+    <div class="stats">
+      <div class="stat-card"><div class="num" id="statTotal">0</div><div class="lbl">Total</div></div>
+      <div class="stat-card pending"><div class="num" id="statPending">0</div><div class="lbl">Pending</div></div>
+      <div class="stat-card completed"><div class="num" id="statCompleted">0</div><div class="lbl">Completed</div></div>
+      <div class="stat-card rejected"><div class="num" id="statRejected">0</div><div class="lbl">Rejected</div></div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" data-filter="pending">Pending</div>
+      <div class="tab" data-filter="completed">Completed</div>
+      <div class="tab" data-filter="rejected">Rejected</div>
+      <div class="tab" data-filter="all">All</div>
+    </div>
+
+    <div id="ordersList"></div>
+  </div>
+
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAJLqhPU-51twgJw0fp5Q-u9iBwHFx7xA8",
+    authDomain: "king-pos-and-tickets.firebaseapp.com",
+    projectId: "king-pos-and-tickets",
+    storageBucket: "king-pos-and-tickets.firebasestorage.app",
+    messagingSenderId: "870841528478",
+    appId: "1:870841528478:web:a8d145acc8df8073888b8f"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  /* ---------- Auth ---------- */
+  const loginScreen = document.getElementById('loginScreen');
+  const dashboard = document.getElementById('dashboard');
+  const loginBtn = document.getElementById('loginBtn');
+  const loginError = document.getElementById('loginError');
+
+  loginBtn.addEventListener('click', async () => {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    loginBtn.disabled = true;
+    loginBtn.textContent = "Logging in...";
+    loginError.style.display = 'none';
+    try {
+      await auth.signInWithEmailAndPassword(email, password);
+    } catch (err) {
+      loginError.textContent = "Login မှားနေပါသည် — Email/Password ကို ပြန်စစ်ပါ";
+      loginError.style.display = 'block';
+    } finally {
+      loginBtn.disabled = false;
+      loginBtn.textContent = "Login";
+    }
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', () => auth.signOut());
+
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      loginScreen.style.display = 'none';
+      dashboard.style.display = 'block';
+      document.getElementById('whoAmI').textContent = user.email;
+      startListening();
+    } else {
+      loginScreen.style.display = 'block';
+      dashboard.style.display = 'none';
+      if (unsubscribe) unsubscribe();
+    }
+  });
+
+  /* ---------- Orders ---------- */
+  let allOrders = [];
+  let currentFilter = 'pending';
+  let unsubscribe = null;
+
+  function startListening() {
+    unsubscribe = db.collection('orders')
+      .orderBy('createdAt', 'desc')
+      .limit(300)
+      .onSnapshot(snap => {
+        allOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderStats();
+        renderOrders();
+      }, err => {
+        console.error(err);
+      });
+  }
+
+  function renderStats() {
+    document.getElementById('statTotal').textContent = allOrders.length;
+    document.getElementById('statPending').textContent = allOrders.filter(o => o.status === 'pending').length;
+    document.getElementById('statCompleted').textContent = allOrders.filter(o => o.status === 'completed').length;
+    document.getElementById('statRejected').textContent = allOrders.filter(o => o.status === 'rejected').length;
+  }
+
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentFilter = tab.dataset.filter;
+      renderOrders();
+    });
+  });
+
+  function fmtTime(ts) {
+    if (!ts || !ts.toDate) return '—';
+    return ts.toDate().toLocaleString('en-GB', { timeZone: 'Asia/Yangon', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+  }
+
+  function renderOrders() {
+    const list = document.getElementById('ordersList');
+    const filtered = currentFilter === 'all' ? allOrders : allOrders.filter(o => o.status === currentFilter);
+
+    if (filtered.length === 0) {
+      list.innerHTML = `<div class="empty-state">Order မရှိသေးပါ</div>`;
+      return;
+    }
+
+    list.innerHTML = filtered.map(o => `
+      <div class="order-card" data-id="${o.id}">
+        <div class="order-main">
+          <div class="col">
+            <div class="k">Order</div>
+            <div class="v">#${o.orderId || o.id.slice(0,8)}</div>
+          </div>
+          <div class="col">
+            <div class="k">Player / Zone</div>
+            <div class="v">${escapeHtml(o.playerId)} / ${escapeHtml(o.zoneId)}</div>
+          </div>
+          <div class="col">
+            <div class="k">Pack</div>
+            <div class="v">${escapeHtml(o.packLabel)}</div>
+          </div>
+          <div class="col">
+            <div class="k">Price</div>
+            <div class="v">${(o.packPrice || 0).toLocaleString()} Ks</div>
+          </div>
+          <div class="col">
+            <div class="k">Status / Time</div>
+            <div class="v">
+              <span class="badge ${o.status}">${o.status}</span>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">${fmtTime(o.createdAt)}</div>
+            </div>
+          </div>
+        </div>
+        <div class="order-actions">
+          ${o.status === 'pending' ? `
+            <button class="act-btn approve" data-action="completed" data-id="${o.id}">✓ Approve</button>
+            <button class="act-btn reject" data-action="rejected" data-id="${o.id}">✕ Reject</button>
+          ` : `
+            <button class="act-btn approve" data-action="pending" data-id="${o.id}">↺ Re-open</button>
+          `}
+        </div>
+      </div>
+    `).join('');
+
+    list.querySelectorAll('.act-btn').forEach(btn => {
+      btn.addEventListener('click', () => updateStatus(btn.dataset.id, btn.dataset.action, btn));
+    });
+  }
+
+  async function updateStatus(docId, newStatus, btn) {
+    btn.disabled = true;
+    try {
+      await db.collection('orders').doc(docId).update({
+        status: newStatus,
+        reviewedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        reviewedBy: auth.currentUser.email
+      });
+    } catch (err) {
+      console.error(err);
+      alert("Update fail ဖြစ်ပါတယ်: " + err.message);
+      btn.disabled = false;
+    }
+  }
+
+  function escapeHtml(str) {
+    return String(str ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+</script>
+</body>
+</html>
