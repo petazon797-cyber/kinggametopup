@@ -552,7 +552,8 @@ const db = firebase.firestore();
 const TG_PROXY_URL = "https://petazon--56c32efe75f511f186e31607ee4eb77e.web.val.run";
 
 /* ---------- Pack data ---------- */
-const PACKS = [
+/* ---------- Fallback pack data (used only if Google Sheet fetch fails) ---------- */
+const FALLBACK_PACKS = [
   { group: "2X Diamond ✨", items: [
     { label: "50+50 Diamond", price: 4000 },
     { label: "150+150 Diamond", price: 11000 },
@@ -602,19 +603,114 @@ const PACKS = [
   ]},
 ];
 
+/* ---------- Live prices from Google Sheet ---------- */
+// ⚠️ ဒီ URL ကို Google Sheet ရဲ့ "Publish to web" CSV link နဲ့ အစားထိုးပါ
+// (File > Share > Publish to web > CSV format > Publish)
+const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQv_v2oYMMH78iRI_U2lrXzlBrb0ziWVIC00NW-uVpGkECdbQFWv0noDl6A96itdFi-Ay43lONKW8zr/pub?output=csv";
+
+let PACKS = [];
+
+// Minimal CSV parser — handles quoted fields containing commas
+function parseCSV(text) {
+  const rows = [];
+  let row = [], field = '', inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i], next = text[i + 1];
+    if (inQuotes) {
+      if (c === '"' && next === '"') { field += '"'; i++; }
+      else if (c === '"') { inQuotes = false; }
+      else { field += c; }
+    } else {
+      if (c === '"') inQuotes = true;
+      else if (c === ',') { row.push(field); field = ''; }
+      else if (c === '\n' || c === '\r') {
+        if (c === '\r' && next === '\n') i++;
+        row.push(field); field = '';
+        if (row.some(v => v !== '')) rows.push(row);
+        row = [];
+      } else { field += c; }
+    }
+  }
+  if (field !== '' || row.length) { row.push(field); rows.push(row); }
+  return rows;
+}
+
+// Matches your real sheet layout: a title/exchange-rate row at the top,
+// then a header row containing "Package", "Diamond Amount", "Profitable"
+// (column order doesn't matter). "Package" is only filled on the first
+// row of each group and left blank on the rows below it (merged-cell
+// style) — we carry the last-seen Package name down onto blank rows.
+// "Profitable" is used as the customer-facing price.
+function rowsToPacks(rows) {
+  if (!rows.length) return [];
+
+  // Find the header row (the row that contains a "Package" cell) instead
+  // of assuming row 1, since row 1 may be a title / exchange-rate row.
+  const headerIdx = rows.findIndex(r =>
+    r.some(cell => cell.trim().toLowerCase() === 'package')
+  );
+  if (headerIdx === -1) return [];
+
+  const header = rows[headerIdx].map(h => h.trim().toLowerCase());
+  const pkgI = header.indexOf('package');
+  const amtI = header.indexOf('diamond amount');
+  const priceI = header.indexOf('profitable');
+  if (pkgI === -1 || amtI === -1 || priceI === -1) return [];
+
+  const groupOrder = [];
+  const groupMap = new Map();
+  let lastGroup = '';
+
+  for (let i = headerIdx + 1; i < rows.length; i++) {
+    const r = rows[i];
+    const pkgCell = (r[pkgI] || '').trim();
+    if (pkgCell) lastGroup = pkgCell;
+
+    const amount = (r[amtI] || '').trim();
+    const price = Number((r[priceI] || '').replace(/[,\s]/g, ''));
+    if (!lastGroup || !amount || !Number.isFinite(price) || price <= 0) continue;
+
+    const label = /diamond|pass|pack/i.test(amount) ? amount : `${amount} Diamond`;
+
+    if (!groupMap.has(lastGroup)) { groupMap.set(lastGroup, []); groupOrder.push(lastGroup); }
+    groupMap.get(lastGroup).push({ label, price });
+  }
+  return groupOrder.map(group => ({ group, items: groupMap.get(group) }));
+}
+
+async function loadPacks() {
+  try {
+    const res = await fetch(SHEET_CSV_URL + (SHEET_CSV_URL.includes('?') ? '&' : '?') + 'ts=' + Date.now());
+    if (!res.ok) throw new Error('SHEET_FETCH_FAILED');
+    const parsed = rowsToPacks(parseCSV(await res.text()));
+    if (!parsed.length) throw new Error('SHEET_EMPTY_OR_MISFORMATTED');
+    PACKS = parsed;
+  } catch (err) {
+    console.error('Google Sheet ကနေ ဈေးနှုန်း ဆွဲမရပါ, fallback ဈေးနှုန်းဟောင်း သုံးထားပါတယ်:', err);
+    PACKS = FALLBACK_PACKS;
+    showToast("ဈေးနှုန်းအသစ် sync မဖြစ်သေးပါ — နောက်ဆုံးသိမ်းထားသော ဈေးနှုန်းများ ပြသနေပါသည်", "error");
+  }
+  buildPackDropdown();
+}
+
 /* ---------- Build dropdown ---------- */
 const packSelect = document.getElementById('packSelect');
-PACKS.forEach((grp, gi) => {
-  const og = document.createElement('optgroup');
-  og.label = grp.group;
-  grp.items.forEach((item, ii) => {
-    const opt = document.createElement('option');
-    opt.value = `${gi}-${ii}`;
-    opt.textContent = `${item.label} — ${item.price.toLocaleString()} Ks`;
-    og.appendChild(opt);
+function buildPackDropdown() {
+  packSelect.innerHTML = '<option value="" disabled selected>Diamond Pack ရွေးချယ်ပါ</option>';
+  PACKS.forEach((grp, gi) => {
+    const og = document.createElement('optgroup');
+    og.label = grp.group;
+    grp.items.forEach((item, ii) => {
+      const opt = document.createElement('option');
+      opt.value = `${gi}-${ii}`;
+      opt.textContent = `${item.label} — ${item.price.toLocaleString()} Ks`;
+      og.appendChild(opt);
+    });
+    packSelect.appendChild(og);
   });
-  packSelect.appendChild(og);
-});
+}
+packSelect.innerHTML = '<option value="" disabled selected>ဈေးနှုန်းများ Load နေသည်...</option>';
+loadPacks();
 
 const ticket = document.getElementById('ticket');
 const ticketPack = document.getElementById('ticketPack');
