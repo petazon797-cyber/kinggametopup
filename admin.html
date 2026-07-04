@@ -294,15 +294,15 @@
           </div>
           <div class="col">
             <div class="k">Player / Zone</div>
-            <div class="v">${escapeHtml(o.playerId)} / ${escapeHtml(o.zoneId)}</div>
+            <div class="v">${escapeHtml(o.playerId)} / ${escapeHtml(o.zoneId)}${o.username ? `<div style="font-size:11px;color:var(--success);margin-top:2px;">${escapeHtml(o.username)}</div>` : ''}</div>
           </div>
           <div class="col">
             <div class="k">Pack</div>
-            <div class="v">${escapeHtml(o.packLabel)}</div>
+            <div class="v">${escapeHtml(o.packLabel)}${o.quantity && o.quantity > 1 ? ` x${o.quantity}` : ''}</div>
           </div>
           <div class="col">
-            <div class="k">Price</div>
-            <div class="v">${(o.packPrice || 0).toLocaleString()} Ks</div>
+            <div class="k">Total</div>
+            <div class="v">${(o.totalPrice || o.packPrice || 0).toLocaleString()} Ks</div>
           </div>
           <div class="col">
             <div class="k">Status / Time</div>
@@ -312,6 +312,7 @@
             </div>
           </div>
         </div>
+        ${o.email ? `<div style="font-size:11.5px;color:var(--text-muted);margin-top:6px;">✉️ ${escapeHtml(o.email)}</div>` : ''}
         <div class="order-actions">
           ${o.status === 'pending' ? `
             <button class="act-btn approve" data-action="completed" data-id="${o.id}">✓ Approve</button>
