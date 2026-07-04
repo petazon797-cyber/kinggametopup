@@ -364,6 +364,64 @@
   #refreshPriceBtn svg{stroke:#06111f;}
   #refreshPriceBtn:active{transform:scale(0.96);}
 
+  /* ---------- Pack selection cards ---------- */
+  .pack-group-label{
+    font-size:12.5px;font-weight:700;color:var(--accent-cyan);
+    text-transform:uppercase;letter-spacing:.5px;
+    margin:14px 0 8px;
+  }
+  .pack-group-label:first-child{margin-top:0;}
+  .server-grid{
+    display:grid;grid-template-columns:repeat(2,1fr);gap:12px;
+  }
+  .server-card{
+    background:var(--input-bg);border:1.5px solid var(--border-glass);
+    border-radius:16px;padding:22px 14px;text-align:center;cursor:pointer;
+    transition:border-color .15s, transform .1s, background .15s;
+  }
+  .server-card:active{transform:scale(0.97);}
+  .server-icon{
+    display:flex;align-items:center;justify-content:center;
+    height:38px;margin-bottom:8px;
+  }
+  .server-name{font-size:15px;font-weight:700;color:var(--text-primary);}
+  .server-sub{font-size:11.5px;color:var(--text-muted);margin-top:3px;}
+  .server-card.selected{
+    border-color:var(--accent-cyan);
+    background:linear-gradient(135deg, rgba(76,224,232,.14), rgba(91,127,255,.10));
+  }
+  .pack-empty-msg{color:var(--text-muted);font-size:13px;padding:10px 0;}
+  .pack-grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+    gap:10px;margin-bottom:6px;
+  }
+  .pack-card{
+    background:var(--input-bg);border:1.5px solid var(--border-glass);
+    border-radius:12px;padding:12px 10px;cursor:pointer;text-align:center;
+    transition:border-color .15s, transform .1s, background .15s;
+  }
+  .pack-card:active{transform:scale(0.96);}
+  .pack-card .pc-label{font-size:13.5px;font-weight:600;color:var(--text-primary);}
+  .pack-card .pc-price{font-size:12.5px;color:var(--text-muted);margin-top:4px;}
+  .pack-card.selected{
+    border-color:var(--accent-cyan);
+    background:linear-gradient(135deg, rgba(76,224,232,.14), rgba(91,127,255,.10));
+  }
+  .pack-card.selected .pc-price{color:var(--accent-cyan);font-weight:700;}
+
+  /* ---------- Reveal-after-selection section ---------- */
+  .reveal-section{
+    display:none;
+    opacity:0;
+    transform:translateY(-6px);
+    transition:opacity .35s ease, transform .35s ease;
+  }
+  .reveal-section.shown{
+    display:block;
+    opacity:1;
+    transform:translateY(0);
+  }
+
   .toast{
     position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(120%);
     background:var(--panel-solid);border:1px solid var(--border-glass);
@@ -396,6 +454,48 @@
   }
 
   footer{text-align:center;margin-top:20px;color:var(--text-muted);font-size:12px;}
+
+  /* Help tooltip */
+  .help-btn{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:18px;height:18px;border-radius:50%;border:1px solid var(--border-glass);
+    background:transparent;color:var(--text-muted);font-size:11px;font-weight:700;
+    cursor:pointer;margin-left:6px;vertical-align:middle;
+  }
+  .help-btn:hover, .help-btn.active{border-color:var(--accent-cyan);color:var(--accent-cyan);}
+  .id-help-box{
+    display:none;background:var(--input-bg);border:1px solid var(--border-glass);
+    border-radius:10px;padding:12px 14px;font-size:12.5px;line-height:1.7;
+    color:var(--text-muted);margin:8px 0 14px;
+  }
+  .id-help-box.shown{display:block;}
+  .id-help-box b{color:var(--text-primary);}
+
+  /* Inline field validation */
+  .field-error{
+    display:none;color:var(--danger);font-size:11.5px;margin-top:5px;
+  }
+  .field-error.shown{display:block;}
+  .field input.invalid{border-color:var(--danger);}
+
+  /* Success panel order summary */
+  .order-id-row{display:flex;align-items:center;justify-content:center;gap:8px;margin:8px 0 14px;}
+  .copy-id-btn{
+    width:26px;height:26px;border-radius:8px;border:1px solid var(--border-glass);
+    background:var(--input-bg);color:var(--text-muted);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .copy-id-btn:hover{color:var(--accent-cyan);border-color:var(--accent-cyan);}
+  .order-summary{
+    background:var(--input-bg);border:1px solid var(--border-glass);border-radius:12px;
+    padding:12px 16px;margin-bottom:16px;text-align:left;
+  }
+  .order-summary .os-row{
+    display:flex;justify-content:space-between;font-size:13px;padding:5px 0;
+  }
+  .order-summary .os-row + .os-row{border-top:1px dashed var(--border-glass);}
+  .order-summary .os-k{color:var(--text-muted);}
+  .order-summary .os-v{font-weight:600;color:var(--text-primary);}
 
   /* Theme toggle */
   .theme-toggle{
@@ -453,82 +553,124 @@
   <!-- FORM CARD -->
   <form class="card" id="orderForm">
 
-    <div class="section-label"><span class="num">1</span> ကစားသမား အချက်အလက်</div>
-    <div class="row">
-      <div class="field">
-        <label for="playerId">Player ID</label>
-        <input type="text" id="playerId" inputmode="numeric" pattern="[0-9]{6,12}" maxlength="12" placeholder="ဥပမာ 123456789" required>
+    <div class="section-label"><span class="num">1</span> Server ရွေးရန်</div>
+    <div class="server-grid" id="serverGrid">
+      <div class="server-card" data-server="global">
+        <div class="server-icon">
+          <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="var(--accent-cyan)" stroke-width="1.6">
+            <circle cx="12" cy="12" r="9.5"/>
+            <ellipse cx="12" cy="12" rx="4.3" ry="9.5"/>
+            <line x1="2.5" y1="12" x2="21.5" y2="12"/>
+            <path d="M4.2 6.8c1.9 1.3 4.9 2.1 7.8 2.1s5.9-.8 7.8-2.1"/>
+            <path d="M4.2 17.2c1.9-1.3 4.9-2.1 7.8-2.1s5.9.8 7.8 2.1"/>
+          </svg>
+        </div>
+        <div class="server-name">Global Server</div>
+        <div class="server-sub">Global / Other Countries</div>
       </div>
-      <div class="field">
-        <label for="zoneId">Zone ID</label>
-        <input type="text" id="zoneId" inputmode="numeric" pattern="[0-9]{3,5}" maxlength="5" placeholder="ဥပမာ 2222" required>
+      <div class="server-card" data-server="mm">
+        <div class="server-icon">
+          <svg viewBox="0 0 30 20" width="38" height="26" style="border-radius:4px;overflow:hidden;">
+            <rect width="30" height="6.667" y="0" fill="#FECB00"/>
+            <rect width="30" height="6.667" y="6.667" fill="#34B233"/>
+            <rect width="30" height="6.667" y="13.333" fill="#EA2839"/>
+            <polygon points="15,4.2 16.05,7.4 19.4,7.4 16.68,9.35 17.73,12.55 15,10.6 12.27,12.55 13.32,9.35 10.6,7.4 13.95,7.4" fill="#FFFFFF"/>
+          </svg>
+        </div>
+        <div class="server-name">Myanmar Server</div>
+        <div class="server-sub">Myanmar (MM) Server</div>
       </div>
     </div>
 
-    <div class="section-label"><span class="num">2</span> Diamond Pack ရွေးရန်</div>
-    <div class="field" style="margin-bottom:10px;">
-      <select id="packSelect" required>
-        <option value="" disabled selected>-- Pack ရွေးချယ်ပါ --</option>
-      </select>
-    </div>
-    <div class="ticket" id="ticket">
-      <div class="ticket-left">
-        <div class="ticket-diamond"></div>
-        <div>
-          <div class="ticket-label">ရွေးချယ်ထားသော Pack</div>
-          <div class="ticket-pack" id="ticketPack">မရွေးရသေးပါ</div>
+    <div id="afterServerSection" class="reveal-section">
+
+      <div class="section-label" style="margin-top:20px;"><span class="num">2</span> Diamond Pack ရွေးရန်</div>
+      <div id="packGrid"></div>
+
+      <div class="ticket" id="ticket">
+        <div class="ticket-left">
+          <div class="ticket-diamond"></div>
+          <div>
+            <div class="ticket-label">ရွေးချယ်ထားသော Pack</div>
+            <div class="ticket-pack" id="ticketPack">မရွေးရသေးပါ</div>
+          </div>
+        </div>
+        <div class="ticket-price" id="ticketPrice">0<small>Ks</small></div>
+      </div>
+
+      <div class="section-label" style="margin-top:20px;"><span class="num">3</span> ကစားသမား အချက်အလက်
+        <button type="button" class="help-btn" id="idHelpBtn" aria-label="Player ID ဘယ်လိုရှာမလဲ">?</button>
+      </div>
+      <div class="id-help-box" id="idHelpBox">
+        <b>Player ID / Zone ID ဘယ်လိုရှာမလဲ —</b><br>
+        MLBB Game ထဲ ဝင်ပါ → ဖန်သားပြင်ရဲ့ <b>ဘယ်ဘက်အပေါ်ထောင့်က Avatar/Profile</b> ကို နှိပ်ပါ → Name အောက်မှာ <b>ID: 123456789 (1234)</b> ဆိုပြီး ပေါ်ပါလိမ့်မယ် — ကွင်းပိတ်ရှေ့က ဂဏန်းက Player ID၊ ကွင်းစကွင်းပိတ်ထဲက ဂဏန်းက Zone ID ဖြစ်ပါတယ်။
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="playerId">Player ID</label>
+          <input type="text" id="playerId" inputmode="numeric" pattern="[0-9]{6,12}" maxlength="12" placeholder="ဥပမာ 123456789" required>
+          <div class="field-error" id="playerIdError"></div>
+        </div>
+        <div class="field">
+          <label for="zoneId">Zone ID</label>
+          <input type="text" id="zoneId" inputmode="numeric" pattern="[0-9]{3,5}" maxlength="5" placeholder="ဥပမာ 2222" required>
+          <div class="field-error" id="zoneIdError"></div>
         </div>
       </div>
-      <div class="ticket-price" id="ticketPrice">0<small>Ks</small></div>
     </div>
 
-    <div class="section-label" style="margin-top:20px;"><span class="num">3</span> ငွေလွှဲ အထောက်အထား</div>
-    <div class="pay-methods">
-      <div class="pay-chip active" data-method="KBZPay">KBZPay</div>
-      <div class="pay-chip" data-method="WavePay">Wave Pay</div>
-      <div class="pay-chip" data-method="AYAPay">AYA Pay</div>
-      <div class="pay-chip" data-method="UABPay">UAB Pay</div>
-    </div>
+    <div id="restOfForm" class="reveal-section">
 
-    <div class="pay-number">
-      <div class="pay-number-left">
-        <div class="pay-number-icon">
-          <svg class="icon" viewBox="0 0 24 24" style="width:17px;height:17px;"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
-        </div>
-        <div>
-          <div class="pay-number-label">ငွေလွှဲရန် ဖုန်းနံပါတ်</div>
-          <div class="pay-number-value" id="payNumber">09 446 627 892</div>
-        </div>
+      <div class="section-label"><span class="num">4</span> ငွေလွှဲ အထောက်အထား</div>
+
+      <div class="pay-methods">
+        <div class="pay-chip active" data-method="KBZPay">KBZPay</div>
+        <div class="pay-chip" data-method="WavePay">Wave Pay</div>
+        <div class="pay-chip" data-method="AYAPay">AYA Pay</div>
+        <div class="pay-chip" data-method="UABPay">UAB Pay</div>
       </div>
-      <button type="button" class="copy-btn" id="copyBtn">
-        <span id="copyIcon" style="display:flex;">
-          <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-        </span> <span id="copyLabel">Copy</span>
+
+      <div class="pay-number">
+        <div class="pay-number-left">
+          <div class="pay-number-icon">
+            <svg class="icon" viewBox="0 0 24 24" style="width:17px;height:17px;"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+          </div>
+          <div>
+            <div class="pay-number-label">ငွေလွှဲရန် ဖုန်းနံပါတ်</div>
+            <div class="pay-number-value" id="payNumber">09 446 627 892</div>
+          </div>
+        </div>
+        <button type="button" class="copy-btn" id="copyBtn">
+          <span id="copyIcon" style="display:flex;">
+            <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </span> <span id="copyLabel">Copy</span>
+        </button>
+      </div>
+
+      <div class="upload-box" id="uploadBox">
+        <input type="file" id="screenshot" accept="image/*" required>
+        <div class="upload-icon">
+          <svg class="icon" viewBox="0 0 24 24" style="width:24px;height:24px;margin:0 auto;stroke:var(--accent-cyan);"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+        </div>
+        <div class="upload-text" id="uploadText">ငွေလွှဲပြေစာ Screenshot ကို နှိပ်ပြီး တင်ပါ</div>
+        <img class="upload-preview" id="uploadPreview" alt="preview">
+      </div>
+
+      <button type="submit" class="submit-btn" id="submitBtn">
+        <span class="spinner"></span>
+        <span class="btn-text">Order တင်မည်</span>
       </button>
-    </div>
-
-    <div class="upload-box" id="uploadBox">
-      <input type="file" id="screenshot" accept="image/*" required>
-      <div class="upload-icon">
-        <svg class="icon" viewBox="0 0 24 24" style="width:24px;height:24px;margin:0 auto;stroke:var(--accent-cyan);"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+      <div class="upload-progress-wrap" id="uploadProgressWrap">
+        <div class="upload-progress-bar" id="uploadProgressBar"></div>
       </div>
-      <div class="upload-text" id="uploadText">ငွေလွှဲပြေစာ Screenshot ကို နှိပ်ပြီး တင်ပါ</div>
-      <img class="upload-preview" id="uploadPreview" alt="preview">
-    </div>
-
-    <button type="submit" class="submit-btn" id="submitBtn">
-      <span class="spinner"></span>
-      <span class="btn-text">Order တင်မည်</span>
-    </button>
-    <div class="upload-progress-wrap" id="uploadProgressWrap">
-      <div class="upload-progress-bar" id="uploadProgressBar"></div>
-    </div>
-    <div class="upload-progress-label" id="uploadProgressLabel"></div>
-    <div class="hint">Order တင်ပြီးနောက် <b>၅-၁၀ မိနစ်</b> အတွင်း Diamond ဖြည့်ပေးပါမည်။<br>ပြေစာမှားယွင်းပါက Order နောက်ကျနိုင်ပါသည်။
-      <div class="tg-contact">
-        <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;fill:#29a9eb;flex-shrink:0;"><path d="M21.94 4.11c.27-1.13-.86-2.06-1.9-1.62L2.4 10.13c-1.16.5-1.15 2.16.02 2.64l4.4 1.8 1.86 5.7c.24.73 1.14.96 1.7.44l2.6-2.42 4.5 3.36c.86.64 2.1.18 2.34-.87l3.12-16.67zM8.53 13.32l9.9-6.94c.3-.2.63.2.37.44l-8.15 7.55c-.3.28-.5.65-.55 1.06l-.28 2.2-1.29-4.3z"/></svg>
-        <span>၁၀ မိနစ်အတွင်း Diamond မရောက်သေးပါက Telegram — <a href="https://t.me/kopethaung778" target="_blank" rel="noopener">@kopethaung778</a></span>
+      <div class="upload-progress-label" id="uploadProgressLabel"></div>
+      <div class="hint">Order တင်ပြီးနောက် <b>၅-၁၀ မိနစ်</b> အတွင်း Diamond ဖြည့်ပေးပါမည်။<br>ပြေစာမှားယွင်းပါက Order နောက်ကျနိုင်ပါသည်။
+        <div class="tg-contact">
+          <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;fill:#29a9eb;flex-shrink:0;"><path d="M21.94 4.11c.27-1.13-.86-2.06-1.9-1.62L2.4 10.13c-1.16.5-1.15 2.16.02 2.64l4.4 1.8 1.86 5.7c.24.73 1.14.96 1.7.44l2.6-2.42 4.5 3.36c.86.64 2.1.18 2.34-.87l3.12-16.67zM8.53 13.32l9.9-6.94c.3-.2.63.2.37.44l-8.15 7.55c-.3.28-.5.65-.55 1.06l-.28 2.2-1.29-4.3z"/></svg>
+          <span>၁၀ မိနစ်အတွင်း Diamond မရောက်သေးပါက Telegram — <a href="https://t.me/kopethaung778" target="_blank" rel="noopener">@kopethaung778</a></span>
+        </div>
       </div>
+
     </div>
   </form>
 
@@ -536,12 +678,18 @@
   <div class="card success-panel" id="successPanel">
     <div class="check"><svg class="icon" viewBox="0 0 24 24" style="width:26px;height:26px;stroke-width:2.2;"><path d="M20 6L9 17l-5-5"/></svg></div>
     <h3>Order တင်ပြီးပါပြီ</h3>
-    <div class="order-id" id="orderIdDisplay">#KDS00000000</div>
+    <div class="order-id-row">
+      <div class="order-id" id="orderIdDisplay">#KDS00000000</div>
+      <button type="button" class="copy-id-btn" id="copyOrderIdBtn" title="Order ID ကူးရန်">
+        <svg class="icon" viewBox="0 0 24 24" style="width:13px;height:13px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+      </button>
+    </div>
+    <div class="order-summary" id="orderSummary"></div>
     <p>သင့် Order ကို လက်ခံရရှိပါပြီ။ Admin မှ စစ်ဆေးပြီး Diamond ကို အမြန်ဆုံး ဖြည့်ပေးပါမည်။ ပြသနာရှိပါက Player ID / Zone ID ကို ပြန်စစ်ပေးပါ။</p>
     <button type="button" class="new-order-btn" id="newOrderBtn">နောက် Order တစ်ခု တင်မည်</button>
   </div>
 
-  <footer>© King Diamond Store — Powered by King Travel Group</footer>
+  <footer>© King Diamond Store — Powered by King Game-Shop Group</footer>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -719,23 +867,112 @@ async function loadPacks() {
   buildPackDropdown();
 }
 
-/* ---------- Build dropdown ---------- */
-const packSelect = document.getElementById('packSelect');
-function buildPackDropdown() {
-  packSelect.innerHTML = '<option value="" disabled selected>Diamond Pack ရွေးချယ်ပါ</option>';
-  PACKS.forEach((grp, gi) => {
-    const og = document.createElement('optgroup');
-    og.label = grp.group;
-    grp.items.forEach((item, ii) => {
-      const opt = document.createElement('option');
-      opt.value = `${gi}-${ii}`;
-      opt.textContent = `${item.label} — ${item.price.toLocaleString()} Ks`;
-      og.appendChild(opt);
-    });
-    packSelect.appendChild(og);
-  });
+/* ---------- Build pack card grid ---------- */
+const packGrid = document.getElementById('packGrid');
+const afterServerSection = document.getElementById('afterServerSection');
+const restOfForm = document.getElementById('restOfForm');
+const serverGrid = document.getElementById('serverGrid');
+let selectedPackValue = null; // "gi-ii" — indexes into the global PACKS array
+let currentServer = null; // 'global' | 'mm'
+
+// Classifies a Sheet "Package" group name as Global or Myanmar server based
+// on its name. Any group whose name mentions Myanmar/MM is treated as the
+// Myanmar server; everything else is treated as Global.
+function classifyGroup(groupName) {
+  return /myanmar|မြန်မာ|\bmm\b/i.test(groupName) ? 'mm' : 'global';
 }
-packSelect.innerHTML = '<option value="" disabled selected>ဈေးနှုန်းများ Load နေသည်...</option>';
+
+function buildPackDropdown() {
+  if (!currentServer) return; // nothing to show until a server is picked
+  packGrid.innerHTML = '';
+
+  if (!PACKS.length) {
+    packGrid.innerHTML = '<div class="pack-empty-msg">ဈေးနှုန်းများ Load နေသည်...</div>';
+    return;
+  }
+
+  let found = false;
+  PACKS.forEach((grp, gi) => {
+    if (classifyGroup(grp.group) !== currentServer) return;
+    found = true;
+
+    const label = document.createElement('div');
+    label.className = 'pack-group-label';
+    label.textContent = grp.group;
+    packGrid.appendChild(label);
+
+    const row = document.createElement('div');
+    row.className = 'pack-grid';
+    grp.items.forEach((item, ii) => {
+      const card = document.createElement('div');
+      card.className = 'pack-card';
+      card.dataset.value = `${gi}-${ii}`;
+      card.innerHTML = `
+        <div class="pc-label">${item.label}</div>
+        <div class="pc-price">${item.price.toLocaleString()} Ks</div>
+      `;
+      card.addEventListener('click', () => selectPack(gi, ii, card));
+      row.appendChild(card);
+    });
+    packGrid.appendChild(row);
+  });
+
+  if (!found) {
+    packGrid.innerHTML = '<div class="pack-empty-msg">ဒီ Server အတွက် Pack မရှိသေးပါ</div>';
+  }
+}
+
+function selectServer(server, cardEl) {
+  currentServer = server;
+  serverGrid.querySelectorAll('.server-card').forEach(c => c.classList.remove('selected'));
+  cardEl.classList.add('selected');
+
+  // Reset any pack picked under the previous server, and hide the
+  // payment/upload section again since it depended on that pack.
+  selectedPackValue = null;
+  ticket.classList.remove('filled');
+  ticketPack.textContent = 'မရွေးရသေးပါ';
+  ticketPrice.innerHTML = '0<small>Ks</small>';
+  restOfForm.classList.remove('shown');
+  restOfForm.style.display = 'none';
+
+  buildPackDropdown();
+
+  if (!afterServerSection.classList.contains('shown')) {
+    afterServerSection.style.display = 'block';
+    requestAnimationFrame(() => {
+      afterServerSection.classList.add('shown');
+      afterServerSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+  }
+}
+
+serverGrid.querySelectorAll('.server-card').forEach(card => {
+  card.addEventListener('click', () => selectServer(card.dataset.server, card));
+});
+
+function selectPack(gi, ii, cardEl) {
+  const item = PACKS[gi].items[ii];
+  selectedPackValue = `${gi}-${ii}`;
+
+  packGrid.querySelectorAll('.pack-card').forEach(c => c.classList.remove('selected'));
+  cardEl.classList.add('selected');
+
+  ticketPack.textContent = item.label;
+  ticketPrice.innerHTML = `${item.price.toLocaleString()}<small>Ks</small>`;
+  ticket.classList.remove('filled');
+  void ticket.offsetWidth; // restart animation
+  ticket.classList.add('filled');
+
+  if (!restOfForm.classList.contains('shown')) {
+    restOfForm.style.display = 'block';
+    requestAnimationFrame(() => {
+      restOfForm.classList.add('shown');
+      restOfForm.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+  }
+}
+
 loadPacks();
 
 document.getElementById('refreshPriceBtn').addEventListener('click', () => {
@@ -745,16 +982,6 @@ document.getElementById('refreshPriceBtn').addEventListener('click', () => {
 const ticket = document.getElementById('ticket');
 const ticketPack = document.getElementById('ticketPack');
 const ticketPrice = document.getElementById('ticketPrice');
-
-packSelect.addEventListener('change', () => {
-  const [gi, ii] = packSelect.value.split('-').map(Number);
-  const item = PACKS[gi].items[ii];
-  ticketPack.textContent = item.label;
-  ticketPrice.innerHTML = `${item.price.toLocaleString()}<small>Ks</small>`;
-  ticket.classList.remove('filled');
-  void ticket.offsetWidth; // restart animation
-  ticket.classList.add('filled');
-});
 
 /* ---------- Payment method chips ---------- */
 let selectedMethod = "KBZPay";
@@ -877,6 +1104,9 @@ function showToast(msg, type = "success") {
 }
 
 /* ---------- Submit ---------- */
+function escapeHtml(str) {
+  return String(str ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
 const form = document.getElementById('orderForm');
 const submitBtn = document.getElementById('submitBtn');
 const progressWrap = document.getElementById('uploadProgressWrap');
@@ -887,6 +1117,44 @@ const ID_PATTERN = /^[0-9]{6,12}$/;
 const ZONE_PATTERN = /^[0-9]{3,5}$/;
 const COOLDOWN_MS = 20000; // minimum gap between two orders, prevents spam/duplicate submits
 let lastOrderAt = 0;
+
+/* ---------- Live inline validation ---------- */
+function validateField(inputEl, errorEl, pattern, message) {
+  const val = inputEl.value.trim();
+  if (val === '') { // don't shame an empty field the user hasn't touched yet
+    inputEl.classList.remove('invalid');
+    errorEl.classList.remove('shown');
+    return true;
+  }
+  const ok = pattern.test(val);
+  inputEl.classList.toggle('invalid', !ok);
+  errorEl.textContent = ok ? '' : message;
+  errorEl.classList.toggle('shown', !ok);
+  return ok;
+}
+
+const playerIdInput = document.getElementById('playerId');
+const zoneIdInput = document.getElementById('zoneId');
+const playerIdError = document.getElementById('playerIdError');
+const zoneIdError = document.getElementById('zoneIdError');
+
+playerIdInput.addEventListener('blur', () =>
+  validateField(playerIdInput, playerIdError, ID_PATTERN, "Player ID မှားနေပါသည် — ဂဏန်း ၆-၁၂ လုံးသာ ရှိရပါမည်")
+);
+zoneIdInput.addEventListener('blur', () =>
+  validateField(zoneIdInput, zoneIdError, ZONE_PATTERN, "Zone ID မှားနေပါသည် — ဂဏန်း ၃-၅ လုံးသာ ရှိရပါမည်")
+);
+// Clear the red state as soon as they start correcting it
+playerIdInput.addEventListener('input', () => { if (!playerIdInput.value) return; playerIdInput.classList.remove('invalid'); playerIdError.classList.remove('shown'); });
+zoneIdInput.addEventListener('input', () => { if (!zoneIdInput.value) return; zoneIdInput.classList.remove('invalid'); zoneIdError.classList.remove('shown'); });
+
+/* ---------- Player ID / Zone ID help tooltip ---------- */
+const idHelpBtn = document.getElementById('idHelpBtn');
+const idHelpBox = document.getElementById('idHelpBox');
+idHelpBtn.addEventListener('click', () => {
+  idHelpBox.classList.toggle('shown');
+  idHelpBtn.classList.toggle('active');
+});
 
 function setProgress(pct, label) {
   progressWrap.classList.add('active');
@@ -932,7 +1200,7 @@ form.addEventListener('submit', async (e) => {
   // Client-side validation
   if (!ID_PATTERN.test(playerId)) { showToast("Player ID မှားနေပါသည် — ဂဏန်း ၆-၁၂ လုံးသာ ထည့်ပါ", "error"); return; }
   if (!ZONE_PATTERN.test(zoneId)) { showToast("Zone ID မှားနေပါသည် — ဂဏန်း ၃-၅ လုံးသာ ထည့်ပါ", "error"); return; }
-  if (!packSelect.value) { showToast("Diamond Pack ရွေးချယ်ပေးပါ", "error"); return; }
+  if (!selectedPackValue) { showToast("Diamond Pack ရွေးချယ်ပေးပါ", "error"); return; }
   if (!file) { showToast("ငွေလွှဲပြေစာ Screenshot တင်ပေးပါ", "error"); return; }
 
   // Spam / duplicate-submit guard
@@ -943,7 +1211,7 @@ form.addEventListener('submit', async (e) => {
     return;
   }
 
-  const [gi, ii] = packSelect.value.split('-').map(Number);
+  const [gi, ii] = selectedPackValue.split('-').map(Number);
   const item = PACKS[gi].items[ii];
   const orderId = "KDS" + Date.now().toString().slice(-8);
 
@@ -994,6 +1262,13 @@ form.addEventListener('submit', async (e) => {
     // 3) Show success
     lastOrderAt = Date.now();
     document.getElementById('orderIdDisplay').textContent = "#" + orderId;
+    document.getElementById('orderSummary').innerHTML = `
+      <div class="os-row"><span class="os-k">Server</span><span class="os-v">${currentServer === 'mm' ? 'Myanmar Server' : 'Global Server'}</span></div>
+      <div class="os-row"><span class="os-k">Pack</span><span class="os-v">${escapeHtml(item.label)}</span></div>
+      <div class="os-row"><span class="os-k">ဈေးနှုန်း</span><span class="os-v">${item.price.toLocaleString()} Ks</span></div>
+      <div class="os-row"><span class="os-k">Player ID</span><span class="os-v">${escapeHtml(playerId)}</span></div>
+      <div class="os-row"><span class="os-k">Zone ID</span><span class="os-v">${escapeHtml(zoneId)}</span></div>
+    `;
     form.style.display = 'none';
     document.getElementById('successPanel').style.display = 'block';
 
@@ -1007,6 +1282,15 @@ form.addEventListener('submit', async (e) => {
   }
 });
 
+document.getElementById('copyOrderIdBtn').addEventListener('click', () => {
+  const idText = document.getElementById('orderIdDisplay').textContent;
+  navigator.clipboard.writeText(idText).then(() => {
+    showToast("Order ID ကူးယူပြီးပါပြီ", "success");
+  }).catch(() => {
+    showToast("Copy မအောင်မြင်ပါ — manual ကူးပါ", "error");
+  });
+});
+
 document.getElementById('newOrderBtn').addEventListener('click', () => {
   form.reset();
   form.style.display = 'block';
@@ -1015,9 +1299,19 @@ document.getElementById('newOrderBtn').addEventListener('click', () => {
   uploadPreview.style.display = 'none';
   uploadText.textContent = 'ငွေလွှဲပြေစာ Screenshot ကို နှိပ်ပြီး တင်ပါ';
   compressedFile = null;
+  selectedPackValue = null;
   ticket.classList.remove('filled');
   ticketPack.textContent = 'မရွေးရသေးပါ';
   ticketPrice.innerHTML = '0<small>Ks</small>';
+  packGrid.querySelectorAll('.pack-card').forEach(c => c.classList.remove('selected'));
+  restOfForm.classList.remove('shown');
+  restOfForm.style.display = 'none';
+  playerIdInput.classList.remove('invalid');
+  zoneIdInput.classList.remove('invalid');
+  playerIdError.classList.remove('shown');
+  zoneIdError.classList.remove('shown');
+  idHelpBox.classList.remove('shown');
+  idHelpBtn.classList.remove('active');
   document.querySelectorAll('.pay-chip').forEach(c => c.classList.remove('active'));
   document.querySelector('.pay-chip[data-method="KBZPay"]').classList.add('active');
   selectedMethod = "KBZPay";
