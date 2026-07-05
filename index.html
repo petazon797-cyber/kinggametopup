@@ -850,10 +850,11 @@
     </div>
     <div class="order-summary" id="orderSummary"></div>
     <p>သင့် Order ကို လက်ခံရရှိပါပြီ။ Admin မှ စစ်ဆေးပြီး Diamond ကို အမြန်ဆုံး ဖြည့်ပေးပါမည်။ ပြသနာရှိပါက Player ID / Zone ID ကို ပြန်စစ်ပေးပါ။</p>
+    <a href="track.html" target="_blank" style="display:block;font-size:12.5px;color:var(--accent-gold);margin-bottom:14px;">📋 Order Status ကို နောက်မှ ဒီနေရာမှာ စစ်ကြည့်နိုင်ပါသည် →</a>
     <button type="button" class="new-order-btn" id="newOrderBtn">နောက် Order တစ်ခု တင်မည်</button>
   </div>
 
-  <footer>© King Diamond Store — Powered by King Game-Shop Group</footer>
+  <footer>© King Diamond Store — Powered by King Game-Shop Group<br><a href="track.html" style="color:var(--accent-gold);">Order Status စစ်ရန်</a></footer>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -1526,7 +1527,10 @@ finalConfirmBtn.addEventListener('click', async () => {
   const qty = modalQty;
   const totalPrice = item.price * qty;
   const email = document.getElementById('customerEmail').value.trim();
-  const orderId = "KDS" + Date.now().toString().slice(-8);
+  // High-entropy ID: doubles as the Firestore doc ID so customers can look
+  // up their own order later (see track.html) without exposing everyone
+  // else's orders — knowing this exact string is required to read it.
+  const orderId = "KDS" + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 8).toUpperCase();
 
   finalConfirmBtn.classList.add('loading');
   finalConfirmBtn.disabled = true;
@@ -1534,7 +1538,7 @@ finalConfirmBtn.addEventListener('click', async () => {
 
   try {
     try {
-      await db.collection("orders").add({
+      await db.collection("orders").doc(orderId).set({
         orderId,
         playerId,
         zoneId,
