@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Status စစ်ရန် — King Diamond Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Outfit:wght@400;500;600;700&family=Noto+Sans+Myanmar:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-void:#FAF3E7;
+    --bg-void-2:#F2E6D2;
+    --panel:rgba(255,255,255,0.72);
+    --panel-solid:#FFFFFF;
+    --border-glass:rgba(43,36,29,0.12);
+    --input-bg:rgba(43,36,29,0.045);
+    --accent-blue:#8C2F4B;
+    --accent-cyan:#B4893D;
+    --accent-gold:#A9762E;
+    --text-primary:#2B241D;
+    --text-muted:#8A7F70;
+    --success:#3F7D5C;
+    --danger:#B23A48;
+    --font-display:'Cormorant Garamond',serif;
+    --font-body:'Noto Sans Myanmar','Outfit',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:var(--font-body);
+    background:
+      radial-gradient(circle at 15% 0%, rgba(140,47,75,0.07), transparent 45%),
+      radial-gradient(circle at 90% 15%, rgba(180,137,61,0.10), transparent 40%),
+      linear-gradient(180deg, var(--bg-void) 0%, var(--bg-void-2) 100%);
+    color:var(--text-primary);
+    min-height:100vh;
+    padding:40px 16px;
+  }
+  .wrap{max-width:460px;margin:0 auto;}
+  h1{
+    font-family:var(--font-display);font-size:26px;font-weight:700;
+    text-align:center;margin-bottom:6px;
+  }
+  p.sub{color:var(--text-muted);font-size:13.5px;text-align:center;margin-bottom:26px;}
+  .card{
+    background:var(--panel);border:1px solid var(--border-glass);
+    border-radius:18px;padding:24px 22px;backdrop-filter:blur(14px);
+    box-shadow:0 8px 30px rgba(43,36,29,0.08);
+  }
+  .field label{display:block;font-size:13px;color:var(--text-muted);margin-bottom:6px;}
+  .field input{
+    width:100%;padding:12px 14px;border-radius:10px;
+    background:var(--input-bg);border:1px solid var(--border-glass);
+    color:var(--text-primary);font-family:var(--font-body);font-size:15px;
+    outline:none;text-transform:uppercase;
+  }
+  .field input:focus{border-color:var(--accent-cyan);}
+  .btn{
+    width:100%;margin-top:14px;padding:13px;border-radius:12px;border:none;cursor:pointer;
+    font-family:var(--font-display);font-weight:700;font-size:16px;
+    background:linear-gradient(90deg,var(--accent-blue),var(--accent-cyan));
+    color:#FDF6EC;
+  }
+  .btn:disabled{opacity:0.6;cursor:not-allowed;}
+  .msg{
+    text-align:center;font-size:13.5px;color:var(--text-muted);margin-top:16px;display:none;
+  }
+  .msg.shown{display:block;}
+  .result{display:none;margin-top:20px;}
+  .result.shown{display:block;}
+  .status-badge{
+    display:inline-block;padding:6px 16px;border-radius:999px;font-weight:700;font-size:13px;
+    margin-bottom:14px;
+  }
+  .status-badge.pending{background:rgba(169,118,46,.15);color:var(--accent-gold);}
+  .status-badge.completed{background:rgba(63,125,93,.15);color:var(--success);}
+  .status-badge.rejected{background:rgba(178,58,72,.15);color:var(--danger);}
+  .r-row{display:flex;justify-content:space-between;font-size:13.5px;padding:7px 0;}
+  .r-row + .r-row{border-top:1px dashed var(--border-glass);}
+  .r-k{color:var(--text-muted);}
+  .r-v{font-weight:600;}
+  .status-note{
+    margin-top:14px;padding:12px 14px;border-radius:10px;font-size:12.5px;line-height:1.6;
+    background:var(--input-bg);color:var(--text-muted);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>💎 Order Status စစ်ရန်</h1>
+  <p class="sub">Order ID ကို ထည့်ပြီး လက်ရှိအခြေအနေကို စစ်ဆေးနိုင်ပါသည်</p>
+
+  <div class="card">
+    <div class="field">
+      <label for="orderIdInput">Order ID</label>
+      <input type="text" id="orderIdInput" placeholder="ဥပမာ KDS1A2B3C4D5E">
+    </div>
+    <button class="btn" id="checkBtn">Status စစ်မည်</button>
+    <div class="msg" id="msgEl"></div>
+
+    <div class="result" id="resultEl">
+      <span class="status-badge" id="statusBadge">—</span>
+      <div class="r-row"><span class="r-k">Order ID</span><span class="r-v" id="rOrderId">—</span></div>
+      <div class="r-row"><span class="r-k">Pack</span><span class="r-v" id="rPack">—</span></div>
+      <div class="r-row"><span class="r-k">စုစုပေါင်း</span><span class="r-v" id="rTotal">—</span></div>
+      <div class="r-row"><span class="r-k">Player ID</span><span class="r-v" id="rPlayerId">—</span></div>
+      <div class="r-row"><span class="r-k">တင်သွင်းချိန်</span><span class="r-v" id="rTime">—</span></div>
+      <div class="status-note" id="statusNote"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAJLqhPU-51twgJw0fp5Q-u9iBwHFx7xA8",
+    authDomain: "king-pos-and-tickets.firebaseapp.com",
+    projectId: "king-pos-and-tickets",
+    storageBucket: "king-pos-and-tickets.firebasestorage.app",
+    messagingSenderId: "870841528478",
+    appId: "1:870841528478:web:a8d145acc8df8073888b8f"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  const orderIdInput = document.getElementById('orderIdInput');
+  const checkBtn = document.getElementById('checkBtn');
+  const msgEl = document.getElementById('msgEl');
+  const resultEl = document.getElementById('resultEl');
+
+  const STATUS_NOTES = {
+    pending: "Order ကို လက်ခံရရှိပြီး admin မှ စစ်ဆေးနေဆဲဖြစ်ပါသည်။ ပုံမှန်အားဖြင့် ၅-၁၀ မိနစ်အတွင်း Diamond ဖြည့်ပေးပါမည်။",
+    completed: "Diamond ကို အောင်မြင်စွာ ဖြည့်သွင်းပြီးပါပြီ။ ကျေးဇူးတင်ပါသည်။",
+    rejected: "ဒီ Order ကို လက်ခံနိုင်ခြင်း မရှိပါ — ငွေလွှဲပြေစာ (သို့) Player ID တွင် ပြသနာရှိနိုင်ပါသည်။ Telegram မှတဆင့် ဆက်သွယ်ပါ။"
+  };
+
+  async function checkOrder() {
+    const orderId = orderIdInput.value.trim().toUpperCase();
+    msgEl.classList.remove('shown');
+    resultEl.classList.remove('shown');
+
+    if (!orderId) {
+      msgEl.textContent = "Order ID ထည့်ပေးပါ";
+      msgEl.classList.add('shown');
+      return;
+    }
+
+    checkBtn.disabled = true;
+    checkBtn.textContent = "စစ်ဆေးနေသည်...";
+
+    try {
+      const doc = await db.collection('orders').doc(orderId).get();
+      if (!doc.exists) {
+        msgEl.textContent = "Order ID ရှာမတွေ့ပါ — ပြန်စစ်ပေးပါ";
+        msgEl.classList.add('shown');
+        return;
+      }
+      const o = doc.data();
+
+      const badge = document.getElementById('statusBadge');
+      badge.className = 'status-badge ' + o.status;
+      badge.textContent = o.status === 'completed' ? '✓ Completed'
+        : o.status === 'rejected' ? '✕ Rejected'
+        : '⏳ Pending';
+
+      document.getElementById('rOrderId').textContent = '#' + o.orderId;
+      document.getElementById('rPack').textContent = o.packLabel + (o.quantity > 1 ? ' x' + o.quantity : '');
+      document.getElementById('rTotal').textContent = (o.totalPrice || o.packPrice || 0).toLocaleString() + ' Ks';
+      document.getElementById('rPlayerId').textContent = o.playerId + (o.username ? ' (' + o.username + ')' : '');
+      document.getElementById('rTime').textContent = o.createdAt && o.createdAt.toDate
+        ? o.createdAt.toDate().toLocaleString('en-GB', { timeZone: 'Asia/Yangon', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
+        : '—';
+      document.getElementById('statusNote').textContent = STATUS_NOTES[o.status] || '';
+
+      resultEl.classList.add('shown');
+    } catch (err) {
+      console.error(err);
+      msgEl.textContent = "Server error — နောက်မှ ပြန်စမ်းကြည့်ပါ";
+      msgEl.classList.add('shown');
+    } finally {
+      checkBtn.disabled = false;
+      checkBtn.textContent = "Status စစ်မည်";
+    }
+  }
+
+  checkBtn.addEventListener('click', checkOrder);
+  orderIdInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') checkOrder(); });
+</script>
+</body>
+</html>
