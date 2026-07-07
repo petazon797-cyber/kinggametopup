@@ -350,6 +350,21 @@
   }
   .tg-contact a{color:#29a9eb;font-weight:600;text-decoration:none;}
   .tg-contact a:hover{text-decoration:underline;}
+  .main-tabs{
+    display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;
+  }
+  .main-tab{
+    padding:13px 10px;border-radius:14px;border:1px solid var(--border-glass);
+    background:var(--panel);color:var(--text-muted);cursor:pointer;
+    font-family:var(--font-display);font-weight:700;font-size:15px;letter-spacing:0.01em;
+    backdrop-filter:blur(10px);transition:all .18s;
+  }
+  .main-tab.active{
+    border-color:var(--accent-gold);color:#FDF6EC;
+    background:linear-gradient(90deg,var(--accent-blue),var(--accent-cyan));
+    box-shadow:0 6px 18px rgba(140,47,75,0.18);
+  }
+
   .price-notice{
     display:flex;align-items:center;gap:10px;flex-wrap:wrap;
     background:rgba(169,118,46,.09);border:1px solid rgba(169,118,46,.30);
@@ -648,6 +663,13 @@
     <p>Diamond Top-up ကို အမြန်ဆုံး၊ စိတ်ချရဆုံး ဝန်ဆောင်မှု</p>
   </div>
 
+  <div class="main-tabs">
+    <button type="button" class="main-tab active" id="orderTabBtn">💎 Order တင်ရန်</button>
+    <button type="button" class="main-tab" id="trackTabBtn">📋 Order Status စစ်ရန်</button>
+  </div>
+
+  <div id="orderTabPanel">
+
   <div class="price-notice" id="priceNotice">
     <svg class="icon" viewBox="0 0 24 24" style="width:18px;height:18px;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
     <span>ဈေးနှုန်း အပြောင်းအလဲ ရှိနိုင်ပါသဖြင့် Website ကို <b>Refresh</b> လုပ်ပြီးမှသာ ငွေလွှဲ/ဝယ်ယူကြပါရန် မေတ္တာရပ်ခံအပ်ပါသည်။</span>
@@ -850,11 +872,42 @@
     </div>
     <div class="order-summary" id="orderSummary"></div>
     <p>သင့် Order ကို လက်ခံရရှိပါပြီ။ Admin မှ စစ်ဆေးပြီး Diamond ကို အမြန်ဆုံး ဖြည့်ပေးပါမည်။ ပြသနာရှိပါက Player ID / Zone ID ကို ပြန်စစ်ပေးပါ။</p>
-    <a href="track.html" target="_blank" style="display:block;font-size:12.5px;color:var(--accent-gold);margin-bottom:14px;">📋 Order Status ကို နောက်မှ ဒီနေရာမှာ စစ်ကြည့်နိုင်ပါသည် →</a>
+    <a href="#" id="goToTrackLink" style="display:block;font-size:12.5px;color:var(--accent-gold);margin-bottom:14px;">📋 Order Status ကို နောက်မှ ဒီနေရာမှာ စစ်ကြည့်နိုင်ပါသည် →</a>
     <button type="button" class="new-order-btn" id="newOrderBtn">နောက် Order တစ်ခု တင်မည်</button>
   </div>
 
-  <footer>© King Diamond Store — Powered by King Game-Shop Group<br><a href="track.html" style="color:var(--accent-gold);">Order Status စစ်ရန်</a></footer>
+  </div><!-- /orderTabPanel -->
+
+  <div id="trackTabPanel" style="display:none;">
+    <div class="card">
+      <div class="section-label"><span class="num">🔍</span> Order Status စစ်ရန်</div>
+      <div class="field">
+        <label for="trackOrderIdInput">Order ID</label>
+        <input type="text" id="trackOrderIdInput" placeholder="ဥပမာ KDS1A2B3C4D5E" style="text-transform:uppercase;">
+      </div>
+      <button type="button" class="submit-btn" id="trackCheckBtn" style="margin-top:6px;">
+        <span class="spinner" id="trackSpinner"></span>
+        <span id="trackBtnText">Status စစ်မည်</span>
+      </button>
+      <div class="hint" id="trackMsg" style="display:none;"></div>
+
+      <div id="trackResult" style="display:none;margin-top:18px;">
+        <div style="text-align:center;margin-bottom:14px;">
+          <span class="order-id" id="trackStatusBadge">—</span>
+        </div>
+        <div class="order-summary">
+          <div class="os-row"><span class="os-k">Order ID</span><span class="os-v" id="trOrderId">—</span></div>
+          <div class="os-row"><span class="os-k">Pack</span><span class="os-v" id="trPack">—</span></div>
+          <div class="os-row"><span class="os-k">စုစုပေါင်း</span><span class="os-v" id="trTotal">—</span></div>
+          <div class="os-row"><span class="os-k">Player ID</span><span class="os-v" id="trPlayerId">—</span></div>
+          <div class="os-row"><span class="os-k">တင်သွင်းချိန်</span><span class="os-v" id="trTime">—</span></div>
+        </div>
+        <div class="id-help-box shown" id="trackStatusNote" style="margin-top:12px;"></div>
+      </div>
+    </div>
+  </div><!-- /trackTabPanel -->
+
+  <footer>© King Diamond Store — Powered by King Game-Shop Group</footer>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -1169,6 +1222,102 @@ loadPacks();
 
 document.getElementById('refreshPriceBtn').addEventListener('click', () => {
   location.reload();
+});
+
+/* ---------- Main tabs: Diamond Pack <-> Check Order ---------- */
+const orderTabBtn = document.getElementById('orderTabBtn');
+const trackTabBtn = document.getElementById('trackTabBtn');
+const orderTabPanel = document.getElementById('orderTabPanel');
+const trackTabPanel = document.getElementById('trackTabPanel');
+
+orderTabBtn.addEventListener('click', () => {
+  orderTabBtn.classList.add('active');
+  trackTabBtn.classList.remove('active');
+  orderTabPanel.style.display = 'block';
+  trackTabPanel.style.display = 'none';
+});
+
+trackTabBtn.addEventListener('click', () => {
+  trackTabBtn.classList.add('active');
+  orderTabBtn.classList.remove('active');
+  trackTabPanel.style.display = 'block';
+  orderTabPanel.style.display = 'none';
+});
+
+/* ---------- Check Order tab logic ---------- */
+const trackOrderIdInput = document.getElementById('trackOrderIdInput');
+const trackCheckBtn = document.getElementById('trackCheckBtn');
+const trackSpinner = document.getElementById('trackSpinner');
+const trackBtnText = document.getElementById('trackBtnText');
+const trackMsg = document.getElementById('trackMsg');
+const trackResult = document.getElementById('trackResult');
+
+const TRACK_STATUS_NOTES = {
+  pending: "Order ကို လက်ခံရရှိပြီး admin မှ စစ်ဆေးနေဆဲဖြစ်ပါသည်။ ပုံမှန်အားဖြင့် ၅-၁၀ မိနစ်အတွင်း Diamond ဖြည့်ပေးပါမည်။",
+  completed: "Diamond ကို အောင်မြင်စွာ ဖြည့်သွင်းပြီးပါပြီ။ ကျေးဇူးတင်ပါသည်။",
+  rejected: "ဒီ Order ကို လက်ခံနိုင်ခြင်း မရှိပါ — ငွေလွှဲပြေစာ (သို့) Player ID တွင် ပြသနာရှိနိုင်ပါသည်။ Telegram မှတဆင့် ဆက်သွယ်ပါ။"
+};
+
+async function checkOrderStatus() {
+  const orderId = trackOrderIdInput.value.trim().toUpperCase();
+  trackMsg.style.display = 'none';
+  trackResult.style.display = 'none';
+
+  if (!orderId) {
+    trackMsg.textContent = "Order ID ထည့်ပေးပါ";
+    trackMsg.style.display = 'block';
+    return;
+  }
+
+  trackCheckBtn.classList.add('loading');
+  trackCheckBtn.disabled = true;
+  trackBtnText.textContent = 'စစ်ဆေးနေသည်...';
+
+  try {
+    const doc = await db.collection('orders').doc(orderId).get();
+    if (!doc.exists) {
+      trackMsg.textContent = "Order ID ရှာမတွေ့ပါ — ပြန်စစ်ပေးပါ";
+      trackMsg.style.display = 'block';
+      return;
+    }
+    const o = doc.data();
+
+    const badge = document.getElementById('trackStatusBadge');
+    badge.textContent = o.status === 'completed' ? '✓ Completed'
+      : o.status === 'rejected' ? '✕ Rejected'
+      : '⏳ Pending';
+    badge.style.color = o.status === 'completed' ? 'var(--success)'
+      : o.status === 'rejected' ? 'var(--danger)'
+      : 'var(--accent-gold)';
+
+    document.getElementById('trOrderId').textContent = '#' + o.orderId;
+    document.getElementById('trPack').textContent = o.packLabel + (o.quantity > 1 ? ' x' + o.quantity : '');
+    document.getElementById('trTotal').textContent = (o.totalPrice || o.packPrice || 0).toLocaleString() + ' Ks';
+    document.getElementById('trPlayerId').textContent = o.playerId + (o.username ? ' (' + o.username + ')' : '');
+    document.getElementById('trTime').textContent = o.createdAt && o.createdAt.toDate
+      ? o.createdAt.toDate().toLocaleString('en-GB', { timeZone: 'Asia/Yangon', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
+      : '—';
+    document.getElementById('trackStatusNote').textContent = TRACK_STATUS_NOTES[o.status] || '';
+
+    trackResult.style.display = 'block';
+  } catch (err) {
+    console.error(err);
+    trackMsg.textContent = "Server error — နောက်မှ ပြန်စမ်းကြည့်ပါ";
+    trackMsg.style.display = 'block';
+  } finally {
+    trackCheckBtn.classList.remove('loading');
+    trackCheckBtn.disabled = false;
+    trackBtnText.textContent = 'Status စစ်မည်';
+  }
+}
+
+trackCheckBtn.addEventListener('click', checkOrderStatus);
+trackOrderIdInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') checkOrderStatus(); });
+
+document.getElementById('goToTrackLink').addEventListener('click', (e) => {
+  e.preventDefault();
+  trackTabBtn.click();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
 const ticket = document.getElementById('ticket');
