@@ -1249,6 +1249,11 @@ function selectGame(game, cardEl) {
     packSectionLabel.textContent = 'Diamond Pack ရွေးရန်';
     zoneIdField.style.display = 'block';
     zoneIdInput.required = true;
+    playerIdInput.pattern = '[0-9]{6,12}';
+    playerIdInput.maxLength = 12;
+    playerIdInput.placeholder = 'ဥပမာ 123456789';
+    playerIdInput.classList.remove('invalid');
+    playerIdError.classList.remove('shown');
     serverSection.style.display = 'block';
     requestAnimationFrame(() => {
       serverSection.classList.add('shown');
@@ -1259,6 +1264,11 @@ function selectGame(game, cardEl) {
     zoneIdField.style.display = 'none';
     zoneIdInput.required = false;
     zoneIdInput.value = '';
+    playerIdInput.pattern = '[0-9]{6,20}';
+    playerIdInput.maxLength = 20;
+    playerIdInput.placeholder = 'ဥပမာ 12345678901234567';
+    playerIdInput.classList.remove('invalid');
+    playerIdError.classList.remove('shown');
     serverSection.classList.remove('shown');
     serverSection.style.display = 'none';
     // HOK has no server step — go straight to the pack grid
@@ -1562,7 +1572,10 @@ const progressWrap = document.getElementById('modalProgressWrap');
 const progressBar = document.getElementById('modalProgressBar');
 const progressLabel = document.getElementById('modalProgressLabel');
 
-const ID_PATTERN = /^[0-9]{6,12}$/;
+const ID_PATTERN_MLBB = /^[0-9]{6,12}$/;
+const ID_PATTERN_HOK = /^[0-9]{6,20}$/;
+function idPattern() { return currentGame === 'hok' ? ID_PATTERN_HOK : ID_PATTERN_MLBB; }
+function idErrorMessage() { return currentGame === 'hok' ? "Player ID မှားနေပါသည် — ဂဏန်း ၆-၂၀ လုံးသာ ရှိရပါမည်" : "Player ID မှားနေပါသည် — ဂဏန်း ၆-၁၂ လုံးသာ ရှိရပါမည်"; }
 const ZONE_PATTERN = /^[0-9]{3,5}$/;
 const COOLDOWN_MS = 20000; // minimum gap between two orders, prevents spam/duplicate submits
 let lastOrderAt = 0;
@@ -1588,7 +1601,7 @@ const playerIdError = document.getElementById('playerIdError');
 const zoneIdError = document.getElementById('zoneIdError');
 
 playerIdInput.addEventListener('blur', () =>
-  validateField(playerIdInput, playerIdError, ID_PATTERN, "Player ID မှားနေပါသည် — ဂဏန်း ၆-၁၂ လုံးသာ ရှိရပါမည်")
+  validateField(playerIdInput, playerIdError, idPattern(), idErrorMessage())
 );
 zoneIdInput.addEventListener('blur', () =>
   validateField(zoneIdInput, zoneIdError, ZONE_PATTERN, "Zone ID မှားနေပါသည် — ဂဏန်း ၃-၅ လုံးသာ ရှိရပါမည်")
@@ -1619,7 +1632,7 @@ async function tryLookupUsername() {
   const playerId = playerIdInput.value.trim();
   const zoneId = zoneIdInput.value.trim();
 
-  if (!ID_PATTERN.test(playerId) || !ZONE_PATTERN.test(zoneId)) {
+  if (!idPattern().test(playerId) || !ZONE_PATTERN.test(zoneId)) {
     usernameCheckEl.classList.remove('shown');
     return;
   }
@@ -1757,7 +1770,7 @@ form.addEventListener('submit', (e) => {
   const file = compressedFile || screenshotInput.files[0];
 
   if (!currentGame) { showToast("ဂိမ်း ရွေးချယ်ပေးပါ", "error"); return; }
-  if (!ID_PATTERN.test(playerId)) { showToast("Player ID မှားနေပါသည် — ဂဏန်း ၆-၁၂ လုံးသာ ထည့်ပါ", "error"); return; }
+  if (!idPattern().test(playerId)) { showToast(idErrorMessage(), "error"); return; }
   if (currentGame === 'mlbb' && !ZONE_PATTERN.test(zoneId)) { showToast("Zone ID မှားနေပါသည် — ဂဏန်း ၃-၅ လုံးသာ ထည့်ပါ", "error"); return; }
   if (!selectedPackValue) { showToast("Pack ရွေးချယ်ပေးပါ", "error"); return; }
   if (!file) { showToast("ငွေလွှဲပြေစာ Screenshot တင်ပေးပါ", "error"); return; }
