@@ -682,38 +682,68 @@
   <!-- FORM CARD -->
   <form class="card" id="orderForm">
 
-    <div class="section-label"><span class="num">1</span> Server ရွေးရန်</div>
-    <div class="server-grid" id="serverGrid">
-      <div class="server-card" data-server="global">
+    <div class="section-label"><span class="num">1</span> ဂိမ်း ရွေးရန်</div>
+    <div class="server-grid" id="gameGrid">
+      <div class="server-card" data-game="mlbb">
         <div class="server-icon">
-          <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="var(--accent-cyan)" stroke-width="1.6">
-            <circle cx="12" cy="12" r="9.5"/>
-            <ellipse cx="12" cy="12" rx="4.3" ry="9.5"/>
-            <line x1="2.5" y1="12" x2="21.5" y2="12"/>
-            <path d="M4.2 6.8c1.9 1.3 4.9 2.1 7.8 2.1s5.9-.8 7.8-2.1"/>
-            <path d="M4.2 17.2c1.9-1.3 4.9-2.1 7.8-2.1s5.9.8 7.8 2.1"/>
+          <svg viewBox="0 0 32 32" width="34" height="34">
+            <polygon points="8,4 24,4 29,12 16,28 3,12" fill="#B4893D"/>
+            <polygon points="8,4 15,4 11,12 3,12" fill="#FFFFFF" opacity="0.4"/>
+            <polygon points="24,4 17,4 21,12 29,12" fill="#FFFFFF" opacity="0.15"/>
+            <polygon points="3,12 11,12 16,28" fill="#000000" opacity="0.10"/>
+            <polygon points="29,12 21,12 16,28" fill="#000000" opacity="0.25"/>
           </svg>
         </div>
-        <div class="server-name">Global Server</div>
-        <div class="server-sub">Global / Other Countries</div>
+        <div class="server-name">MLBB Diamond</div>
+        <div class="server-sub">Mobile Legends: Bang Bang</div>
       </div>
-      <div class="server-card" data-server="mm">
+      <div class="server-card" data-game="hok">
         <div class="server-icon">
-          <svg viewBox="0 0 30 20" width="38" height="26" style="border-radius:4px;overflow:hidden;">
-            <rect width="30" height="6.667" y="0" fill="#FECB00"/>
-            <rect width="30" height="6.667" y="6.667" fill="#34B233"/>
-            <rect width="30" height="6.667" y="13.333" fill="#EA2839"/>
-            <polygon points="15,4.2 16.05,7.4 19.4,7.4 16.68,9.35 17.73,12.55 15,10.6 12.27,12.55 13.32,9.35 10.6,7.4 13.95,7.4" fill="#FFFFFF"/>
+          <svg viewBox="0 0 32 32" width="34" height="34">
+            <circle cx="16" cy="16" r="13" fill="#B4893D"/>
+            <circle cx="16" cy="16" r="13" fill="none" stroke="#8C2F4B" stroke-width="1.4" opacity="0.5"/>
+            <text x="16" y="21" font-size="13" font-weight="700" text-anchor="middle" fill="#FFFFFF" font-family="Georgia, serif">H</text>
           </svg>
         </div>
-        <div class="server-name">Myanmar Server</div>
-        <div class="server-sub">Myanmar (MM) Server</div>
+        <div class="server-name">HOK Token</div>
+        <div class="server-sub">Honor of Kings</div>
+      </div>
+    </div>
+
+    <div id="serverSection" class="reveal-section">
+      <div class="section-label" style="margin-top:20px;"><span class="num">2</span> Server ရွေးရန်</div>
+      <div class="server-grid" id="serverGrid">
+        <div class="server-card" data-server="global">
+          <div class="server-icon">
+            <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="var(--accent-cyan)" stroke-width="1.6">
+              <circle cx="12" cy="12" r="9.5"/>
+              <ellipse cx="12" cy="12" rx="4.3" ry="9.5"/>
+              <line x1="2.5" y1="12" x2="21.5" y2="12"/>
+              <path d="M4.2 6.8c1.9 1.3 4.9 2.1 7.8 2.1s5.9-.8 7.8-2.1"/>
+              <path d="M4.2 17.2c1.9-1.3 4.9-2.1 7.8-2.1s5.9.8 7.8 2.1"/>
+            </svg>
+          </div>
+          <div class="server-name">Global Server</div>
+          <div class="server-sub">Global / Other Countries</div>
+        </div>
+        <div class="server-card" data-server="mm">
+          <div class="server-icon">
+            <svg viewBox="0 0 30 20" width="38" height="26" style="border-radius:4px;overflow:hidden;">
+              <rect width="30" height="6.667" y="0" fill="#FECB00"/>
+              <rect width="30" height="6.667" y="6.667" fill="#34B233"/>
+              <rect width="30" height="6.667" y="13.333" fill="#EA2839"/>
+              <polygon points="15,4.2 16.05,7.4 19.4,7.4 16.68,9.35 17.73,12.55 15,10.6 12.27,12.55 13.32,9.35 10.6,7.4 13.95,7.4" fill="#FFFFFF"/>
+            </svg>
+          </div>
+          <div class="server-name">Myanmar Server</div>
+          <div class="server-sub">Myanmar (MM) Server</div>
+        </div>
       </div>
     </div>
 
     <div id="afterServerSection" class="reveal-section">
 
-      <div class="section-label" style="margin-top:20px;"><span class="num">2</span> Diamond Pack ရွေးရန်</div>
+      <div class="section-label" style="margin-top:20px;"><span class="num">3</span> <span id="packSectionLabel">Diamond Pack ရွေးရန်</span></div>
       <div id="packGrid"></div>
 
       <div class="ticket" id="ticket">
@@ -727,7 +757,7 @@
         <div class="ticket-price" id="ticketPrice">0<small>Ks</small></div>
       </div>
 
-      <div class="section-label" style="margin-top:20px;"><span class="num">3</span> ကစားသမား အချက်အလက်
+      <div class="section-label" style="margin-top:20px;"><span class="num">4</span> ကစားသမား အချက်အလက်
         <button type="button" class="help-btn" id="idHelpBtn" aria-label="Player ID ဘယ်လိုရှာမလဲ">?</button>
       </div>
       <div class="id-help-box" id="idHelpBox">
@@ -740,7 +770,7 @@
           <input type="text" id="playerId" inputmode="numeric" pattern="[0-9]{6,12}" maxlength="12" placeholder="ဥပမာ 123456789" required>
           <div class="field-error" id="playerIdError"></div>
         </div>
-        <div class="field">
+        <div class="field" id="zoneIdField">
           <label for="zoneId">Zone ID</label>
           <input type="text" id="zoneId" inputmode="numeric" pattern="[0-9]{3,5}" maxlength="5" placeholder="ဥပမာ 2222" required>
           <div class="field-error" id="zoneIdError"></div>
@@ -756,7 +786,7 @@
 
     <div id="restOfForm" class="reveal-section">
 
-      <div class="section-label"><span class="num">4</span> ငွေလွှဲ အထောက်အထား</div>
+      <div class="section-label"><span class="num">5</span> ငွေလွှဲ အထောက်အထား</div>
 
       <div class="pay-methods">
         <div class="pay-chip active" data-method="KBZPay">KBZPay</div>
@@ -817,7 +847,7 @@
 
       <div class="modal-recap">
         <div class="mr-row"><span class="mr-k">Player ID</span><span class="mr-v" id="mrPlayerId">—</span></div>
-        <div class="mr-row"><span class="mr-k">Zone ID</span><span class="mr-v" id="mrZoneId">—</span></div>
+        <div class="mr-row" id="mrZoneIdRow"><span class="mr-k">Zone ID</span><span class="mr-v" id="mrZoneId">—</span></div>
         <div class="mr-row" id="mrUsernameRow" style="display:none;"><span class="mr-k">Username</span><span class="mr-v mr-username" id="mrUsername">—</span></div>
         <div class="mr-row"><span class="mr-k">Server</span><span class="mr-v" id="mrServer">—</span></div>
         <div class="mr-row"><span class="mr-k">Package</span><span class="mr-v mr-gold" id="mrPackage">—</span></div>
@@ -999,8 +1029,12 @@ const FALLBACK_PACKS = [
 // ⚠️ ဒီ URL ကို Google Sheet ရဲ့ "Publish to web" CSV link နဲ့ အစားထိုးပါ
 // (File > Share > Publish to web > CSV format > Publish)
 const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/165HkTXR8kc4sT8HB8KoZFoSknZ97JVAYSrxWfEd3Loc/export?format=csv&gid=0";
+// ⚠️ HOK TOKEN PRICE ရှိတဲ့ tab ကို Google Sheet ထဲမှာ click ဝင်ထားစဉ် URL ထဲက
+// "#gid=XXXXXXXXX" ဂဏန်းကို ကူးပြီး ဒီနေရာကို အစားထိုးပါ
+const HOK_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/165HkTXR8kc4sT8HB8KoZFoSknZ97JVAYSrxWfEd3Loc/export?format=csv&gid=1056215074";
 
 let PACKS = [];
+let PACKS_HOK = [];
 
 // Minimal CSV parser — handles quoted fields containing commas
 function parseCSV(text) {
@@ -1027,13 +1061,15 @@ function parseCSV(text) {
   return rows;
 }
 
-// Matches your real sheet layout: a title/exchange-rate row at the top,
-// then a header row containing "Package", "Diamond Amount", "Profitable"
+// Matches the real sheet layout: a title/exchange-rate row at the top,
+// then a header row containing "Package", <amountColName>, "Profitable"
 // (column order doesn't matter). "Package" is only filled on the first
 // row of each group and left blank on the rows below it (merged-cell
 // style) — we carry the last-seen Package name down onto blank rows.
 // "Profitable" is used as the customer-facing price.
-function rowsToPacks(rows) {
+// amountColName / unitLabel let the same parser handle both the MLBB
+// sheet ("Diamond Amount" / "Diamond") and the HOK sheet ("Tokens" / "Token").
+function rowsToPacks(rows, amountColName = 'diamond amount', unitLabel = 'Diamond') {
   if (!rows.length) return [];
 
   // Find the header row (the row that contains a "Package" cell) instead
@@ -1045,7 +1081,7 @@ function rowsToPacks(rows) {
 
   const header = rows[headerIdx].map(h => h.trim().toLowerCase());
   const pkgI = header.indexOf('package');
-  const amtI = header.indexOf('diamond amount');
+  const amtI = header.indexOf(amountColName);
   const priceI = header.indexOf('profitable');
   const iconI = header.indexOf('icon'); // optional — Sheet column not required
   if (pkgI === -1 || amtI === -1 || priceI === -1) return [];
@@ -1063,7 +1099,7 @@ function rowsToPacks(rows) {
     const price = Number((r[priceI] || '').replace(/[,\s]/g, ''));
     if (!lastGroup || !amount || !Number.isFinite(price) || price <= 0) continue;
 
-    const label = /diamond|pass|pack/i.test(amount) ? amount : `${amount} Diamond`;
+    const label = /diamond|pass|pack|token|card/i.test(amount) ? amount : `${amount} ${unitLabel}`;
     const icon = iconI !== -1 ? (r[iconI] || '').trim() : '';
 
     if (!groupMap.has(lastGroup)) { groupMap.set(lastGroup, []); groupOrder.push(lastGroup); }
@@ -1076,7 +1112,7 @@ async function loadPacks() {
   try {
     const res = await fetch(SHEET_CSV_URL + (SHEET_CSV_URL.includes('?') ? '&' : '?') + 'ts=' + Date.now());
     if (!res.ok) throw new Error('SHEET_FETCH_FAILED');
-    const parsed = rowsToPacks(parseCSV(await res.text()));
+    const parsed = rowsToPacks(parseCSV(await res.text()), 'diamond amount', 'Diamond');
     if (!parsed.length) throw new Error('SHEET_EMPTY_OR_MISFORMATTED');
     PACKS = parsed;
   } catch (err) {
@@ -1084,6 +1120,18 @@ async function loadPacks() {
     PACKS = FALLBACK_PACKS;
     showToast("ဈေးနှုန်းအသစ် sync မဖြစ်သေးပါ — နောက်ဆုံးသိမ်းထားသော ဈေးနှုန်းများ ပြသနေပါသည်", "error");
   }
+
+  try {
+    const res2 = await fetch(HOK_SHEET_CSV_URL + (HOK_SHEET_CSV_URL.includes('?') ? '&' : '?') + 'ts=' + Date.now());
+    if (!res2.ok) throw new Error('HOK_SHEET_FETCH_FAILED');
+    const parsed2 = rowsToPacks(parseCSV(await res2.text()), 'tokens', 'Token');
+    if (!parsed2.length) throw new Error('HOK_SHEET_EMPTY_OR_MISFORMATTED');
+    PACKS_HOK = parsed2;
+  } catch (err) {
+    console.error('HOK Token Sheet ကနေ ဈေးနှုန်း ဆွဲမရပါ:', err);
+    PACKS_HOK = [];
+  }
+
   buildPackDropdown();
 }
 
@@ -1105,11 +1153,16 @@ function packIconHtml(icon) {
 
 /* ---------- Build pack card grid ---------- */
 const packGrid = document.getElementById('packGrid');
+const gameGrid = document.getElementById('gameGrid');
+const serverSection = document.getElementById('serverSection');
+const serverGrid = document.getElementById('serverGrid');
 const afterServerSection = document.getElementById('afterServerSection');
 const restOfForm = document.getElementById('restOfForm');
-const serverGrid = document.getElementById('serverGrid');
-let selectedPackValue = null; // "gi-ii" — indexes into the global PACKS array
-let currentServer = null; // 'global' | 'mm'
+const zoneIdField = document.getElementById('zoneIdField');
+const packSectionLabel = document.getElementById('packSectionLabel');
+let selectedPackValue = null; // "gi-ii" — indexes into the active game's PACKS array
+let currentGame = null; // 'mlbb' | 'hok'
+let currentServer = null; // 'global' | 'mm' (only meaningful for mlbb)
 
 // Classifies a Sheet "Package" group name as Global or Myanmar server based
 // on its name. Any group whose name mentions Myanmar/MM is treated as the
@@ -1118,18 +1171,24 @@ function classifyGroup(groupName) {
   return /myanmar|မြန်မာ|\bmm\b/i.test(groupName) ? 'mm' : 'global';
 }
 
+function activePacks() {
+  return currentGame === 'hok' ? PACKS_HOK : PACKS;
+}
+
 function buildPackDropdown() {
-  if (!currentServer) return; // nothing to show until a server is picked
+  if (!currentGame) return;
+  if (currentGame === 'mlbb' && !currentServer) return; // wait for server pick too
   packGrid.innerHTML = '';
 
-  if (!PACKS.length) {
+  const packs = activePacks();
+  if (!packs.length) {
     packGrid.innerHTML = '<div class="pack-empty-msg">ဈေးနှုန်းများ Load နေသည်...</div>';
     return;
   }
 
   let found = false;
-  PACKS.forEach((grp, gi) => {
-    if (classifyGroup(grp.group) !== currentServer) return;
+  packs.forEach((grp, gi) => {
+    if (currentGame === 'mlbb' && classifyGroup(grp.group) !== currentServer) return;
     found = true;
 
     const label = document.createElement('div');
@@ -1163,9 +1222,58 @@ function buildPackDropdown() {
   });
 
   if (!found) {
-    packGrid.innerHTML = '<div class="pack-empty-msg">ဒီ Server အတွက် Pack မရှိသေးပါ</div>';
+    packGrid.innerHTML = '<div class="pack-empty-msg">Pack မရှိသေးပါ</div>';
   }
 }
+
+function resetDownstreamSelections() {
+  selectedPackValue = null;
+  ticket.classList.remove('filled');
+  ticketPack.textContent = 'မရွေးရသေးပါ';
+  ticketPrice.innerHTML = '0<small>Ks</small>';
+  restOfForm.classList.remove('shown');
+  restOfForm.style.display = 'none';
+  afterServerSection.classList.remove('shown');
+  afterServerSection.style.display = 'none';
+}
+
+function selectGame(game, cardEl) {
+  currentGame = game;
+  currentServer = null;
+  gameGrid.querySelectorAll('.server-card').forEach(c => c.classList.remove('selected'));
+  cardEl.classList.add('selected');
+  serverGrid.querySelectorAll('.server-card').forEach(c => c.classList.remove('selected'));
+  resetDownstreamSelections();
+
+  if (game === 'mlbb') {
+    packSectionLabel.textContent = 'Diamond Pack ရွေးရန်';
+    zoneIdField.style.display = 'block';
+    zoneIdInput.required = true;
+    serverSection.style.display = 'block';
+    requestAnimationFrame(() => {
+      serverSection.classList.add('shown');
+      serverSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+  } else {
+    packSectionLabel.textContent = 'Token Pack ရွေးရန်';
+    zoneIdField.style.display = 'none';
+    zoneIdInput.required = false;
+    zoneIdInput.value = '';
+    serverSection.classList.remove('shown');
+    serverSection.style.display = 'none';
+    // HOK has no server step — go straight to the pack grid
+    buildPackDropdown();
+    afterServerSection.style.display = 'block';
+    requestAnimationFrame(() => {
+      afterServerSection.classList.add('shown');
+      afterServerSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+  }
+}
+
+gameGrid.querySelectorAll('.server-card').forEach(card => {
+  card.addEventListener('click', () => selectGame(card.dataset.game, card));
+});
 
 function selectServer(server, cardEl) {
   currentServer = server;
@@ -1197,7 +1305,7 @@ serverGrid.querySelectorAll('.server-card').forEach(card => {
 });
 
 function selectPack(gi, ii, cardEl) {
-  const item = PACKS[gi].items[ii];
+  const item = activePacks()[gi].items[ii];
   selectedPackValue = `${gi}-${ii}`;
 
   packGrid.querySelectorAll('.pack-card').forEach(c => c.classList.remove('selected'));
@@ -1499,9 +1607,17 @@ let verifiedUsername = null;
 let usernameLookupSeq = 0; // guards against out-of-order responses
 
 async function tryLookupUsername() {
+  verifiedUsername = null;
+
+  // The lookup service is MLBB-specific and needs a Zone ID, which HOK
+  // orders don't have — just skip it for HOK.
+  if (currentGame !== 'mlbb') {
+    usernameCheckEl.classList.remove('shown');
+    return;
+  }
+
   const playerId = playerIdInput.value.trim();
   const zoneId = zoneIdInput.value.trim();
-  verifiedUsername = null;
 
   if (!ID_PATTERN.test(playerId) || !ZONE_PATTERN.test(zoneId)) {
     usernameCheckEl.classList.remove('shown');
@@ -1603,8 +1719,16 @@ confirmModal.addEventListener('click', (e) => { if (e.target === confirmModal) c
 function openConfirmModal() {
   const { playerId, zoneId, item } = pendingOrder;
   document.getElementById('mrPlayerId').textContent = playerId;
-  document.getElementById('mrZoneId').textContent = zoneId;
-  document.getElementById('mrServer').textContent = currentServer === 'mm' ? 'Myanmar Server' : 'Global Server';
+
+  const zoneIdRow = document.getElementById('mrZoneIdRow');
+  if (currentGame === 'mlbb') {
+    zoneIdRow.style.display = 'flex';
+    document.getElementById('mrZoneId').textContent = zoneId;
+    document.getElementById('mrServer').textContent = currentServer === 'mm' ? 'Myanmar Server' : 'Global Server';
+  } else {
+    zoneIdRow.style.display = 'none';
+    document.getElementById('mrServer').textContent = 'HOK Token';
+  }
   document.getElementById('mrPackage').textContent = item.label;
 
   const usernameRow = document.getElementById('mrUsernameRow');
@@ -1629,12 +1753,13 @@ form.addEventListener('submit', (e) => {
   e.preventDefault();
 
   const playerId = playerIdInput.value.trim();
-  const zoneId = zoneIdInput.value.trim();
+  const zoneId = currentGame === 'mlbb' ? zoneIdInput.value.trim() : '';
   const file = compressedFile || screenshotInput.files[0];
 
+  if (!currentGame) { showToast("ဂိမ်း ရွေးချယ်ပေးပါ", "error"); return; }
   if (!ID_PATTERN.test(playerId)) { showToast("Player ID မှားနေပါသည် — ဂဏန်း ၆-၁၂ လုံးသာ ထည့်ပါ", "error"); return; }
-  if (!ZONE_PATTERN.test(zoneId)) { showToast("Zone ID မှားနေပါသည် — ဂဏန်း ၃-၅ လုံးသာ ထည့်ပါ", "error"); return; }
-  if (!selectedPackValue) { showToast("Diamond Pack ရွေးချယ်ပေးပါ", "error"); return; }
+  if (currentGame === 'mlbb' && !ZONE_PATTERN.test(zoneId)) { showToast("Zone ID မှားနေပါသည် — ဂဏန်း ၃-၅ လုံးသာ ထည့်ပါ", "error"); return; }
+  if (!selectedPackValue) { showToast("Pack ရွေးချယ်ပေးပါ", "error"); return; }
   if (!file) { showToast("ငွေလွှဲပြေစာ Screenshot တင်ပေးပါ", "error"); return; }
 
   const now = Date.now();
@@ -1645,7 +1770,7 @@ form.addEventListener('submit', (e) => {
   }
 
   const [gi, ii] = selectedPackValue.split('-').map(Number);
-  pendingOrder = { playerId, zoneId, file, gi, ii, item: PACKS[gi].items[ii] };
+  pendingOrder = { playerId, zoneId, file, gi, ii, item: activePacks()[gi].items[ii] };
   openConfirmModal();
 });
 
@@ -1689,8 +1814,9 @@ finalConfirmBtn.addEventListener('click', async () => {
     try {
       await db.collection("orders").doc(orderId).set({
         orderId,
+        game: currentGame,
         playerId,
-        zoneId,
+        zoneId: currentGame === 'mlbb' ? zoneId : null,
         username: verifiedUsername || null,
         packLabel: item.label,
         packPrice: item.price,
@@ -1707,8 +1833,9 @@ finalConfirmBtn.addEventListener('click', async () => {
 
     const caption =
       `🆕 Order အသစ် #${orderId}\n` +
+      `🎮 ${currentGame === 'hok' ? 'HOK Token' : 'MLBB Diamond'}\n` +
       `👤 Player ID: ${playerId}${verifiedUsername ? ' (' + verifiedUsername + ')' : ''}\n` +
-      `🌍 Zone ID: ${zoneId}\n` +
+      (currentGame === 'mlbb' ? `🌍 Zone ID: ${zoneId}\n` : '') +
       `💎 Pack: ${item.label} x${qty}\n` +
       `💰 စုစုပေါင်း: ${totalPrice.toLocaleString()} Ks\n` +
       `💳 ငွေလွှဲနည်း: ${selectedMethod}\n` +
@@ -1730,11 +1857,11 @@ finalConfirmBtn.addEventListener('click', async () => {
     closeModal();
     document.getElementById('orderIdDisplay').textContent = "#" + orderId;
     document.getElementById('orderSummary').innerHTML = `
-      <div class="os-row"><span class="os-k">Server</span><span class="os-v">${currentServer === 'mm' ? 'Myanmar Server' : 'Global Server'}</span></div>
+      <div class="os-row"><span class="os-k">Server</span><span class="os-v">${currentGame === 'hok' ? 'HOK Token' : (currentServer === 'mm' ? 'Myanmar Server' : 'Global Server')}</span></div>
       <div class="os-row"><span class="os-k">Pack</span><span class="os-v">${escapeHtml(item.label)} x${qty}</span></div>
       <div class="os-row"><span class="os-k">စုစုပေါင်း</span><span class="os-v">${totalPrice.toLocaleString()} Ks</span></div>
       <div class="os-row"><span class="os-k">Player ID</span><span class="os-v">${escapeHtml(playerId)}${verifiedUsername ? ' (' + escapeHtml(verifiedUsername) + ')' : ''}</span></div>
-      <div class="os-row"><span class="os-k">Zone ID</span><span class="os-v">${escapeHtml(zoneId)}</span></div>
+      ${currentGame === 'mlbb' ? `<div class="os-row"><span class="os-k">Zone ID</span><span class="os-v">${escapeHtml(zoneId)}</span></div>` : ''}
     `;
     form.style.display = 'none';
     document.getElementById('successPanel').style.display = 'block';
