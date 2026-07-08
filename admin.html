@@ -5,30 +5,33 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin Dashboard — Diamond Orders</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Noto+Sans+Myanmar:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Outfit:wght@400;500;600;700&family=Noto+Sans+Myanmar:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg-void:#090b16;
-    --bg-void-2:#0d1128;
-    --panel:rgba(22,27,51,0.62);
-    --panel-solid:#141a34;
-    --border-glass:rgba(255,255,255,0.09);
-    --input-bg:rgba(9,11,22,0.55);
-    --accent-blue:#5b7fff;
-    --accent-cyan:#4ce0e8;
-    --accent-gold:#ffc857;
-    --text-primary:#edeff7;
-    --text-muted:#8d93b0;
-    --success:#34d399;
-    --danger:#fb7185;
-    --font-display:'Rajdhani',sans-serif;
-    --font-body:'Noto Sans Myanmar','Rajdhani',sans-serif;
+    --bg-void:#FAF3E7;
+    --bg-void-2:#F2E6D2;
+    --panel:rgba(255,255,255,0.72);
+    --panel-solid:#FFFFFF;
+    --border-glass:rgba(43,36,29,0.12);
+    --input-bg:rgba(43,36,29,0.045);
+    --accent-blue:#8C2F4B;
+    --accent-cyan:#B4893D;
+    --accent-gold:#A9762E;
+    --text-primary:#2B241D;
+    --text-muted:#8A7F70;
+    --success:#3F7D5C;
+    --danger:#B23A48;
+    --font-display:'Cormorant Garamond',serif;
+    --font-body:'Noto Sans Myanmar','Outfit',sans-serif;
     --radius:16px;
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   body{
     font-family:var(--font-body);
-    background:linear-gradient(180deg, var(--bg-void) 0%, var(--bg-void-2) 100%);
+    background:
+      radial-gradient(circle at 15% 0%, rgba(140,47,75,0.06), transparent 45%),
+      radial-gradient(circle at 90% 15%, rgba(180,137,61,0.09), transparent 40%),
+      linear-gradient(180deg, var(--bg-void) 0%, var(--bg-void-2) 100%);
     color:var(--text-primary);
     min-height:100vh;
     padding:24px 16px 60px;
@@ -41,9 +44,10 @@
     background:var(--panel);border:1px solid var(--border-glass);
     border-radius:var(--radius);padding:32px 28px;
     backdrop-filter:blur(14px);
+    box-shadow:0 8px 30px rgba(43,36,29,0.08);
   }
   #loginScreen h1{
-    font-family:var(--font-display);font-size:22px;font-weight:700;
+    font-family:var(--font-display);font-size:24px;font-weight:700;
     margin-bottom:6px;text-align:center;
   }
   #loginScreen p.sub{color:var(--text-muted);font-size:13px;text-align:center;margin-bottom:22px;}
@@ -58,9 +62,9 @@
   .field input:focus{border-color:var(--accent-cyan);}
   .btn{
     width:100%;padding:12px;border-radius:10px;border:none;cursor:pointer;
-    font-family:var(--font-display);font-weight:700;font-size:15px;letter-spacing:.3px;
-    background:linear-gradient(135deg,var(--accent-cyan),var(--accent-blue));
-    color:#06111f;
+    font-family:var(--font-display);font-weight:700;font-size:16px;letter-spacing:.3px;
+    background:linear-gradient(135deg,var(--accent-blue),var(--accent-cyan));
+    color:#FDF6EC;
   }
   .btn:disabled{opacity:.6;cursor:not-allowed;}
   #loginError{
@@ -73,7 +77,7 @@
     display:flex;justify-content:space-between;align-items:center;
     margin-bottom:22px;flex-wrap:wrap;gap:12px;
   }
-  header.top h1{font-family:var(--font-display);font-size:24px;font-weight:700;}
+  header.top h1{font-family:var(--font-display);font-size:26px;font-weight:700;}
   header.top .who{color:var(--text-muted);font-size:13px;}
   .logout-btn{
     padding:8px 16px;border-radius:999px;border:1px solid var(--border-glass);
@@ -85,8 +89,9 @@
   .stat-card{
     background:var(--panel);border:1px solid var(--border-glass);
     border-radius:14px;padding:16px;text-align:center;
+    box-shadow:0 4px 14px rgba(43,36,29,0.06);
   }
-  .stat-card .num{font-family:var(--font-display);font-size:26px;font-weight:700;}
+  .stat-card .num{font-family:var(--font-display);font-size:28px;font-weight:700;}
   .stat-card .lbl{color:var(--text-muted);font-size:12px;margin-top:2px;}
   .stat-card.pending .num{color:var(--accent-gold);}
   .stat-card.completed .num{color:var(--success);}
@@ -98,7 +103,7 @@
     padding:8px 16px;border-radius:999px;font-size:13px;cursor:pointer;
     background:var(--panel);border:1px solid var(--border-glass);color:var(--text-muted);
   }
-  .tab.active{background:linear-gradient(135deg,var(--accent-cyan),var(--accent-blue));color:#06111f;font-weight:600;border-color:transparent;}
+  .tab.active{background:linear-gradient(135deg,var(--accent-blue),var(--accent-cyan));color:#FDF6EC;font-weight:600;border-color:transparent;}
 
   /* ---------- Order cards ---------- */
   #ordersList{display:flex;flex-direction:column;gap:12px;}
@@ -106,6 +111,7 @@
     background:var(--panel);border:1px solid var(--border-glass);
     border-radius:14px;padding:16px 18px;
     display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;
+    box-shadow:0 4px 14px rgba(43,36,29,0.05);
   }
   .order-main{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;align-items:center;}
   .order-main .col .k{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;}
@@ -113,15 +119,15 @@
   .badge{
     display:inline-block;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:600;
   }
-  .badge.pending{background:rgba(255,200,87,.15);color:var(--accent-gold);}
-  .badge.completed{background:rgba(52,211,153,.15);color:var(--success);}
-  .badge.rejected{background:rgba(251,113,133,.15);color:var(--danger);}
+  .badge.pending{background:rgba(169,118,46,.15);color:var(--accent-gold);}
+  .badge.completed{background:rgba(63,125,93,.15);color:var(--success);}
+  .badge.rejected{background:rgba(178,58,72,.15);color:var(--danger);}
   .order-actions{display:flex;gap:8px;}
   .act-btn{
     padding:8px 14px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:600;
   }
-  .act-btn.approve{background:var(--success);color:#06251a;}
-  .act-btn.reject{background:var(--danger);color:#2b0810;}
+  .act-btn.approve{background:var(--success);color:#F3F9F5;}
+  .act-btn.reject{background:var(--danger);color:#FCF1F2;}
   .act-btn.delete{background:transparent;color:var(--danger);border:1px solid var(--danger);}
   .act-btn:disabled{opacity:.5;cursor:not-allowed;}
   .empty-state{text-align:center;padding:60px 20px;color:var(--text-muted);}
@@ -137,6 +143,7 @@
 <body>
 
 <div class="wrap">
+
 
   <!-- ---------- Login ---------- -->
   <div id="loginScreen">
