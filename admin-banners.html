@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Banner Admin | King Diamond Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Outfit:wght@400;500;600;700&family=Noto+Sans+Myanmar:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+<style>
+  :root{
+    --bg-void:#FAF3E7;
+    --bg-void-2:#F2E6D2;
+    --panel:rgba(255,255,255,0.72);
+    --panel-solid:#FFFFFF;
+    --border-glass:rgba(43,36,29,0.12);
+    --input-bg:rgba(43,36,29,0.045);
+    --accent-blue:#8C2F4B;
+    --accent-cyan:#B4893D;
+    --accent-gold:#A9762E;
+    --text-primary:#2B241D;
+    --text-muted:#8A7F70;
+    --success:#3F7D5C;
+    --danger:#B23A48;
+    --font-display:'Cormorant Garamond',serif;
+    --font-body:'Noto Sans Myanmar','Outfit',sans-serif;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  body{
+    font-family:var(--font-body);
+    color:var(--text-primary);
+    background:
+      radial-gradient(circle at 15% 0%, rgba(140,47,75,0.07), transparent 45%),
+      radial-gradient(circle at 90% 15%, rgba(180,137,61,0.10), transparent 40%),
+      linear-gradient(180deg, var(--bg-void) 0%, var(--bg-void-2) 100%);
+    min-height:100%;
+    padding:24px 16px 60px;
+  }
+  .wrap{max-width:640px;margin:0 auto;padding-top:20px;}
+  h1{
+    font-family:var(--font-display);font-weight:700;font-size:clamp(24px,6vw,32px);
+    color:var(--text-primary);text-align:center;margin-bottom:6px;
+  }
+  .sub{text-align:center;color:var(--text-muted);font-size:13.5px;margin-bottom:26px;}
+
+  .card{
+    background:var(--panel);border:1px solid var(--border-glass);border-radius:var(--radius);
+    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    padding:22px;margin-bottom:18px;
+    box-shadow:0 8px 30px rgba(43,36,29,0.08), inset 0 1px 0 rgba(255,255,255,0.5);
+    position:relative;overflow:hidden;
+  }
+  .card::before{
+    content:"";position:absolute;top:0;left:0;right:0;height:1px;
+    background:linear-gradient(90deg, transparent, rgba(169,118,46,0.55), rgba(140,47,75,0.45), transparent);
+  }
+  .section-label{
+    font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:0.06em;
+    color:var(--accent-gold);text-transform:uppercase;margin-bottom:14px;
+  }
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:13px;color:var(--text-muted);margin-bottom:6px;}
+  .field input[type=text], .field input[type=password], .field input[type=url]{
+    width:100%;background:var(--input-bg);border:1px solid var(--border-glass);
+    color:var(--text-primary);padding:12px 14px;border-radius:12px;
+    font-family:var(--font-body);font-size:15px;outline:none;
+  }
+  .field input:focus{border-color:var(--accent-cyan);box-shadow:0 0 0 3px rgba(180,137,61,0.15);}
+  .hint{font-size:12px;color:var(--text-muted);line-height:1.6;margin-top:8px;}
+  .hint b{color:var(--accent-gold);}
+
+  .upload-box{
+    border:1.5px dashed var(--border-glass);border-radius:14px;padding:22px;text-align:center;
+    cursor:pointer;position:relative;transition:border-color .15s, background .15s;
+  }
+  .upload-box:hover{border-color:var(--accent-cyan);background:rgba(180,137,61,0.05);}
+  .upload-box.has-file{border-color:var(--success);border-style:solid;}
+  .upload-box input{position:absolute;inset:0;opacity:0;cursor:pointer;}
+  .upload-icon{font-size:26px;margin-bottom:6px;}
+  .upload-text{font-size:13.5px;color:var(--text-muted);}
+  .upload-preview{margin-top:12px;max-width:100%;max-height:200px;border-radius:10px;display:none;}
+
+  .submit-btn{
+    width:100%;padding:15px;border:none;border-radius:14px;
+    background:linear-gradient(90deg,var(--accent-blue),var(--accent-cyan));
+    color:#FDF6EC;font-family:var(--font-display);font-weight:700;font-size:17px;
+    letter-spacing:0.03em;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    transition:transform .12s, opacity .12s; margin-top:4px;
+  }
+  .submit-btn:active{transform:scale(0.985);}
+  .submit-btn:disabled{opacity:0.55;cursor:not-allowed;}
+  .spinner{
+    width:16px;height:16px;border:2.5px solid rgba(253,246,236,0.35);
+    border-top-color:#FDF6EC;border-radius:50%;animation:spin .7s linear infinite;display:none;
+  }
+  .submit-btn.loading .spinner{display:inline-block;}
+  .submit-btn.loading .btn-text{display:none;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .banner-list{display:flex;flex-direction:column;gap:12px;}
+  .banner-item{
+    display:flex;align-items:center;gap:12px;
+    background:var(--input-bg);border:1px solid var(--border-glass);
+    border-radius:12px;padding:10px;
+  }
+  .banner-item img{
+    width:76px;height:44px;object-fit:cover;border-radius:8px;flex-shrink:0;
+    background:var(--bg-void-2);
+  }
+  .banner-item .bi-info{flex:1;min-width:0;}
+  .banner-item .bi-title{font-size:13.5px;font-weight:600;color:var(--text-primary);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .banner-item .bi-meta{font-size:11.5px;color:var(--text-muted);margin-top:2px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .del-btn{
+    flex-shrink:0;background:rgba(178,58,72,0.10);border:1px solid rgba(178,58,72,0.35);
+    color:var(--danger);padding:8px 12px;border-radius:10px;font-size:12.5px;font-weight:700;
+    cursor:pointer;font-family:var(--font-body);
+  }
+  .del-btn:active{transform:scale(0.95);}
+  .del-btn:disabled{opacity:0.5;cursor:not-allowed;}
+  .empty-msg{color:var(--text-muted);font-size:13px;text-align:center;padding:16px 0;}
+
+  .gate{max-width:360px;margin:80px auto 0;}
+  .toast{
+    position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);
+    background:var(--panel-solid);border:1px solid var(--border-glass);color:var(--text-primary);
+    padding:12px 18px;border-radius:12px;font-size:13.5px;box-shadow:0 8px 24px rgba(0,0,0,0.15);
+    opacity:0;pointer-events:none;transition:all .25s;z-index:50;max-width:88vw;text-align:center;
+  }
+  .toast.shown{opacity:1;transform:translateX(-50%) translateY(0);}
+  .toast.error{border-color:rgba(178,58,72,0.4);color:var(--danger);}
+  .toast.success{border-color:rgba(63,125,93,0.4);color:var(--success);}
+</style>
+</head>
+<body>
+
+<!-- ============ PASSCODE GATE ============ -->
+<div class="wrap gate" id="gateWrap">
+  <h1>🔒 Banner Admin</h1>
+  <p class="sub">စီမံခန့်ခွဲသူများသာ ဝင်ရောက်နိုင်ပါသည်</p>
+  <div class="card">
+    <div class="field">
+      <label for="passcodeInput">Passcode</label>
+      <input type="password" id="passcodeInput" placeholder="Passcode ထည့်ပါ" autocomplete="off">
+    </div>
+    <button type="button" class="submit-btn" id="gateBtn"><span class="btn-text">ဝင်မည်</span></button>
+    <p class="hint">⚠️ ဒီ passcode က UI အလွယ်တစ်ခုသာဖြစ်ပြီး ခိုင်မာသော လုံခြုံရေးမဟုတ်ပါ — ဤဖိုင်ရဲ့ script ထဲမှာ passcode ကို တွေ့မြင်နိုင်သူတိုင်း ဖြတ်ဝင်နိုင်ပါသည်။ တကယ့်လုံခြုံရေးအတွက် Firestore <b>Security Rules</b> ထဲမှာ "banners" collection ကို admin-only write ဖြစ်အောင် ပြင်ဆင်ဖို့ လိုအပ်ပါသည်။</p>
+  </div>
+</div>
+
+<!-- ============ ADMIN PANEL (shown after passcode) ============ -->
+<div class="wrap" id="adminWrap" style="display:none;">
+  <h1>💎 Banner Admin</h1>
+  <p class="sub">ထိပ်စည်း banner ပုံများကို ထည့်/ဖျက် စီမံရန်</p>
+
+  <div class="card">
+    <div class="section-label">Banner အသစ်တင်ရန်</div>
+
+    <div class="upload-box" id="uploadBox">
+      <input type="file" id="bannerFile" accept="image/png,image/jpeg,image/jpg,image/webp">
+      <div class="upload-icon">🖼️</div>
+      <div class="upload-text" id="uploadText">ပုံ (PNG/JPG) ကို နှိပ်ပြီး ရွေးပါ</div>
+      <img class="upload-preview" id="uploadPreview">
+    </div>
+
+    <div class="field" style="margin-top:16px;">
+      <label for="bannerTitle">Caption (optional — ပုံအောက်မှာ ပြမည်)</label>
+      <input type="text" id="bannerTitle" placeholder="ဥပမာ — Weekly Pass အထူးလျှော့ဈေး!">
+    </div>
+    <div class="field">
+      <label for="bannerLink">Link (optional — ပုံကို နှိပ်လျှင် ဖွင့်ပေးမည့် URL)</label>
+      <input type="url" id="bannerLink" placeholder="https://...">
+    </div>
+
+    <button type="button" class="submit-btn" id="uploadBtn">
+      <span class="spinner"></span>
+      <span class="btn-text">Banner တင်မည်</span>
+    </button>
+    <p class="hint">ပုံများကို အလိုအလျောက် ချုံ့ (compress) ပြီးမှ သိမ်းဆည်းပါမည် — အရွယ်အစားကြီးသော ပုံများ အဆင်ပြေပါသည်။</p>
+  </div>
+
+  <div class="card">
+    <div class="section-label">လက်ရှိ Banner များ</div>
+    <div class="banner-list" id="bannerList">
+      <div class="empty-msg">Loading...</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   ⚠️ CHANGE THIS before publishing — this is only a light UI
+   gate, not real security. See warning text on the page.
+   ========================================================= */
+const ADMIN_PASSCODE = "kingdiamond2026";
+
+/* ---------- Firebase (same project as the main store page) ---------- */
+const firebaseConfig = {
+  apiKey: "AIzaSyAJLqhPU-51twgJw0fp5Q-u9iBwHFx7xA8",
+  authDomain: "king-pos-and-tickets.firebaseapp.com",
+  projectId: "king-pos-and-tickets",
+  storageBucket: "king-pos-and-tickets.firebasestorage.app",
+  messagingSenderId: "870841528478",
+  appId: "1:870841528478:web:a8d145acc8df8073888b8f",
+  measurementId: "G-TRP931BEBD"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+/* ---------- Toast ---------- */
+const toastEl = document.getElementById('toast');
+let toastTimer = null;
+function showToast(msg, type = '') {
+  toastEl.textContent = msg;
+  toastEl.className = 'toast shown' + (type ? ' ' + type : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('shown'), 3000);
+}
+
+/* ---------- Passcode gate ---------- */
+const gateWrap = document.getElementById('gateWrap');
+const adminWrap = document.getElementById('adminWrap');
+const passcodeInput = document.getElementById('passcodeInput');
+const gateBtn = document.getElementById('gateBtn');
+
+function tryUnlock() {
+  if (passcodeInput.value === ADMIN_PASSCODE) {
+    sessionStorage.setItem('bannerAdminUnlocked', '1');
+    gateWrap.style.display = 'none';
+    adminWrap.style.display = 'block';
+    loadBanners();
+  } else {
+    showToast('Passcode မှားနေပါသည်', 'error');
+  }
+}
+gateBtn.addEventListener('click', tryUnlock);
+passcodeInput.addEventListener('keydown', e => { if (e.key === 'Enter') tryUnlock(); });
+
+if (sessionStorage.getItem('bannerAdminUnlocked') === '1') {
+  gateWrap.style.display = 'none';
+  adminWrap.style.display = 'block';
+  loadBanners();
+}
+
+/* ---------- Image compression (same approach as the store page) ---------- */
+function compressImage(file, maxDim = 1280, quality = 0.75) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let { width, height } = img;
+      if (width > maxDim || height > maxDim) {
+        const scale = maxDim / Math.max(width, height);
+        width = Math.round(width * scale);
+        height = Math.round(height * scale);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      canvas.toBlob(blob => {
+        if (!blob) { reject(new Error('COMPRESS_FAILED')); return; }
+        resolve(blob);
+      }, 'image/jpeg', quality);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('IMAGE_LOAD_FAILED')); };
+    img.src = url;
+  });
+}
+function blobToDataURL(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error('READ_FAILED'));
+    reader.readAsDataURL(blob);
+  });
+}
+// Firestore documents max out at ~1MiB — compress progressively until the
+// resulting base64 string comfortably fits, so uploads never silently fail.
+async function compressUntilSafe(file) {
+  const attempts = [
+    { maxDim: 1280, quality: 0.75 },
+    { maxDim: 1000, quality: 0.65 },
+    { maxDim: 800,  quality: 0.55 },
+    { maxDim: 640,  quality: 0.5 },
+  ];
+  const LIMIT = 700 * 1024; // leave headroom under the ~1MiB doc cap
+  let dataUrl = null;
+  for (const opt of attempts) {
+    const blob = await compressImage(file, opt.maxDim, opt.quality);
+    dataUrl = await blobToDataURL(blob);
+    if (dataUrl.length <= LIMIT) return dataUrl;
+  }
+  return dataUrl; // return smallest attempt even if still large
+}
+
+/* ---------- Upload form ---------- */
+const uploadBox = document.getElementById('uploadBox');
+const bannerFile = document.getElementById('bannerFile');
+const uploadText = document.getElementById('uploadText');
+const uploadPreview = document.getElementById('uploadPreview');
+const bannerTitle = document.getElementById('bannerTitle');
+const bannerLink = document.getElementById('bannerLink');
+const uploadBtn = document.getElementById('uploadBtn');
+
+let pendingDataUrl = null;
+
+bannerFile.addEventListener('change', async () => {
+  const file = bannerFile.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) {
+    showToast('ပုံဖိုင် (Image) သာ ရွေးပေးပါ', 'error');
+    bannerFile.value = ''; pendingDataUrl = null;
+    return;
+  }
+  uploadBox.classList.add('has-file');
+  uploadText.textContent = 'ပုံပြင်ဆင်နေသည်...';
+  try {
+    pendingDataUrl = await compressUntilSafe(file);
+    uploadPreview.src = pendingDataUrl;
+    uploadPreview.style.display = 'block';
+    uploadText.textContent = file.name;
+  } catch (err) {
+    console.error(err);
+    showToast('ပုံ ဖတ်ရှုမှု မအောင်မြင်ပါ', 'error');
+    pendingDataUrl = null;
+    uploadBox.classList.remove('has-file');
+    uploadText.textContent = 'ပုံ (PNG/JPG) ကို နှိပ်ပြီး ရွေးပါ';
+  }
+});
+
+uploadBtn.addEventListener('click', async () => {
+  if (!pendingDataUrl) { showToast('ပုံတစ်ခု ရွေးပေးပါ', 'error'); return; }
+
+  uploadBtn.classList.add('loading');
+  uploadBtn.disabled = true;
+  try {
+    await db.collection('banners').add({
+      image: pendingDataUrl,
+      title: bannerTitle.value.trim() || null,
+      link: bannerLink.value.trim() || null,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    showToast('Banner တင်ပြီးပါပြီ', 'success');
+
+    // reset form
+    bannerFile.value = '';
+    bannerTitle.value = '';
+    bannerLink.value = '';
+    pendingDataUrl = null;
+    uploadBox.classList.remove('has-file');
+    uploadPreview.style.display = 'none';
+    uploadText.textContent = 'ပုံ (PNG/JPG) ကို နှိပ်ပြီး ရွေးပါ';
+
+    loadBanners();
+  } catch (err) {
+    console.error(err);
+    showToast('တင်ခြင်း မအောင်မြင်ပါ: ' + err.message, 'error');
+  } finally {
+    uploadBtn.classList.remove('loading');
+    uploadBtn.disabled = false;
+  }
+});
+
+/* ---------- List + delete ---------- */
+const bannerListEl = document.getElementById('bannerList');
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+async function loadBanners() {
+  bannerListEl.innerHTML = '<div class="empty-msg">Loading...</div>';
+  try {
+    const snap = await db.collection('banners').orderBy('createdAt', 'desc').get();
+    if (snap.empty) {
+      bannerListEl.innerHTML = '<div class="empty-msg">Banner မရှိသေးပါ</div>';
+      return;
+    }
+    bannerListEl.innerHTML = '';
+    snap.forEach(doc => {
+      const b = doc.data();
+      const when = b.createdAt && b.createdAt.toDate ? b.createdAt.toDate().toLocaleString('en-GB', { timeZone: 'Asia/Yangon' }) : '';
+      const item = document.createElement('div');
+      item.className = 'banner-item';
+      item.innerHTML = `
+        <img src="${b.image}" alt="banner">
+        <div class="bi-info">
+          <div class="bi-title">${escapeHtml(b.title || '(caption မရှိ)')}</div>
+          <div class="bi-meta">${escapeHtml(when)}${b.link ? ' · linked' : ''}</div>
+        </div>
+        <button type="button" class="del-btn" data-id="${doc.id}">ဖျက်မည်</button>
+      `;
+      bannerListEl.appendChild(item);
+    });
+
+    bannerListEl.querySelectorAll('.del-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        if (!confirm('ဒီ banner ကို ဖျက်မှာ သေချာပါသလား?')) return;
+        btn.disabled = true;
+        btn.textContent = '...';
+        try {
+          await db.collection('banners').doc(btn.dataset.id).delete();
+          showToast('Banner ဖျက်ပြီးပါပြီ', 'success');
+          loadBanners();
+        } catch (err) {
+          console.error(err);
+          showToast('ဖျက်ခြင်း မအောင်မြင်ပါ', 'error');
+          btn.disabled = false;
+          btn.textContent = 'ဖျက်မည်';
+        }
+      });
+    });
+  } catch (err) {
+    console.error(err);
+    bannerListEl.innerHTML = '<div class="empty-msg">Load မအောင်မြင်ပါ</div>';
+  }
+}
+</script>
+</body>
+</html>
