@@ -3,9 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Dashboard — Diamond Orders</title>
+<title>Admin Dashboard — King Diamond Store</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Outfit:wght@400;500;600;700&family=Noto+Sans+Myanmar:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
 <style>
   :root{
     --bg-void:#FAF3E7;
@@ -53,13 +60,13 @@
   #loginScreen p.sub{color:var(--text-muted);font-size:13px;text-align:center;margin-bottom:22px;}
   .field{margin-bottom:14px;}
   .field label{display:block;font-size:13px;color:var(--text-muted);margin-bottom:6px;}
-  .field input{
+  .field input[type=email], .field input[type=password], .field input[type=text], .field input[type=url]{
     width:100%;padding:11px 12px;border-radius:10px;
     background:var(--input-bg);border:1px solid var(--border-glass);
     color:var(--text-primary);font-family:var(--font-body);font-size:14.5px;
     outline:none;
   }
-  .field input:focus{border-color:var(--accent-cyan);}
+  .field input:focus{border-color:var(--accent-cyan);box-shadow:0 0 0 3px rgba(180,137,61,0.15);}
   .btn{
     width:100%;padding:12px;border-radius:10px;border:none;cursor:pointer;
     font-family:var(--font-display);font-weight:700;font-size:16px;letter-spacing:.3px;
@@ -75,13 +82,27 @@
   #dashboard{display:none;}
   header.top{
     display:flex;justify-content:space-between;align-items:center;
-    margin-bottom:22px;flex-wrap:wrap;gap:12px;
+    margin-bottom:18px;flex-wrap:wrap;gap:12px;
   }
   header.top h1{font-family:var(--font-display);font-size:26px;font-weight:700;}
   header.top .who{color:var(--text-muted);font-size:13px;}
   .logout-btn{
     padding:8px 16px;border-radius:999px;border:1px solid var(--border-glass);
     background:var(--panel);color:var(--text-primary);font-size:13px;cursor:pointer;
+  }
+
+  /* ---------- Top-level page tabs (Orders / Banners) ---------- */
+  .page-tabs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px;max-width:420px;}
+  .page-tab{
+    padding:12px 10px;border-radius:14px;border:1px solid var(--border-glass);
+    background:var(--panel);color:var(--text-muted);cursor:pointer;
+    font-family:var(--font-display);font-weight:700;font-size:15px;
+    backdrop-filter:blur(10px);transition:all .18s;
+  }
+  .page-tab.active{
+    border-color:var(--accent-gold);color:#FDF6EC;
+    background:linear-gradient(90deg,var(--accent-blue),var(--accent-cyan));
+    box-shadow:0 6px 18px rgba(140,47,75,0.18);
   }
 
   /* ---------- Stats ---------- */
@@ -97,7 +118,7 @@
   .stat-card.completed .num{color:var(--success);}
   .stat-card.rejected .num{color:var(--danger);}
 
-  /* ---------- Filter tabs ---------- */
+  /* ---------- Filter tabs (order status) ---------- */
   .tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
   .tab{
     padding:8px 16px;border-radius:999px;font-size:13px;cursor:pointer;
@@ -132,6 +153,88 @@
   .act-btn:disabled{opacity:.5;cursor:not-allowed;}
   .empty-state{text-align:center;padding:60px 20px;color:var(--text-muted);}
 
+  /* ---------- Banners tab ---------- */
+  .card{
+    background:var(--panel);border:1px solid var(--border-glass);border-radius:var(--radius);
+    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    padding:22px;margin-bottom:18px;
+    box-shadow:0 8px 30px rgba(43,36,29,0.08), inset 0 1px 0 rgba(255,255,255,0.5);
+    position:relative;overflow:hidden;
+  }
+  .card::before{
+    content:"";position:absolute;top:0;left:0;right:0;height:1px;
+    background:linear-gradient(90deg, transparent, rgba(169,118,46,0.55), rgba(140,47,75,0.45), transparent);
+  }
+  .section-label{
+    font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:0.06em;
+    color:var(--accent-gold);text-transform:uppercase;margin-bottom:14px;
+  }
+  .hint{font-size:12px;color:var(--text-muted);line-height:1.6;margin-top:8px;}
+  .hint b{color:var(--accent-gold);}
+
+  .upload-box{
+    border:1.5px dashed var(--border-glass);border-radius:14px;padding:22px;text-align:center;
+    cursor:pointer;position:relative;transition:border-color .15s, background .15s;
+  }
+  .upload-box:hover{border-color:var(--accent-cyan);background:rgba(180,137,61,0.05);}
+  .upload-box.has-file{border-color:var(--success);border-style:solid;}
+  .upload-box input{position:absolute;inset:0;opacity:0;cursor:pointer;}
+  .upload-icon{font-size:26px;margin-bottom:6px;}
+  .upload-text{font-size:13.5px;color:var(--text-muted);}
+  .upload-preview{margin-top:12px;max-width:100%;max-height:200px;border-radius:10px;display:none;}
+
+  .submit-btn{
+    width:100%;padding:15px;border:none;border-radius:14px;
+    background:linear-gradient(90deg,var(--accent-blue),var(--accent-cyan));
+    color:#FDF6EC;font-family:var(--font-display);font-weight:700;font-size:17px;
+    letter-spacing:0.03em;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    transition:transform .12s, opacity .12s; margin-top:4px;
+  }
+  .submit-btn:active{transform:scale(0.985);}
+  .submit-btn:disabled{opacity:0.55;cursor:not-allowed;}
+  .spinner{
+    width:16px;height:16px;border:2.5px solid rgba(253,246,236,0.35);
+    border-top-color:#FDF6EC;border-radius:50%;animation:spin .7s linear infinite;display:none;
+  }
+  .submit-btn.loading .spinner{display:inline-block;}
+  .submit-btn.loading .btn-text{display:none;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .banner-list{display:flex;flex-direction:column;gap:12px;}
+  .banner-item{
+    display:flex;align-items:center;gap:12px;
+    background:var(--input-bg);border:1px solid var(--border-glass);
+    border-radius:12px;padding:10px;
+  }
+  .banner-item img{
+    width:76px;height:44px;object-fit:cover;border-radius:8px;flex-shrink:0;
+    background:var(--bg-void-2);
+  }
+  .banner-item .bi-info{flex:1;min-width:0;}
+  .banner-item .bi-title{font-size:13.5px;font-weight:600;color:var(--text-primary);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .banner-item .bi-meta{font-size:11.5px;color:var(--text-muted);margin-top:2px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .del-btn{
+    flex-shrink:0;background:rgba(178,58,72,0.10);border:1px solid rgba(178,58,72,0.35);
+    color:var(--danger);padding:8px 12px;border-radius:10px;font-size:12.5px;font-weight:700;
+    cursor:pointer;font-family:var(--font-body);
+  }
+  .del-btn:active{transform:scale(0.95);}
+  .del-btn:disabled{opacity:0.5;cursor:not-allowed;}
+  .empty-msg{color:var(--text-muted);font-size:13px;text-align:center;padding:16px 0;}
+
+  .toast{
+    position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);
+    background:var(--panel-solid);border:1px solid var(--border-glass);color:var(--text-primary);
+    padding:12px 18px;border-radius:12px;font-size:13.5px;box-shadow:0 8px 24px rgba(43,36,29,0.15);
+    opacity:0;pointer-events:none;transition:all .25s;z-index:50;max-width:88vw;text-align:center;
+  }
+  .toast.shown{opacity:1;transform:translateX(-50%) translateY(0);}
+  .toast.error{border-color:rgba(178,58,72,0.4);color:var(--danger);}
+  .toast.success{border-color:rgba(63,125,93,0.4);color:var(--success);}
+
   @media (max-width:800px){
     .stats{grid-template-columns:repeat(2,1fr);}
     .order-card{grid-template-columns:1fr;}
@@ -144,11 +247,10 @@
 
 <div class="wrap">
 
-
-  <!-- ---------- Login ---------- -->
+  <!-- ---------- Login (single gate for the whole dashboard) ---------- -->
   <div id="loginScreen">
     <h1>🔐 Admin Login</h1>
-    <p class="sub">Diamond Order Dashboard</p>
+    <p class="sub">King Diamond Store — Admin Dashboard</p>
     <div class="field">
       <label for="loginEmail">Email</label>
       <input type="email" id="loginEmail" autocomplete="username" placeholder="admin@example.com">
@@ -161,215 +263,467 @@
     <div id="loginError"></div>
   </div>
 
-  <!-- ---------- Dashboard ---------- -->
+  <!-- ---------- Dashboard (shown after login) ---------- -->
   <div id="dashboard">
     <header class="top">
       <div>
-        <h1>💎 Diamond Orders</h1>
+        <h1>💎 Admin Dashboard</h1>
         <div class="who" id="whoAmI"></div>
       </div>
       <button class="logout-btn" id="logoutBtn">Logout</button>
     </header>
 
-    <div class="stats">
-      <div class="stat-card"><div class="num" id="statTotal">0</div><div class="lbl">Total</div></div>
-      <div class="stat-card pending"><div class="num" id="statPending">0</div><div class="lbl">Pending</div></div>
-      <div class="stat-card completed"><div class="num" id="statCompleted">0</div><div class="lbl">Completed</div></div>
-      <div class="stat-card rejected"><div class="num" id="statRejected">0</div><div class="lbl">Rejected</div></div>
+    <div class="page-tabs">
+      <div class="page-tab active" id="ordersPageTab">📦 Orders</div>
+      <div class="page-tab" id="bannersPageTab">🖼️ Banners</div>
     </div>
 
-    <div class="tabs">
-      <div class="tab active" data-filter="pending">Pending</div>
-      <div class="tab" data-filter="completed">Completed</div>
-      <div class="tab" data-filter="rejected">Rejected</div>
-      <div class="tab" data-filter="all">All</div>
+    <!-- ============ ORDERS PANEL ============ -->
+    <div id="ordersPanel">
+      <div class="stats">
+        <div class="stat-card"><div class="num" id="statTotal">0</div><div class="lbl">Total</div></div>
+        <div class="stat-card pending"><div class="num" id="statPending">0</div><div class="lbl">Pending</div></div>
+        <div class="stat-card completed"><div class="num" id="statCompleted">0</div><div class="lbl">Completed</div></div>
+        <div class="stat-card rejected"><div class="num" id="statRejected">0</div><div class="lbl">Rejected</div></div>
+      </div>
+
+      <div class="tabs">
+        <div class="tab active" data-filter="pending">Pending</div>
+        <div class="tab" data-filter="completed">Completed</div>
+        <div class="tab" data-filter="rejected">Rejected</div>
+        <div class="tab" data-filter="all">All</div>
+      </div>
+
+      <div id="ordersList"></div>
     </div>
 
-    <div id="ordersList"></div>
-  </div>
+    <!-- ============ BANNERS PANEL ============ -->
+    <div id="bannersPanel" style="display:none;">
+      <div class="card">
+        <div class="section-label">Banner အသစ်တင်ရန်</div>
 
-</div>
-
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyAJLqhPU-51twgJw0fp5Q-u9iBwHFx7xA8",
-    authDomain: "king-pos-and-tickets.firebaseapp.com",
-    projectId: "king-pos-and-tickets",
-    storageBucket: "king-pos-and-tickets.firebasestorage.app",
-    messagingSenderId: "870841528478",
-    appId: "1:870841528478:web:a8d145acc8df8073888b8f"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
-
-  /* ---------- Auth ---------- */
-  const loginScreen = document.getElementById('loginScreen');
-  const dashboard = document.getElementById('dashboard');
-  const loginBtn = document.getElementById('loginBtn');
-  const loginError = document.getElementById('loginError');
-
-  loginBtn.addEventListener('click', async () => {
-    const email = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPassword').value;
-    loginBtn.disabled = true;
-    loginBtn.textContent = "Logging in...";
-    loginError.style.display = 'none';
-    try {
-      await auth.signInWithEmailAndPassword(email, password);
-    } catch (err) {
-      loginError.textContent = "Login မှားနေပါသည် — Email/Password ကို ပြန်စစ်ပါ";
-      loginError.style.display = 'block';
-    } finally {
-      loginBtn.disabled = false;
-      loginBtn.textContent = "Login";
-    }
-  });
-
-  document.getElementById('logoutBtn').addEventListener('click', () => auth.signOut());
-
-  auth.onAuthStateChanged(user => {
-    if (user) {
-      loginScreen.style.display = 'none';
-      dashboard.style.display = 'block';
-      document.getElementById('whoAmI').textContent = user.email;
-      startListening();
-    } else {
-      loginScreen.style.display = 'block';
-      dashboard.style.display = 'none';
-      if (unsubscribe) unsubscribe();
-    }
-  });
-
-  /* ---------- Orders ---------- */
-  let allOrders = [];
-  let currentFilter = 'pending';
-  let unsubscribe = null;
-
-  function startListening() {
-    unsubscribe = db.collection('orders')
-      .orderBy('createdAt', 'desc')
-      .limit(300)
-      .onSnapshot(snap => {
-        allOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        renderStats();
-        renderOrders();
-      }, err => {
-        console.error(err);
-      });
-  }
-
-  function renderStats() {
-    document.getElementById('statTotal').textContent = allOrders.length;
-    document.getElementById('statPending').textContent = allOrders.filter(o => o.status === 'pending').length;
-    document.getElementById('statCompleted').textContent = allOrders.filter(o => o.status === 'completed').length;
-    document.getElementById('statRejected').textContent = allOrders.filter(o => o.status === 'rejected').length;
-  }
-
-  document.querySelectorAll('.tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-      currentFilter = tab.dataset.filter;
-      renderOrders();
-    });
-  });
-
-  function fmtTime(ts) {
-    if (!ts || !ts.toDate) return '—';
-    return ts.toDate().toLocaleString('en-GB', { timeZone: 'Asia/Yangon', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
-  }
-
-  function renderOrders() {
-    const list = document.getElementById('ordersList');
-    const filtered = currentFilter === 'all' ? allOrders : allOrders.filter(o => o.status === currentFilter);
-
-    if (filtered.length === 0) {
-      list.innerHTML = `<div class="empty-state">Order မရှိသေးပါ</div>`;
-      return;
-    }
-
-    list.innerHTML = filtered.map(o => `
-      <div class="order-card" data-id="${o.id}">
-        <div class="order-main">
-          <div class="col">
-            <div class="k">Order</div>
-            <div class="v">#${o.orderId || o.id.slice(0,8)}</div>
-          </div>
-          <div class="col">
-            <div class="k">Player / Zone</div>
-            <div class="v">${escapeHtml(o.playerId)} / ${escapeHtml(o.zoneId)}${o.username ? `<div style="font-size:11px;color:var(--success);margin-top:2px;">${escapeHtml(o.username)}</div>` : ''}</div>
-          </div>
-          <div class="col">
-            <div class="k">Pack</div>
-            <div class="v">${escapeHtml(o.packLabel)}${o.quantity && o.quantity > 1 ? ` x${o.quantity}` : ''}</div>
-          </div>
-          <div class="col">
-            <div class="k">Total</div>
-            <div class="v">${(o.totalPrice || o.packPrice || 0).toLocaleString()} Ks</div>
-          </div>
-          <div class="col">
-            <div class="k">Status / Time</div>
-            <div class="v">
-              <span class="badge ${o.status}">${o.status}</span>
-              <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">${fmtTime(o.createdAt)}</div>
-            </div>
-          </div>
+        <div class="upload-box" id="uploadBox">
+          <input type="file" id="bannerFile" accept="image/png,image/jpeg,image/jpg,image/webp">
+          <div class="upload-icon">🖼️</div>
+          <div class="upload-text" id="uploadText">ပုံ (PNG/JPG) ကို နှိပ်ပြီး ရွေးပါ</div>
+          <img class="upload-preview" id="uploadPreview">
         </div>
-        ${o.email ? `<div style="font-size:11.5px;color:var(--text-muted);margin-top:6px;">✉️ ${escapeHtml(o.email)}</div>` : ''}
-        <div class="order-actions">
-          ${o.status === 'pending' ? `
-            <button class="act-btn approve" data-action="completed" data-id="${o.id}">✓ Approve</button>
-            <button class="act-btn reject" data-action="rejected" data-id="${o.id}">✕ Reject</button>
-          ` : `
-            <button class="act-btn approve" data-action="pending" data-id="${o.id}">↺ Re-open</button>
-          `}
-          <button class="act-btn delete" data-delete-id="${o.id}" data-order-label="#${o.orderId || o.id.slice(0,8)}">🗑 Delete</button>
+
+        <div class="field" style="margin-top:16px;">
+          <label for="bannerTitle">Caption (optional — ပုံအောက်မှာ ပြမည်)</label>
+          <input type="text" id="bannerTitle" placeholder="ဥပမာ — Weekly Pass အထူးလျှော့ဈေး!">
+        </div>
+        <div class="field">
+          <label for="bannerLink">Link (optional — ပုံကို နှိပ်လျှင် ဖွင့်ပေးမည့် URL)</label>
+          <input type="url" id="bannerLink" placeholder="https://...">
+        </div>
+
+        <button type="button" class="submit-btn" id="uploadBtn">
+          <span class="spinner"></span>
+          <span class="btn-text">Banner တင်မည်</span>
+        </button>
+        <p class="hint">ပုံများကို အလိုအလျောက် ချုံ့ (compress) ပြီးမှ သိမ်းဆည်းပါမည် — အရွယ်အစားကြီးသော ပုံများ အဆင်ပြေပါသည်။</p>
+      </div>
+
+      <div class="card">
+        <div class="section-label">လက်ရှိ Banner များ</div>
+        <div class="banner-list" id="bannerList">
+          <div class="empty-msg">Loading...</div>
         </div>
       </div>
-    `).join('');
+    </div>
 
-    list.querySelectorAll('.act-btn[data-action]').forEach(btn => {
-      btn.addEventListener('click', () => updateStatus(btn.dataset.id, btn.dataset.action, btn));
-    });
-    list.querySelectorAll('.act-btn.delete').forEach(btn => {
-      btn.addEventListener('click', () => deleteOrder(btn.dataset.deleteId, btn.dataset.orderLabel, btn));
-    });
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- Firebase (single init for the whole dashboard) ---------- */
+const firebaseConfig = {
+  apiKey: "AIzaSyAJLqhPU-51twgJw0fp5Q-u9iBwHFx7xA8",
+  authDomain: "king-pos-and-tickets.firebaseapp.com",
+  projectId: "king-pos-and-tickets",
+  storageBucket: "king-pos-and-tickets.firebasestorage.app",
+  messagingSenderId: "870841528478",
+  appId: "1:870841528478:web:a8d145acc8df8073888b8f",
+  measurementId: "G-TRP931BEBD"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+/* ---------- Toast ---------- */
+const toastEl = document.getElementById('toast');
+let toastTimer = null;
+function showToast(msg, type = '') {
+  toastEl.textContent = msg;
+  toastEl.className = 'toast shown' + (type ? ' ' + type : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('shown'), 3000);
+}
+
+function escapeHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ---------- Auth (single gate for both Orders + Banners) ---------- */
+const loginScreen = document.getElementById('loginScreen');
+const dashboard = document.getElementById('dashboard');
+const loginBtn = document.getElementById('loginBtn');
+const loginError = document.getElementById('loginError');
+let unsubscribe = null;
+
+loginBtn.addEventListener('click', async () => {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  loginBtn.disabled = true;
+  loginBtn.textContent = "Logging in...";
+  loginError.style.display = 'none';
+  try {
+    await auth.signInWithEmailAndPassword(email, password);
+  } catch (err) {
+    loginError.textContent = "Login မှားနေပါသည် — Email/Password ကို ပြန်စစ်ပါ";
+    loginError.style.display = 'block';
+  } finally {
+    loginBtn.disabled = false;
+    loginBtn.textContent = "Login";
   }
+});
 
-  async function deleteOrder(docId, label, btn) {
-    if (!confirm(`Order ${label} ကို အပြီးဖျက်မှာ သေချာလား? ဒါကို ပြန်ရအောင်လုပ်လို့ မရတော့ပါဘူး။`)) return;
-    btn.disabled = true;
-    try {
-      await db.collection('orders').doc(docId).delete();
-    } catch (err) {
+document.getElementById('logoutBtn').addEventListener('click', () => auth.signOut());
+
+auth.onAuthStateChanged(user => {
+  if (user) {
+    loginScreen.style.display = 'none';
+    dashboard.style.display = 'block';
+    document.getElementById('whoAmI').textContent = user.email;
+    startListeningOrders();
+    loadBanners();
+  } else {
+    loginScreen.style.display = 'block';
+    dashboard.style.display = 'none';
+    if (unsubscribe) unsubscribe();
+  }
+});
+
+/* ---------- Page tabs: Orders <-> Banners ---------- */
+const ordersPageTab = document.getElementById('ordersPageTab');
+const bannersPageTab = document.getElementById('bannersPageTab');
+const ordersPanel = document.getElementById('ordersPanel');
+const bannersPanel = document.getElementById('bannersPanel');
+
+ordersPageTab.addEventListener('click', () => {
+  ordersPageTab.classList.add('active');
+  bannersPageTab.classList.remove('active');
+  ordersPanel.style.display = 'block';
+  bannersPanel.style.display = 'none';
+});
+bannersPageTab.addEventListener('click', () => {
+  bannersPageTab.classList.add('active');
+  ordersPageTab.classList.remove('active');
+  bannersPanel.style.display = 'block';
+  ordersPanel.style.display = 'none';
+});
+
+/* =========================================================
+   ORDERS
+   ========================================================= */
+let allOrders = [];
+let currentFilter = 'pending';
+
+function startListeningOrders() {
+  unsubscribe = db.collection('orders')
+    .orderBy('createdAt', 'desc')
+    .limit(300)
+    .onSnapshot(snap => {
+      allOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderStats();
+      renderOrders();
+    }, err => {
       console.error(err);
-      alert("Delete fail ဖြစ်ပါတယ်: " + err.message);
-      btn.disabled = false;
-    }
+    });
+}
+
+function renderStats() {
+  document.getElementById('statTotal').textContent = allOrders.length;
+  document.getElementById('statPending').textContent = allOrders.filter(o => o.status === 'pending').length;
+  document.getElementById('statCompleted').textContent = allOrders.filter(o => o.status === 'completed').length;
+  document.getElementById('statRejected').textContent = allOrders.filter(o => o.status === 'rejected').length;
+}
+
+document.querySelectorAll('.tabs .tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentFilter = tab.dataset.filter;
+    renderOrders();
+  });
+});
+
+function fmtTime(ts) {
+  if (!ts || !ts.toDate) return '—';
+  return ts.toDate().toLocaleString('en-GB', { timeZone: 'Asia/Yangon', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+}
+
+function renderOrders() {
+  const list = document.getElementById('ordersList');
+  const filtered = currentFilter === 'all' ? allOrders : allOrders.filter(o => o.status === currentFilter);
+
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="empty-state">Order မရှိသေးပါ</div>`;
+    return;
   }
 
-  async function updateStatus(docId, newStatus, btn) {
-    btn.disabled = true;
-    try {
-      await db.collection('orders').doc(docId).update({
-        status: newStatus,
-        reviewedAt: firebase.firestore.FieldValue.serverTimestamp(),
-        reviewedBy: auth.currentUser.email
+  list.innerHTML = filtered.map(o => `
+    <div class="order-card" data-id="${o.id}">
+      <div class="order-main">
+        <div class="col">
+          <div class="k">Order</div>
+          <div class="v">#${o.orderId || o.id.slice(0,8)}</div>
+        </div>
+        <div class="col">
+          <div class="k">Player / Zone</div>
+          <div class="v">${escapeHtml(o.playerId)}${o.zoneId ? ' / ' + escapeHtml(o.zoneId) : ''}${o.username ? `<div style="font-size:11px;color:var(--success);margin-top:2px;">${escapeHtml(o.username)}</div>` : ''}</div>
+        </div>
+        <div class="col">
+          <div class="k">Pack</div>
+          <div class="v">${escapeHtml(o.packLabel)}${o.quantity && o.quantity > 1 ? ` x${o.quantity}` : ''}</div>
+        </div>
+        <div class="col">
+          <div class="k">Total</div>
+          <div class="v">${(o.totalPrice || o.packPrice || 0).toLocaleString()} Ks</div>
+        </div>
+        <div class="col">
+          <div class="k">Status / Time</div>
+          <div class="v">
+            <span class="badge ${o.status}">${o.status}</span>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">${fmtTime(o.createdAt)}</div>
+          </div>
+        </div>
+      </div>
+      ${o.email ? `<div style="font-size:11.5px;color:var(--text-muted);margin-top:6px;">✉️ ${escapeHtml(o.email)}</div>` : ''}
+      <div class="order-actions">
+        ${o.status === 'pending' ? `
+          <button class="act-btn approve" data-action="completed" data-id="${o.id}">✓ Approve</button>
+          <button class="act-btn reject" data-action="rejected" data-id="${o.id}">✕ Reject</button>
+        ` : `
+          <button class="act-btn approve" data-action="pending" data-id="${o.id}">↺ Re-open</button>
+        `}
+        <button class="act-btn delete" data-delete-id="${o.id}" data-order-label="#${o.orderId || o.id.slice(0,8)}">🗑 Delete</button>
+      </div>
+    </div>
+  `).join('');
+
+  list.querySelectorAll('.act-btn[data-action]').forEach(btn => {
+    btn.addEventListener('click', () => updateStatus(btn.dataset.id, btn.dataset.action, btn));
+  });
+  list.querySelectorAll('.act-btn.delete').forEach(btn => {
+    btn.addEventListener('click', () => deleteOrder(btn.dataset.deleteId, btn.dataset.orderLabel, btn));
+  });
+}
+
+async function deleteOrder(docId, label, btn) {
+  if (!confirm(`Order ${label} ကို အပြီးဖျက်မှာ သေချာလား? ဒါကို ပြန်ရအောင်လုပ်လို့ မရတော့ပါဘူး။`)) return;
+  btn.disabled = true;
+  try {
+    await db.collection('orders').doc(docId).delete();
+    showToast('Order ဖျက်ပြီးပါပြီ', 'success');
+  } catch (err) {
+    console.error(err);
+    showToast("Delete fail ဖြစ်ပါတယ်: " + err.message, 'error');
+    btn.disabled = false;
+  }
+}
+
+async function updateStatus(docId, newStatus, btn) {
+  btn.disabled = true;
+  try {
+    await db.collection('orders').doc(docId).update({
+      status: newStatus,
+      reviewedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      reviewedBy: auth.currentUser.email
+    });
+  } catch (err) {
+    console.error(err);
+    showToast("Update fail ဖြစ်ပါတယ်: " + err.message, 'error');
+    btn.disabled = false;
+  }
+}
+
+/* =========================================================
+   BANNERS
+   ========================================================= */
+
+/* ---------- Image compression (same approach as the store page) ---------- */
+function compressImage(file, maxDim = 1280, quality = 0.75) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let { width, height } = img;
+      if (width > maxDim || height > maxDim) {
+        const scale = maxDim / Math.max(width, height);
+        width = Math.round(width * scale);
+        height = Math.round(height * scale);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      canvas.toBlob(blob => {
+        if (!blob) { reject(new Error('COMPRESS_FAILED')); return; }
+        resolve(blob);
+      }, 'image/jpeg', quality);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('IMAGE_LOAD_FAILED')); };
+    img.src = url;
+  });
+}
+function blobToDataURL(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error('READ_FAILED'));
+    reader.readAsDataURL(blob);
+  });
+}
+// Firestore documents max out at ~1MiB — compress progressively until the
+// resulting base64 string comfortably fits, so uploads never silently fail.
+async function compressUntilSafe(file) {
+  const attempts = [
+    { maxDim: 1280, quality: 0.75 },
+    { maxDim: 1000, quality: 0.65 },
+    { maxDim: 800,  quality: 0.55 },
+    { maxDim: 640,  quality: 0.5 },
+  ];
+  const LIMIT = 700 * 1024; // leave headroom under the ~1MiB doc cap
+  let dataUrl = null;
+  for (const opt of attempts) {
+    const blob = await compressImage(file, opt.maxDim, opt.quality);
+    dataUrl = await blobToDataURL(blob);
+    if (dataUrl.length <= LIMIT) return dataUrl;
+  }
+  return dataUrl; // return smallest attempt even if still large
+}
+
+/* ---------- Upload form ---------- */
+const uploadBox = document.getElementById('uploadBox');
+const bannerFile = document.getElementById('bannerFile');
+const uploadText = document.getElementById('uploadText');
+const uploadPreview = document.getElementById('uploadPreview');
+const bannerTitle = document.getElementById('bannerTitle');
+const bannerLink = document.getElementById('bannerLink');
+const uploadBtn = document.getElementById('uploadBtn');
+
+let pendingDataUrl = null;
+
+bannerFile.addEventListener('change', async () => {
+  const file = bannerFile.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) {
+    showToast('ပုံဖိုင် (Image) သာ ရွေးပေးပါ', 'error');
+    bannerFile.value = ''; pendingDataUrl = null;
+    return;
+  }
+  uploadBox.classList.add('has-file');
+  uploadText.textContent = 'ပုံပြင်ဆင်နေသည်...';
+  try {
+    pendingDataUrl = await compressUntilSafe(file);
+    uploadPreview.src = pendingDataUrl;
+    uploadPreview.style.display = 'block';
+    uploadText.textContent = file.name;
+  } catch (err) {
+    console.error(err);
+    showToast('ပုံ ဖတ်ရှုမှု မအောင်မြင်ပါ', 'error');
+    pendingDataUrl = null;
+    uploadBox.classList.remove('has-file');
+    uploadText.textContent = 'ပုံ (PNG/JPG) ကို နှိပ်ပြီး ရွေးပါ';
+  }
+});
+
+uploadBtn.addEventListener('click', async () => {
+  if (!pendingDataUrl) { showToast('ပုံတစ်ခု ရွေးပေးပါ', 'error'); return; }
+
+  uploadBtn.classList.add('loading');
+  uploadBtn.disabled = true;
+  try {
+    await db.collection('banners').add({
+      image: pendingDataUrl,
+      title: bannerTitle.value.trim() || null,
+      link: bannerLink.value.trim() || null,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    showToast('Banner တင်ပြီးပါပြီ', 'success');
+
+    bannerFile.value = '';
+    bannerTitle.value = '';
+    bannerLink.value = '';
+    pendingDataUrl = null;
+    uploadBox.classList.remove('has-file');
+    uploadPreview.style.display = 'none';
+    uploadText.textContent = 'ပုံ (PNG/JPG) ကို နှိပ်ပြီး ရွေးပါ';
+
+    loadBanners();
+  } catch (err) {
+    console.error(err);
+    showToast('တင်ခြင်း မအောင်မြင်ပါ: ' + err.message, 'error');
+  } finally {
+    uploadBtn.classList.remove('loading');
+    uploadBtn.disabled = false;
+  }
+});
+
+/* ---------- List + delete ---------- */
+const bannerListEl = document.getElementById('bannerList');
+
+async function loadBanners() {
+  bannerListEl.innerHTML = '<div class="empty-msg">Loading...</div>';
+  try {
+    const snap = await db.collection('banners').orderBy('createdAt', 'desc').get();
+    if (snap.empty) {
+      bannerListEl.innerHTML = '<div class="empty-msg">Banner မရှိသေးပါ</div>';
+      return;
+    }
+    bannerListEl.innerHTML = '';
+    snap.forEach(doc => {
+      const b = doc.data();
+      const when = b.createdAt && b.createdAt.toDate ? b.createdAt.toDate().toLocaleString('en-GB', { timeZone: 'Asia/Yangon' }) : '';
+      const item = document.createElement('div');
+      item.className = 'banner-item';
+      item.innerHTML = `
+        <img src="${b.image}" alt="banner">
+        <div class="bi-info">
+          <div class="bi-title">${escapeHtml(b.title || '(caption မရှိ)')}</div>
+          <div class="bi-meta">${escapeHtml(when)}${b.link ? ' · linked' : ''}</div>
+        </div>
+        <button type="button" class="del-btn" data-id="${doc.id}">ဖျက်မည်</button>
+      `;
+      bannerListEl.appendChild(item);
+    });
+
+    bannerListEl.querySelectorAll('.del-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        if (!confirm('ဒီ banner ကို ဖျက်မှာ သေချာပါသလား?')) return;
+        btn.disabled = true;
+        btn.textContent = '...';
+        try {
+          await db.collection('banners').doc(btn.dataset.id).delete();
+          showToast('Banner ဖျက်ပြီးပါပြီ', 'success');
+          loadBanners();
+        } catch (err) {
+          console.error(err);
+          showToast('ဖျက်ခြင်း မအောင်မြင်ပါ', 'error');
+          btn.disabled = false;
+          btn.textContent = 'ဖျက်မည်';
+        }
       });
-    } catch (err) {
-      console.error(err);
-      alert("Update fail ဖြစ်ပါတယ်: " + err.message);
-      btn.disabled = false;
-    }
+    });
+  } catch (err) {
+    console.error(err);
+    bannerListEl.innerHTML = '<div class="empty-msg">Load မအောင်မြင်ပါ</div>';
   }
-
-  function escapeHtml(str) {
-    return String(str ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  }
+}
 </script>
 </body>
 </html>
