@@ -327,6 +327,11 @@
     pointer-events:none;
   }
   .sticky-summary.shown{transform:translateY(0);opacity:1;pointer-events:auto;}
+  /* Hidden per request: this floating bar was covering the confirm button,
+     the Telegram admin contact line, and the footer at the bottom of the
+     page. The pack/price info is already shown inline in the .ticket card
+     above, so this duplicate fixed bar is no longer shown. */
+  .sticky-summary{display:none !important;}
   .ss-left{display:flex;align-items:center;gap:10px;min-width:0;}
   .ss-diamond{
     width:24px;height:24px;flex-shrink:0;
@@ -407,7 +412,7 @@
   .upload-icon{font-size:26px;margin-bottom:6px;}
   .upload-text{font-size:13.5px;color:var(--text-muted);}
   .upload-preview{
-    margin-top:12px;max-width:100%;max-height:180px;border-radius:10px;
+    margin:12px auto 0;max-width:100%;max-height:180px;border-radius:10px;
     display:none;
   }
 
@@ -533,6 +538,13 @@
     border-color:var(--accent-gold);color:#FFFFFF;
     background:linear-gradient(90deg,var(--accent-blue),var(--accent-cyan));
     box-shadow:0 6px 18px rgba(10,132,255,0.18);
+  }
+
+  /* "Order တင်ရန်" / "Order Status စစ်ရန်" tabs — smaller on mobile */
+  @media (max-width:480px){
+    #orderTabBtn, #trackTabBtn{
+      padding:10px 6px;font-size:12.5px;border-radius:14px;
+    }
   }
 
   .category-tabs{
@@ -670,8 +682,7 @@
      so clearance needs to cover both — otherwise the submit button/hint text
      end up hidden behind it. Same safe-area amount is added to each so they
      stay in sync on notched/home-indicator phones. */
-  .sticky-summary{bottom:calc(92px + env(safe-area-inset-bottom, 0px)) !important;}
-  body{padding-bottom:calc(160px + env(safe-area-inset-bottom, 0px));}
+  body{padding-bottom:calc(110px + env(safe-area-inset-bottom, 0px));}
 
   /* ---------- Support page ---------- */
   .support-intro{font-size:13px;color:var(--text-muted);margin:2px 0 16px;}
@@ -811,7 +822,7 @@
   .toast.success{border-color:rgba(52,199,89,0.5);}
   .toast.error{border-color:rgba(255,59,48,0.5);}
 
-  .success-panel{display:none;text-align:center;padding:10px 4px;}
+  .success-panel{display:none;text-align:center;padding:10px 4px;margin-bottom:calc(90px + env(safe-area-inset-bottom, 0px));}
   .success-panel .check{
     width:58px;height:58px;border-radius:50%;
     background:rgba(52,199,89,0.15);border:1.5px solid var(--success);
@@ -3055,6 +3066,7 @@ finalConfirmBtn.addEventListener('click', async () => {
     form.style.display = 'none';
     document.getElementById('successPanel').style.display = 'block';
     stickySummary.classList.remove('shown');
+    window.scrollTo({ top: 0, behavior: 'instant' });
 
   } catch (err) {
     console.error(err);
