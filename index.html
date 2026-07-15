@@ -1221,6 +1221,18 @@
     </div><!-- /screenPacks -->
   </form>
 
+  <!-- STICKY SELECTION SUMMARY — keeps chosen pack/price visible while scrolling -->
+  <div class="sticky-summary" id="stickySummary">
+    <div class="ss-left">
+      <div class="ss-diamond"></div>
+      <div>
+        <div class="ss-label">ရွေးချယ်ထားသော Pack</div>
+        <div class="ss-pack" id="ssPack">—</div>
+      </div>
+    </div>
+    <div class="ss-price" id="ssPrice">0<small>Ks</small></div>
+  </div>
+
   <!-- CONFIRM PURCHASE MODAL -->
   <div class="modal-overlay" id="confirmModal">
     <div class="modal-box">
@@ -1346,7 +1358,7 @@
 
     <div id="reviewList"></div>
 
-    <button type="button" class="write-review-btn" id="writeReviewBtn">✍️ Order ID ထည့်ပြီး Review ရေးရန်</button>
+    <button type="button" class="write-review-btn" id="writeReviewBtn">✍️ Order ထည့်ပြီး Review ရေးရန်</button>
 
     <div class="review-form-box" id="reviewFormBox" style="display:none;">
       <div class="field">
