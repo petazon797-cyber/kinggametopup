@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="my">
 <head>
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<!-- (သို့မဟုတ်) လိုဂိုက .png ဆိုရင် -->
+<!-- <link rel="icon" type="image/png" href="/favicon.png"> -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 <title>King Game Shop | Game Top-up</title>
@@ -868,13 +871,16 @@
     to{opacity:1; transform:translateX(0);}
   }
   .back-btn{
-    display:flex;align-items:center;gap:6px;
-    background:none;border:none;cursor:pointer;
-    color:var(--text-muted);font-family:var(--font-body);
-    font-size:13px;font-weight:600;padding:6px 2px 14px;margin:0;
-    transition:color .15s;
+    display:inline-flex;align-items:center;gap:6px;
+    background:var(--input-bg);border:1.5px solid var(--border-glass);border-radius:12px;
+    cursor:pointer;color:var(--text-primary);font-family:var(--font-body);
+    font-size:13px;font-weight:700;padding:9px 16px;margin:0 0 14px;
+    box-shadow:0 6px 16px rgba(20,20,40,0.10), inset 0 1px 0 rgba(255,255,255,0.35);
+    transition:color .15s, border-color .15s, transform .12s, box-shadow .15s;
   }
-  .back-btn:hover, .back-btn:active{color:var(--accent-cyan);}
+  html[data-theme="dark"] .back-btn{box-shadow:0 4px 12px rgba(0,0,0,0.3);}
+  .back-btn:hover{border-color:var(--accent-cyan);color:var(--accent-cyan);}
+  .back-btn:active{transform:scale(0.97);}
   .back-btn .icon{stroke:currentColor;fill:none;stroke-width:2;}
   .selected-game-header{
     display:flex;align-items:center;gap:10px;
@@ -1338,6 +1344,10 @@
       <div class="selected-game-header" id="selectedGameHeader"></div>
 
     <div id="serverSection" class="reveal-section">
+      <div class="modal-warning" style="margin:10px 0 14px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><line x1="12" y1="8" x2="12" y2="13"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+        <p style="margin:0;color:var(--text-primary);">မလေး၊ စင်ကာပူ၊ ဖိလစ်ပိုင်၊ အင်ဒို၊ ရုရှား ဆာဗာ အကောင့်များ ထည့်၍မရပါ။ လိုအပ်ပါက Admin telegram - <a href="https://t.me/kopethaung778" target="_blank" rel="noopener" style="color:var(--danger);font-weight:600;">@kopethaung778</a> သို့ ဆက်သွယ်နိုင်ပါသည်။</p>
+      </div>
       <div class="section-label" style="margin-top:2px;"><span class="num">2</span> Server ရွေးရန်</div>
       <div class="server-grid" id="serverGrid">
         <div class="server-card" data-server="global">
