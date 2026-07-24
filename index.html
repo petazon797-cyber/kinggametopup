@@ -3714,7 +3714,7 @@ finalConfirmBtn.addEventListener('click', async () => {
 
   try {
     try {
-      await db.collection("orders").doc(orderId).set({
+      const firestoreWrite = db.collection("orders").doc(orderId).set({
         orderId,
         game: currentGame,
         server: gameNeedsServerStep(currentGame) ? currentServer : null,
@@ -3729,13 +3729,22 @@ finalConfirmBtn.addEventListener('click', async () => {
         status: "pending",
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
+      const firestoreTimeout = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("connection timed out — network may be blocking Firebase")), 15000)
+      );
+      await Promise.race([firestoreWrite, firestoreTimeout]);
     } catch (fsErr) {
       throw new Error("FIRESTORE: " + fsErr.message);
     }
 
+    const serverDisplayName = gameNeedsServerStep(currentGame)
+      ? (currentGame === 'mlbbban' ? currentServer : (currentServer === 'mm' ? 'Myanmar Server' : 'Global Server'))
+      : gameDisplayName(currentGame);
+
     const caption =
       `🆕 Order အသစ် #${orderId}\n` +
       `🎮 ${gameDisplayName(currentGame)}\n` +
+      `🖥️ Sever: ${serverDisplayName}\n` +
       `👤 Player ID: ${playerId}${verifiedUsername ? ' (' + verifiedUsername + ')' : ''}\n` +
       (gameNeedsServerStep(currentGame) ? `🌍 Zone ID: ${zoneId}\n` : '') +
       `💎 Pack: ${item.label} x${qty}\n` +
@@ -3758,11 +3767,7 @@ finalConfirmBtn.addEventListener('click', async () => {
     closeModal();
     document.getElementById('orderIdDisplay').textContent = "#" + orderId;
     document.getElementById('orderSummary').innerHTML = `
-      <div class="os-row"><span class="os-k">Server</span><span class="os-v">${
-        currentGame === 'mlbb' ? (currentServer === 'mm' ? 'Myanmar Server' : 'Global Server') :
-        currentGame === 'mlbbban' ? escapeHtml(currentServer) :
-        gameDisplayName(currentGame)
-      }</span></div>
+      <div class="os-row"><span class="os-k">Server</span><span class="os-v">${escapeHtml(serverDisplayName)}</span></div>
       <div class="os-row"><span class="os-k">Pack</span><span class="os-v">${escapeHtml(item.label)} x${qty}</span></div>
       <div class="os-row"><span class="os-k">စုစုပေါင်း</span><span class="os-v">${totalPrice.toLocaleString()} Ks</span></div>
       <div class="os-row"><span class="os-k">Player ID</span><span class="os-v">${escapeHtml(playerId)}${verifiedUsername ? ' (' + escapeHtml(verifiedUsername) + ')' : ''}</span></div>
@@ -3775,7 +3780,11 @@ finalConfirmBtn.addEventListener('click', async () => {
 
   } catch (err) {
     console.error(err);
-    showToast("အမှား: " + err.message, "error");
+    if (String(err.message).startsWith("FIRESTORE")) {
+      showToast("Server ဆီ ချိတ်ဆက်၍ မရပါ — Network/VPN ပြောင်းပြီး ထပ်စမ်းကြည့်ပါ", "error");
+    } else {
+      showToast("အမှား: " + err.message, "error");
+    }
   } finally {
     finalConfirmBtn.classList.remove('loading');
     finalConfirmBtn.disabled = !confirmRegionCheck.checked;
