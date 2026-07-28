@@ -480,6 +480,16 @@
   .copy-btn:active{transform:scale(0.94);}
   .copy-btn.copied{background:rgba(52,199,89,0.16);border-color:rgba(52,199,89,0.5);color:var(--success);}
 
+  .transfer-note-box{
+    display:flex;flex-direction:column;gap:6px;
+    background:rgba(255,159,10,0.10);border:1px solid rgba(255,159,10,0.35);
+    border-radius:14px;padding:11px 14px;margin-bottom:18px;
+    color:var(--text-primary);font-size:12.5px;line-height:1.55;
+  }
+  .transfer-note-box .tnb-row{display:flex;align-items:flex-start;gap:7px;}
+  .transfer-note-box svg{stroke:#FF9F0A;flex-shrink:0;margin-top:1px;}
+  .transfer-note-box b{color:var(--accent-gold);}
+
   .submit-btn{
     width:100%;padding:17px;border:1px solid rgba(255,255,255,0.18);border-radius:999px;
     background:linear-gradient(90deg,var(--accent-blue),var(--accent-gold),var(--accent-cyan));
@@ -1484,15 +1494,43 @@
             <svg class="icon" viewBox="0 0 24 24" style="width:17px;height:17px;"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
           </div>
           <div>
-            <div class="pay-number-label">ငွေလွှဲရန် ဖုန်းနံပါတ်</div>
-            <div class="pay-number-value" id="payNumber">09 446 627 892</div>
+            <div class="pay-number-label">ငွေလွှဲရန် ဖုန်းနံပါတ် (၁)</div>
+            <div class="pay-number-value" id="payNumber1">09 446 627 892</div>
           </div>
         </div>
-        <button type="button" class="copy-btn" id="copyBtn">
-          <span id="copyIcon" style="display:flex;">
+        <button type="button" class="copy-btn" id="copyBtn1" data-number="09446627892">
+          <span class="copy-icon" style="display:flex;">
             <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-          </span> <span id="copyLabel">Copy</span>
+          </span> <span class="copy-label">Copy</span>
         </button>
+      </div>
+
+      <div class="pay-number">
+        <div class="pay-number-left">
+          <div class="pay-number-icon">
+            <svg class="icon" viewBox="0 0 24 24" style="width:17px;height:17px;"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+          </div>
+          <div>
+            <div class="pay-number-label">ငွေလွှဲရန် ဖုန်းနံပါတ် (၂)</div>
+            <div class="pay-number-value" id="payNumber2">09 440 147 197</div>
+          </div>
+        </div>
+        <button type="button" class="copy-btn" id="copyBtn2" data-number="09440147197">
+          <span class="copy-icon" style="display:flex;">
+            <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </span> <span class="copy-label">Copy</span>
+        </button>
+      </div>
+
+      <div class="transfer-note-box">
+        <div class="tnb-row">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 2-3 4"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span>ငွေလွှဲပြေစာ Note ကို <b>Payment, Shopping</b> ဆိုပြီးရေးပေးပါ။</span>
+        </div>
+        <div class="tnb-row">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 2-3 4"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span>Events အတွက် Preorder တင်ပါက Note တွင် <b>"Pre"</b> ဟုရေးပေးပါ။</span>
+        </div>
       </div>
 
       <div class="upload-box" id="uploadBox">
@@ -2760,13 +2798,25 @@ function bestValueIndex(items) {
 function isPlayerInfoValid() {
   const idOk = idPattern().test(playerIdInput.value.trim());
   const zoneOk = !gameNeedsServerStep(currentGame) || ZONE_PATTERN.test(zoneIdInput.value.trim());
-  return idOk && zoneOk;
+  // For games with a Zone/Server step, the community lookup API can verify the
+  // username against the ID/Zone entered — require that confirmation before
+  // packs unlock, so a mistyped ID (that still happens to be a valid *format*)
+  // can't be used to place an order against the wrong account.
+  const usernameOk = !gameNeedsServerStep(currentGame) || !!verifiedUsername || usernameLookupFailed;
+  return idOk && zoneOk && usernameOk;
 }
 function updatePackLockUI() {
   const locked = !isPlayerInfoValid();
   packGrid.classList.toggle('locked', locked);
   categoryTabsEl.classList.toggle('locked', locked);
   packLockHint.classList.toggle('shown', locked);
+  if (locked && packLockHint) {
+    const idZoneOk = idPattern().test(playerIdInput.value.trim())
+      && (!gameNeedsServerStep(currentGame) || ZONE_PATTERN.test(zoneIdInput.value.trim()));
+    packLockHint.querySelector('span').textContent = idZoneOk
+      ? 'Username စစ်ဆေးနေဆဲ (သို့) Username မတွေ့ပါ — ID/Zone ID ကို ပြန်စစ်ပေးပါ'
+      : 'အပေါ်က Player ID (Zone ID အပါအဝင်) ကို အရင်ဖြည့်ပါ — ပြီးမှ Pack ရွေးလို့ရပါမည်';
+  }
 }
 
 function buildPackDropdown() {
@@ -3231,34 +3281,41 @@ document.querySelectorAll('.pay-chip').forEach(chip => {
   });
 });
 
-/* ---------- Copy phone number ---------- */
-const copyBtn = document.getElementById('copyBtn');
-const copyLabel = document.getElementById('copyLabel');
-const copyIcon = document.getElementById('copyIcon');
-copyBtn.addEventListener('click', async () => {
-  const number = document.getElementById('payNumber').textContent.trim();
-  try {
-    await navigator.clipboard.writeText(number);
-  } catch (e) {
-    // fallback for older browsers / non-secure context
-    const ta = document.createElement('textarea');
-    ta.value = number;
-    ta.style.position = 'fixed';
-    ta.style.opacity = '0';
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-  }
-  copyBtn.classList.add('copied');
-  copyIcon.innerHTML = '<svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;"><path d="M20 6L9 17l-5-5"/></svg>';
-  copyLabel.textContent = 'ကူးပြီး';
-  showToast('ဖုန်းနံပါတ် Copy ပြီးပါပြီ', 'success');
-  setTimeout(() => {
-    copyBtn.classList.remove('copied');
-    copyIcon.innerHTML = '<svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>';
-    copyLabel.textContent = 'Copy';
-  }, 2000);
+/* ---------- Copy phone number(s) ----------
+   Each payment number has its own Copy button (data-number holds the
+   digits to copy); the handler below is shared by all of them so adding
+   further numbers later just means adding another .copy-btn[data-number]. */
+document.querySelectorAll('.pay-number .copy-btn').forEach((btn) => {
+  const label = btn.querySelector('.copy-label');
+  const icon = btn.querySelector('.copy-icon');
+  const iconDefault = icon.innerHTML;
+  const iconCheck = '<svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;"><path d="M20 6L9 17l-5-5"/></svg>';
+
+  btn.addEventListener('click', async () => {
+    const number = btn.dataset.number;
+    try {
+      await navigator.clipboard.writeText(number);
+    } catch (e) {
+      // fallback for older browsers / non-secure context
+      const ta = document.createElement('textarea');
+      ta.value = number;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    btn.classList.add('copied');
+    icon.innerHTML = iconCheck;
+    label.textContent = 'ကူးပြီး';
+    showToast('ဖုန်းနံပါတ် Copy ပြီးပါပြီ', 'success');
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      icon.innerHTML = iconDefault;
+      label.textContent = 'Copy';
+    }, 2000);
+  });
 });
 
 /* ---------- Upload preview + validation + compression ---------- */
@@ -3427,10 +3484,13 @@ zoneIdInput.addEventListener('blur', rememberIds);
 const USERNAME_LOOKUP_URL = "https://petazon--2d724226859811f18a3d1607ee4eb77e.web.val.run";
 const usernameCheckEl = document.getElementById('usernameCheck');
 let verifiedUsername = null;
+let usernameLookupFailed = false; // true when the lookup service itself is unreachable
 let usernameLookupSeq = 0; // guards against out-of-order responses
 
 async function tryLookupUsername() {
   verifiedUsername = null;
+  usernameLookupFailed = false;
+  updatePackLockUI(); // re-lock immediately — any previous confirmation is now stale
 
   // The lookup service is MLBB-specific and needs a Zone ID, which HOK/PUBG
   // orders don't have — just skip it for those.
@@ -3473,11 +3533,16 @@ async function tryLookupUsername() {
       usernameCheckEl.className = 'username-check shown notfound';
       usernameCheckEl.innerHTML = `Username မတွေ့ပါ — ID/Zone ကို ပြန်စစ်ပေးပါ`;
     }
+    updatePackLockUI();
   } catch (err) {
     if (seq !== usernameLookupSeq) return;
-    // Silent fallback — lookup service may be unofficial/unreliable, never block the order
+    // Lookup service may be unofficial/unreliable — if it's down, fall back to
+    // allowing the order on ID/Zone format alone rather than blocking checkout
+    // entirely during an outage.
     usernameCheckEl.classList.remove('shown');
     console.warn('Username lookup unavailable:', err);
+    usernameLookupFailed = true;
+    updatePackLockUI();
   }
 }
 
@@ -3662,6 +3727,7 @@ form.addEventListener('submit', (e) => {
   if (!currentGame) { showToast("ဂိမ်း ရွေးချယ်ပေးပါ", "error"); return; }
   if (!idPattern().test(playerId)) { showToast(idErrorMessage(), "error"); return; }
   if (gameNeedsServerStep(currentGame) && !ZONE_PATTERN.test(zoneId)) { showToast("Zone ID မှားနေပါသည် — ဂဏန်း ၃-၅ လုံးသာ ထည့်ပါ", "error"); return; }
+  if (gameNeedsServerStep(currentGame) && !verifiedUsername && !usernameLookupFailed) { showToast("Username မစစ်ရသေးပါ — ID/Zone ID ကို ပြန်ရိုက်ပြီး Username ရလာအောင် စောင့်ပေးပါ", "error"); return; }
   if (!selectedPackValue) { showToast("Pack ရွေးချယ်ပေးပါ", "error"); return; }
   if (!file) { showToast("ငွေလွှဲပြေစာ Screenshot တင်ပေးပါ", "error"); return; }
 
@@ -3827,6 +3893,8 @@ document.getElementById('newOrderBtn').addEventListener('click', () => {
   idHelpBtn.classList.remove('active');
   usernameCheckEl.classList.remove('shown');
   verifiedUsername = null;
+  usernameLookupFailed = false;
+  updatePackLockUI();
   pendingOrder = null;
   document.querySelectorAll('.pay-chip').forEach(c => c.classList.remove('active'));
   document.querySelector('.pay-chip[data-method="KBZPay"]').classList.add('active');
