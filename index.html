@@ -3549,6 +3549,17 @@ async function tryLookupUsername() {
 playerIdInput.addEventListener('blur', tryLookupUsername);
 zoneIdInput.addEventListener('blur', tryLookupUsername);
 
+// Also auto-trigger the check as the customer types (debounced), so they
+// don't have to click away from the field for it to run — blur above stays
+// as a fallback (e.g. for autofill, which doesn't always fire 'input').
+let usernameLookupDebounce = null;
+function scheduleUsernameLookup() {
+  if (usernameLookupDebounce) clearTimeout(usernameLookupDebounce);
+  usernameLookupDebounce = setTimeout(tryLookupUsername, 600);
+}
+playerIdInput.addEventListener('input', scheduleUsernameLookup);
+zoneIdInput.addEventListener('input', scheduleUsernameLookup);
+
 /* ---------- "Sever Check" standalone page ----------
    Same unofficial community API as the username auto-lookup above, but
    surfaced as its own page so customers can check Username + Zone/Server +
