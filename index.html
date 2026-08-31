@@ -818,6 +818,24 @@
   .contact-label{font-size:11px;color:var(--text-muted);}
   .contact-value{font-size:14.5px;font-weight:700;font-family:var(--font-display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .contact-arrow{color:var(--text-muted);font-size:20px;flex-shrink:0;}
+  /* ---------- Terms & Conditions ---------- */
+  .terms-modal .modal-box{max-width:560px;}
+  .terms-body{max-height:56vh;overflow-y:auto;padding-right:4px;margin:14px 0 4px;}
+  .terms-body h4{font-family:var(--font-display);font-size:14px;font-weight:700;color:var(--text-primary);margin:16px 0 6px;}
+  .terms-body h4:first-child{margin-top:0;}
+  .terms-body p, .terms-body li{font-size:13px;line-height:1.6;color:var(--text-muted);}
+  .terms-body ul{margin:4px 0 4px 18px;}
+  .terms-body li{margin-bottom:4px;}
+  .terms-updated{font-size:11px;color:var(--text-muted);margin-top:12px;text-align:right;font-style:italic;}
+
+  .terms-link-row{
+    display:flex;align-items:center;justify-content:center;gap:6px;
+    width:100%;margin-top:14px;padding:12px;background:none;border:none;
+    font-family:var(--font-body);font-size:12.5px;font-weight:600;color:var(--accent-blue);
+    cursor:pointer;text-decoration:underline;text-underline-offset:3px;
+  }
+  html[data-theme="dark"] .terms-link-row{color:var(--accent-blue);}
+
   .support-hours{
     display:flex;align-items:flex-start;gap:10px;
     margin-top:16px;padding:14px;border-radius:16px;
@@ -1452,6 +1470,11 @@
       </div>
     </div>
 
+    <button type="button" class="terms-link-row terms-open-btn">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      စည်းကမ်းချက်များ ဖတ်ရှုရန်
+    </button>
+
     </div><!-- /screenGames -->
 
     <div id="screenPacks" class="wizard-screen">
@@ -1687,6 +1710,7 @@
     </div>
   </div>
 
+
   <!-- SUCCESS CARD -->
   <div class="card success-panel" id="successPanel">
     <div class="check"><svg class="icon" viewBox="0 0 24 24" style="width:26px;height:26px;stroke-width:2.2;"><path d="M20 6L9 17l-5-5"/></svg></div>
@@ -1872,6 +1896,17 @@
       <span class="contact-arrow">›</span>
     </a>
 
+    <button type="button" class="contact-row terms-open-btn" style="width:100%;">
+      <span class="contact-icon" style="background:linear-gradient(135deg,var(--accent-blue),var(--accent-gold));">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
+      </span>
+      <span class="contact-body">
+        <span class="contact-label">Terms &amp; Conditions</span>
+        <span class="contact-value">စည်းကမ်းချက်များ ဖတ်ရှုရန်</span>
+      </span>
+      <span class="contact-arrow">›</span>
+    </button>
+
     <div class="support-hours">
       <span class="support-hours-icon">
         <svg class="icon" viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--accent-gold);"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -1950,6 +1985,51 @@
     <span>Support</span>
   </button>
 </nav>
+
+  <!-- TERMS & CONDITIONS MODAL -->
+  <div class="modal-overlay terms-modal" id="termsModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>စည်းကမ်းချက်များ</h3>
+        <button type="button" class="modal-close" id="termsCloseBtn" aria-label="Close">
+          <svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="terms-body">
+        <h4>1. Order တင်ခြင်း</h4>
+        <p>Player ID / Zone ID ကို မှန်ကန်စွာ ရိုက်ထည့်ရန် ကိုယ်တိုင်တာဝန်ယူပါသည်။ မှားယွင်းစွာ ဖြည့်သွင်းထားသော ID များကြောင့် Diamond/Item များ အခြားသူများ Account သို့ ရောက်ရှိသွားပါက King Games-Shop မှ တာဝန်မယူပါ။</p>
+
+        <h4>2. ငွေပေးချေမှု</h4>
+        <p>ငွေလွှဲပြီးပါက မှန်ကန်သော ငွေလွှဲပြေစာ Screenshot ကို Order Form တွင် တင်ပေးရပါမည်။ ငွေလွှဲပြေစာ မပါဘဲ Order များကို လက်ခံဆောင်ရွက်ပေးမည် မဟုတ်ပါ။</p>
+
+        <h4>3. Order ဆောင်ရွက်ချိန်</h4>
+        <ul>
+          <li>ပုံမှန်အားဖြင့် မိနစ် (၅ - ၃၀) အတွင်း ဆောင်ရွက်ပေးပါသည်။</li>
+          <li>Server အလုပ်များချိန် / Maintenance ကြောင့် အချိန်ပိုကြာနိုင်ပါသည်။</li>
+          <li>Order status ကို "Order Status စစ်ရန်" Tab မှတစ်ဆင့် စစ်ဆေးနိုင်ပါသည်။</li>
+        </ul>
+
+        <h4>4. ငွေပြန်အမ်းခြင်း</h4>
+        <p>ဖောက်သည်ဘက်မှ Player ID / Zone ID မှားယွင်းစွာဖြည့်သွင်းခြင်း သို့မဟုတ် Pack မှားရွေးခြင်းကြောင့် ဖြစ်ပေါ်သည့် အမှားများအတွက် ငွေပြန်အမ်းပေးမည် မဟုတ်ပါ။ King Games-Shop ဘက်မှ ဆောင်ရွက်ပေးရန် ပျက်ကွက်မှုရှိမှသာ ငွေပြန်အမ်းခြင်း သို့မဟုတ် ပြန်လည်ဆောင်ရွက်ပေးခြင်း ပြုလုပ်ပေးပါမည်။</p>
+
+        <h4>5. ဈေးနှုန်း</h4>
+        <p>ဈေးနှုန်းများသည် အချိန်နှင့်တပြေးညီ ပြောင်းလဲနိုင်ပါသည်။ Order မတင်မီ နောက်ဆုံးဈေးနှုန်းအတွက် Website ကို Refresh လုပ်ပြီးမှ ဆက်လက်ဆောင်ရွက်ပေးပါရန် မေတ္တာရပ်ခံအပ်ပါသည်။</p>
+
+        <h4>6. တားမြစ်ချက်များ</h4>
+        <p>လှည့်ဖြားမှု၊ Payment Fraud သို့မဟုတ် သံသယဖြစ်ဖွယ် Order များကို King Games-Shop မှ ကြိုတင်အသိပေးခြင်းမရှိဘဲ ပယ်ဖျက်ပိုင်ခွင့်ရှိပါသည်။</p>
+
+        <h4>7. ဆက်သွယ်ရန်</h4>
+        <p>Order နှင့်ပတ်သက်၍ ပြဿနာရှိပါက Support Tab ရှိ Telegram / Viber / Gmail Channel များမှတစ်ဆင့် ဆက်သွယ်နိုင်ပါသည်။</p>
+
+        <div class="terms-updated">Last updated: August 2026</div>
+      </div>
+
+      <button type="button" class="submit-btn" id="termsAgreeBtn">
+        <span class="btn-text">နားလည်ပါပြီ</span>
+      </button>
+    </div>
+  </div>
 
 <div class="toast" id="toast"></div>
 
@@ -3150,6 +3230,12 @@ if (window.ResizeObserver) {
 }
 
 function switchPage(name) {
+  // These 4 tabs are always outside the game/pack wizard, so make sure the
+  // wizard's "nav-hidden" state (set when a game is picked, and otherwise
+  // only cleared by the wizard's own back button) never leaks in and hides
+  // the bottom nav here — e.g. after completing an order without tapping
+  // "back to games" first.
+  htmlEl.classList.remove('nav-hidden');
   Object.entries(appPages).forEach(([key, el]) => {
     el.style.display = key === name ? 'block' : 'none';
   });
@@ -3797,6 +3883,26 @@ function closeModal() {
 }
 modalCloseBtn.addEventListener('click', closeModal);
 confirmModal.addEventListener('click', (e) => { if (e.target === confirmModal) closeModal(); });
+
+/* ---------- Terms & Conditions modal ---------- */
+const termsModal = document.getElementById('termsModal');
+const termsCloseBtn = document.getElementById('termsCloseBtn');
+const termsAgreeBtn = document.getElementById('termsAgreeBtn');
+
+function openTermsModal() {
+  termsModal.classList.add('shown');
+  htmlEl.classList.add('modal-open');
+}
+function closeTermsModal() {
+  termsModal.classList.remove('shown');
+  htmlEl.classList.remove('modal-open');
+}
+document.querySelectorAll('.terms-open-btn').forEach(btn => {
+  btn.addEventListener('click', openTermsModal);
+});
+termsCloseBtn.addEventListener('click', closeTermsModal);
+termsAgreeBtn.addEventListener('click', closeTermsModal);
+termsModal.addEventListener('click', (e) => { if (e.target === termsModal) closeTermsModal(); });
 
 function openConfirmModal() {
   const { playerId, zoneId, item } = pendingOrder;
