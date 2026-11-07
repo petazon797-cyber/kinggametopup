@@ -11,6 +11,7 @@
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
 <style>
   :root{
@@ -1068,6 +1069,9 @@
     background:linear-gradient(135deg,var(--accent-blue),var(--accent-cyan));
     color:#FFFFFF;
   }
+  .theme-toggle .theme-divider{width:1px;height:22px;background:var(--border-glass);margin:0 2px;flex-shrink:0;}
+  #headerLoginBtn{font-family:var(--font-display);font-weight:800;font-size:15px;}
+  #headerLoginBtn.logged-in{background:linear-gradient(135deg,var(--accent-blue),var(--accent-cyan));color:#FFFFFF;}
   .icon{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
 
   /* Username lookup */
@@ -1381,12 +1385,65 @@
     backdrop-filter:blur(18px) saturate(180%);-webkit-backdrop-filter:blur(18px) saturate(180%);
     box-shadow:var(--shadow-soft-sm);
   }
+  /* ---------- My Orders history (local + Firestore) ---------- */
+  .history-item{
+    background:var(--input-bg);border:1px solid var(--border-glass);
+    border-radius:14px;padding:12px 14px;margin-bottom:10px;
+  }
+  .history-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px;}
+  .history-id{font-family:var(--font-display);font-weight:700;font-size:13.5px;color:var(--text-primary);word-break:break-all;}
+  .history-badge{
+    flex-shrink:0;font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;
+    background:rgba(255,159,10,0.14);color:#FF9F0A;
+  }
+  .history-badge.completed{background:rgba(52,199,89,0.14);color:var(--success);}
+  .history-badge.rejected{background:rgba(255,59,48,0.12);color:var(--danger);}
+  .history-meta{font-size:12.5px;color:var(--text-muted);line-height:1.55;}
+  .history-actions{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap;}
+  .history-btn{
+    padding:7px 12px;border-radius:999px;border:1px solid var(--border-glass);
+    background:var(--panel-solid);color:var(--text-primary);
+    font-family:var(--font-body);font-size:12px;font-weight:600;cursor:pointer;
+  }
+  .history-btn.danger{color:var(--danger);}
+  .history-filter{
+    padding:7px 13px;border-radius:999px;border:1px solid var(--border-glass);
+    background:var(--panel);color:var(--text-muted);cursor:pointer;
+    font-family:var(--font-display);font-size:12px;font-weight:600;
+  }
+  .history-filter.active{
+    background:linear-gradient(120deg,var(--accent-blue),var(--accent-cyan));
+    border:none;color:#FFFFFF;
+  }
+  /* ---------- Optional Google login ---------- */
+  .google-btn{
+    width:100%;padding:13px 16px;border-radius:999px;
+    background:#FFFFFF;border:1.5px solid var(--border-glass);
+    color:#1F1F1F;font-family:var(--font-display);font-weight:700;font-size:15px;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;
+    box-shadow:var(--shadow-soft-sm);
+    transition:transform .12s ease, box-shadow .15s ease;
+  }
+  .google-btn:active{transform:scale(0.98);}
+  .google-btn .google-g{
+    width:22px;height:22px;border-radius:50%;flex-shrink:0;
+    background:#FFFFFF;border:1px solid rgba(0,0,0,0.08);
+    color:#4285F4;font-family:var(--font-display);font-weight:800;font-size:15px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .google-link-btn{
+    background:none;border:none;cursor:pointer;padding:4px 2px;
+    color:var(--accent-blue);font-family:var(--font-body);font-size:13px;font-weight:600;
+    text-decoration:underline;text-underline-offset:3px;
+  }
   #refreshPriceBtn{background:var(--accent-blue);}
 </style>
 </head>
 <body>
 
 <div class="theme-toggle" id="themeToggle">
+  <button type="button" id="headerLoginBtn" title="Google နဲ့ Login ဝင်မယ်" aria-label="Google နဲ့ Login ဝင်မယ်"><svg class="icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></button>
+  <span class="theme-divider" aria-hidden="true"></span>
   <button type="button" id="darkBtn" title="Dark mode" aria-label="Dark mode">
     <svg class="icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
   </button>
@@ -1417,6 +1474,13 @@
   </div>
 
   <div id="orderTabPanel">
+
+  <!-- Account: slim status strip — login lives in the small header button
+       beside the theme toggle; guest checkout always works -->
+  <div class="card" id="accountCard" style="padding:14px 18px;">
+    <div id="accountStatusLine" class="hint" style="text-align:left;margin:0;">🔒 Account စစ်ဆေးနေသည်…</div>
+    <p class="hint" style="margin:8px 0 0;">💡 <b>Guest အနေနဲ့လည်း ဝယ်လို့ရပါတယ်</b> — Login မလုပ်လည်း Order တင်နိုင်သည်။ <button type="button" class="google-link-btn" id="googleLogoutBtn" style="display:none;">Logout</button></p>
+  </div>
 
   <div class="price-notice" id="priceNotice">
     <svg class="icon" viewBox="0 0 24 24" style="width:18px;height:18px;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
@@ -1508,7 +1572,7 @@
     <div id="serverSection" class="reveal-section">
       <div class="modal-warning" id="restrictedServerNotice" style="margin:10px 0 14px;">
         <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><line x1="12" y1="8" x2="12" y2="13"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-        <p style="margin:0;color:var(--text-primary);">မလေး၊ စင်ကာပူ၊ ဖိလစ်ပိုင်၊ အင်ဒို၊ ရုရှား ဆာဗာ အကောင့်များ ထည့်၍မရပါ။ လိုအပ်ပါက Admin telegram - <a href="https://t.me/kopethaung778" target="_blank" rel="noopener" style="color:var(--danger);font-weight:600;">@kopethaung778</a> သို့ ဆက်သွယ်နိုင်ပါသည်။</p>
+        <p style="margin:0;color:var(--text-primary);">မလေး၊ စင်ကာပူ၊ ဖိလစ်ပိုင်၊ အင်ဒို၊ ရုရှား ဆာဗာ အကောင့်များအတွက် လိုအပ်ပါက Ban Sever Box တွင်ဝယ်ယူနိုင်ပါသည်။</p>
       </div>
       <div class="section-label" style="margin-top:2px;"><span class="num">2</span> Server ရွေးရန်</div>
       <div class="server-grid" id="serverGrid">
@@ -1716,7 +1780,7 @@
     <div class="check"><svg class="icon" viewBox="0 0 24 24" style="width:26px;height:26px;stroke-width:2.2;"><path d="M20 6L9 17l-5-5"/></svg></div>
     <h3>Order တင်ပြီးပါပြီ</h3>
     <div class="order-id-row">
-      <div class="order-id" id="orderIdDisplay">#KGTU000000</div>
+      <div class="order-id" id="orderIdDisplay">#KDS000000</div>
       <button type="button" class="copy-id-btn" id="copyOrderIdBtn" title="Order ID ကူးရန်">
         <svg class="icon" viewBox="0 0 24 24" style="width:13px;height:13px;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
       </button>
@@ -1734,7 +1798,7 @@
       <div class="section-label"><span class="num">🔍</span> Order Status စစ်ရန်</div>
       <div class="field">
         <label for="trackOrderIdInput">Order ID</label>
-        <input type="text" id="trackOrderIdInput" placeholder="ဥပမာ KGTU1A2B3C" style="text-transform:uppercase;">
+        <input type="text" id="trackOrderIdInput" placeholder="ဥပမာ KDSMH7X2K9A1B2C" style="text-transform:uppercase;">
       </div>
       <button type="button" class="submit-btn" id="trackCheckBtn" style="margin-top:6px;">
         <span class="spinner" id="trackSpinner"></span>
@@ -1754,6 +1818,34 @@
           <div class="os-row"><span class="os-k">တင်သွင်းချိန်</span><span class="os-v" id="trTime">—</span></div>
         </div>
         <div class="id-help-box shown" id="trackStatusNote" style="margin-top:12px;"></div>
+      </div>
+
+      <!-- ===== My Orders history: local (this device) + Firestore (by Player ID) ===== -->
+      <div id="myOrdersSection" style="margin-top:22px;">
+        <div class="section-label"><span class="num">📋</span> ကျွန်တော့် Order များ</div>
+        <div id="authStatusLine" class="hint" style="text-align:left;margin:0 0 12px;">🔒 Account စစ်ဆေးနေသည်…</div>
+        <p class="hint" style="text-align:left;margin:0 0 12px;">ဒီ ဖုန်းထဲမှာ တင်ထားတဲ့ Order တွေ အလိုအလျောက် မှတ်ထားပေးပါတယ်။ သင့် Account ရဲ့ Order တွေကို အလိုအလျောက် ပြပေးတယ် — အရင် Order (Account မပါတဲ့) တွေအတွက်တော့ Player ID ရိုက်ထည့်ပြီး ရှာနိုင်ပါတယ်။</p>
+        <div class="field">
+          <label for="historyPlayerIdInput">Player ID (Firestore History ရှာရန်)</label>
+          <input type="text" id="historyPlayerIdInput" placeholder="ဥပမာ 12345678">
+        </div>
+        <div class="row" style="margin-bottom:12px;">
+          <button type="button" class="new-order-btn" id="loadHistoryBtn" style="flex:1;padding:11px 10px;">🔍 History ရှာမည်</button>
+          <button type="button" class="new-order-btn" id="refreshHistoryBtn" style="flex:1;padding:11px 10px;">↻ Status ပြန်စစ်မည်</button>
+        </div>
+        <div class="row" style="margin-bottom:12px;">
+          <button type="button" class="new-order-btn" id="linkTelegramBtn" style="flex:1;padding:11px 10px;">📲 Telegram နဲ့ ချိတ်မယ် (မကြာမီ)</button>
+        </div>
+        <div id="historyFilters" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+          <button type="button" class="history-filter active" data-filter="all">အားလုံး</button>
+          <button type="button" class="history-filter" data-filter="pending">⏳ Pending</button>
+          <button type="button" class="history-filter" data-filter="completed">✓ Completed</button>
+          <button type="button" class="history-filter" data-filter="rejected">✕ Rejected</button>
+        </div>
+        <div id="myOrdersList"></div>
+        <div id="myOrdersEmpty" class="hint" style="display:none;">မှတ်တမ်း မရှိသေးပါ — Order အသစ် တင်လိုက်ရင် ဒီနေရာမှာ အလိုအလျောက် ပေါ်လာပါမယ်။</div>
+        <div id="historyNote" class="hint" style="display:none;text-align:left;"></div>
+        <button type="button" class="new-order-btn" id="clearHistoryBtn" style="margin-top:6px;">🗑 ဒီ ဖုန်းထဲက History အားလုံး ဖျက်မည်</button>
       </div>
     </div>
   </div><!-- /trackTabPanel -->
@@ -1800,8 +1892,8 @@
 
     <div class="review-form-box" id="reviewFormBox" style="display:none;">
       <div class="field">
-        <label>Order ID (Order Status စာမျက်နှာ သို့မဟုတ် Order Confirm မှာ ရရှိထားသည့် ID)</label>
-        <input type="text" id="reviewOrderId" placeholder="ဥပမာ KGTU1A2B3C4D">
+        <label>Order ID</label>
+        <input type="text" id="reviewOrderId" placeholder="ဥပမာ KDSMH7X2K9A1B2C">
         <div class="field-error" id="reviewOrderIdError"></div>
       </div>
       <div class="field">
@@ -2001,7 +2093,7 @@
         <p>Player ID / Zone ID ကို မှန်ကန်စွာ ရိုက်ထည့်ရန် ကိုယ်တိုင်တာဝန်ယူပါသည်။ မှားယွင်းစွာ ဖြည့်သွင်းထားသော ID များကြောင့် Diamond/Item များ အခြားသူများ Account သို့ ရောက်ရှိသွားပါက King Games-Shop မှ တာဝန်မယူပါ။</p>
 
         <h4>2. ငွေပေးချေမှု</h4>
-        <p>ငွေလွှဲပြီးပါက မှန်ကန်သော ငွေလွှဲပြေစာ Screenshot ကို Order Form တွင် တင်ပေးရပါမည်။ ငွေလွှဲပြေစာ မပါဘဲ Order များကို လက်ခံဆောင်ရွက်ပေးမည် မဟုတ်ပါ။</p>
+        <p>ငွေလွှဲပြီးပါက မှန်ကန်သော ငွေလွှဲပြေစာ Screenshot ကို Order Form တွင် တင်ပေးရပါမည်။ ငွေလွှဲပြေစာ မပါသည့် Order များကို လက်ခံဆောင်ရွက်ပေးမည် မဟုတ်ပါ။</p>
 
         <h4>3. Order ဆောင်ရွက်ချိန်</h4>
         <ul>
@@ -2060,6 +2152,244 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+
+/* =====================================================================
+   Phase 1 login — Firebase Anonymous Auth (invisible, no password,
+   no forced login, guest checkout unchanged)
+   - On first visit the browser silently gets a private account UID.
+     That UID is saved on every order as `ownerUid`, so history is tied
+     to the account, not just to a Player ID anyone can type in.
+   - The UID survives closing/reopening the browser on this device
+     (Firebase Auth persistence). Clearing browser/site data creates a
+     NEW anonymous account — old orders stay in Firestore, but this
+     browser can no longer claim them by UID (they are still findable
+     by Order ID / Player ID). Phase 2 (Telegram link) fixes that by
+     moving the same UID onto a Telegram account.
+   - Requires Anonymous to be enabled in Firebase Console:
+     Authentication -> Sign-in method -> Anonymous -> Enable.
+     If it is not enabled, signInAnonymously fails with
+     auth/operation-not-allowed and the shop keeps working on local
+     history only (ownerUid stays null) — orders are never blocked.
+   ===================================================================== */
+const auth = (typeof firebase !== 'undefined' && typeof firebase.auth === 'function') ? firebase.auth() : null;
+let currentUid = null;
+let authStatus = 'checking'; // checking | ready | disabled | unavailable
+let authErrorCode = null;
+const HEADER_LOGIN_ICON = '<svg class="icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+
+function currentGoogleEmail() {
+  const u = auth && auth.currentUser;
+  if (!u) return '';
+  if (u.email) return u.email;
+  const gp = (u.providerData || []).find(p => p.providerId === 'google.com');
+  return gp && gp.email ? gp.email : '';
+}
+function isGoogleUser() {
+  const u = auth && auth.currentUser;
+  return !!u && !u.isAnonymous && (u.providerData || []).some(p => p.providerId === 'google.com');
+}
+function updateAuthStatusUI() {
+  let text;
+  if (authStatus === 'ready' && currentUid && isGoogleUser()) {
+    text = '✅ Google နဲ့ ဝင်ထားပါတယ် — ' + currentGoogleEmail() + ' — Order History ကို ဖုန်းပြောင်းလည်း ပြန်ရမယ်။';
+  } else if (authStatus === 'ready' && currentUid) {
+    text = '🔒 Guest Account အသင့် — Order တွေကို သင့် Account နဲ့ပဲ တွဲသိမ်းထားပါတယ်။ ID: ' + currentUid.slice(0, 8) + '… (Browser data မရှင်းပါနဲ့)';
+  } else if (authStatus === 'disabled') {
+    text = '⚠️ Anonymous login ကို Firebase Console မှာ မဖွင့်ရသေးပါ — Authentication → Sign-in method → Anonymous → Enable လုပ်ပေးပါ။ Google နဲ့တော့ ဝင်လို့ရပါသေးတယ် — အဲဒီအထိ Guest history က Local ပဲ အလုပ်လုပ်ပါမယ်။';
+  } else if (authStatus === 'unavailable') {
+    text = '⚠️ Account ချိတ်ဆက်၍ မရပါ — Network စစ်ပြီး Refresh လုပ်ကြည့်ပါ။ Local history ပဲ အလုပ်လုပ်နေပါတယ်။';
+  } else {
+    text = '🔒 Account စစ်ဆေးနေသည်…';
+  }
+  [document.getElementById('authStatusLine'), document.getElementById('accountStatusLine')].forEach(el => {
+    if (el) el.textContent = text;
+  });
+  const loggedInGoogle = isGoogleUser();
+  const logoutBtn = document.getElementById('googleLogoutBtn');
+  if (logoutBtn) logoutBtn.style.display = loggedInGoogle ? 'inline-block' : 'none';
+  // Small header button beside the theme toggle: person icon for a guest,
+  // first letter of the Gmail when logged in (tap it to log out).
+  const headerBtn = document.getElementById('headerLoginBtn');
+  if (headerBtn) {
+    if (loggedInGoogle) {
+      const email = currentGoogleEmail();
+      headerBtn.textContent = email ? email.charAt(0).toUpperCase() : 'G';
+      headerBtn.classList.add('logged-in');
+      headerBtn.title = email + ' — နှိပ်ရင် Logout လုပ်မယ်';
+      headerBtn.setAttribute('aria-label', 'Logout — ' + email);
+    } else {
+      headerBtn.innerHTML = HEADER_LOGIN_ICON;
+      headerBtn.classList.remove('logged-in');
+      headerBtn.title = 'Google နဲ့ Login ဝင်မယ်';
+      headerBtn.setAttribute('aria-label', 'Google နဲ့ Login ဝင်မယ်');
+    }
+  }
+}
+
+async function ensureAnonymousAuth() {
+  if (!auth) { authStatus = 'unavailable'; updateAuthStatusUI(); return null; }
+  if (auth.currentUser) {
+    currentUid = auth.currentUser.uid;
+    authStatus = 'ready';
+    updateAuthStatusUI();
+    return currentUid;
+  }
+  let authTimer = null;
+  try {
+    const cred = await Promise.race([
+      auth.signInAnonymously(),
+      new Promise((_, reject) => { authTimer = setTimeout(() => reject(new Error('auth-timeout')), 8000); })
+    ]);
+    currentUid = cred && cred.user ? cred.user.uid : (auth.currentUser && auth.currentUser.uid);
+    authStatus = currentUid ? 'ready' : 'unavailable';
+    updateAuthStatusUI();
+    return currentUid;
+  } catch (err) {
+    authErrorCode = err && err.code ? err.code : String((err && err.message) || err);
+    authStatus = (err && err.code === 'auth/operation-not-allowed') ? 'disabled' : 'unavailable';
+    console.warn('Anonymous sign-in failed:', err);
+    updateAuthStatusUI();
+    return null;
+  } finally {
+    if (authTimer) clearTimeout(authTimer);
+  }
+}
+
+/* =====================================================================
+   Optional Google login (Gmail) — Phase 2a
+   - Sign in and Sign up are the SAME Google flow: the first time a
+     Gmail account is used, Firebase creates the account (sign up);
+     afterwards the same button signs in. The login entry point is the
+     small 👤 button beside the theme toggle (top right).
+   - Redirect flow (not popup): popups are blocked in many mobile /
+     in-app browsers, redirect always works — Google's page opens,
+     then the shop comes back and handleGoogleRedirectResult() runs.
+   - Anonymous users are LINKED, not replaced: linkWithRedirect keeps
+     the same UID, so the anonymous account's orders/history follow
+     the Google account to a new device. Signing in fresh instead
+     would create a second UID and orphan the old history.
+   - Requires Google to be enabled in Firebase Console:
+     Authentication -> Sign-in method -> Google -> Enable (and add a
+     support email). No Cloud Function / bot / Blaze plan needed.
+   ===================================================================== */
+const googleProvider = (typeof firebase !== 'undefined' && firebase.auth && firebase.auth.GoogleAuthProvider)
+  ? new firebase.auth.GoogleAuthProvider()
+  : null;
+if (googleProvider) googleProvider.setCustomParameters({ prompt: 'select_account' });
+
+async function handleGoogleLogin() {
+  if (!auth || !googleProvider) {
+    showToast('Google login ကို ဖွင့်မရပါ', 'error');
+    return;
+  }
+  try {
+    const user = auth.currentUser;
+    if (user && user.isAnonymous) {
+      // Link Google onto the anonymous account — UID (and history) stays.
+      await user.linkWithRedirect(googleProvider);
+    } else if (user) {
+      showToast('Google နဲ့ ဝင်ထားပြီးပါပြီ', 'success');
+    } else {
+      await auth.signInWithRedirect(googleProvider);
+    }
+    // Redirect leaves this page; on return, handleGoogleRedirectResult() runs.
+  } catch (err) {
+    console.warn('Google login failed:', err);
+    if (err && err.code === 'auth/credential-already-in-use' && err.credential) {
+      // This Gmail is already linked to a different Firebase account
+      // (e.g. signed in with Google on another device). Sign in as that
+      // account instead — its history comes back; this device's anonymous
+      // orders stay findable by Order ID / Player ID / local history.
+      try {
+        await auth.signInWithCredential(err.credential);
+        showToast('ဒီ Gmail က အရင် account နဲ့ ချိတ်ထားပြီးသား — အဲဒီ account နဲ့ ဝင်လိုက်ပါပြီ', 'success');
+      } catch (e2) {
+        showToast('Google login မအောင်မြင်ပါ — ပြန်စမ်းကြည့်ပါ', 'error');
+      }
+    } else if (err && err.code === 'auth/account-exists-with-different-credential') {
+      showToast('ဒီ Gmail က တခြား login နည်းနဲ့ သုံးထားပြီးသား — အဲဒီနည်းနဲ့ ဝင်ပေးပါ', 'error');
+    } else {
+      showToast('Google login မအောင်မြင်ပါ — ပြန်စမ်းကြည့်ပါ', 'error');
+    }
+  }
+}
+
+async function handleGoogleRedirectResult() {
+  if (!auth || typeof auth.getRedirectResult !== 'function') return false;
+  try {
+    const result = await auth.getRedirectResult();
+    if (result && result.user) {
+      currentUid = result.user.uid;
+      authStatus = 'ready';
+      updateAuthStatusUI();
+      showToast('Google နဲ့ ဝင်ပြီးပါပြီ' + (result.user.email ? ' — ' + result.user.email : ''), 'success');
+      return true;
+    }
+    return false;
+  } catch (err) {
+    console.warn('Google redirect result failed:', err);
+    if (err && err.code === 'auth/credential-already-in-use' && err.credential) {
+      try {
+        const cred = await auth.signInWithCredential(err.credential);
+        currentUid = cred && cred.user ? cred.user.uid : currentUid;
+        authStatus = 'ready';
+        updateAuthStatusUI();
+        showToast('ဒီ Gmail က အရင် account နဲ့ ချိတ်ထားပြီးသား — အဲဒီ account နဲ့ ဝင်လိုက်ပါပြီ', 'success');
+        return true;
+      } catch (e2) { /* fall through to the generic error below */ }
+    }
+    showToast('Google login မအောင်မြင်ပါ — ပြန်စမ်းကြည့်ပါ', 'error');
+    return false;
+  }
+}
+
+if (auth) {
+  try {
+    auth.onAuthStateChanged((user) => {
+      currentUid = user ? user.uid : null;
+      if (user) authStatus = 'ready';
+      updateAuthStatusUI();
+      if (user) {
+        // History helpers are defined later in this script; wait a tick
+        // so their `let` bindings are initialised before we call them.
+        setTimeout(() => {
+          try { if (typeof loadFirestoreHistory === 'function') loadFirestoreHistory(savedPlayerId()); } catch (e) { console.warn('Auth history reload failed:', e); }
+        }, 0);
+      }
+    });
+  } catch (e) { console.warn('onAuthStateChanged failed:', e); }
+  // Google redirect comes back to this page: handle it BEFORE creating a
+  // fresh anonymous account, or the redirect result would be lost.
+  (async () => {
+    await handleGoogleRedirectResult();
+    await ensureAnonymousAuth();
+  })();
+} else {
+  authStatus = 'unavailable';
+}
+updateAuthStatusUI();
+
+async function handleGoogleLogout() {
+  if (!auth) return;
+  try { await auth.signOut(); } catch (e) { /* ignore */ }
+  // Back to a fresh guest account so ordering keeps working.
+  currentUid = null;
+  await ensureAnonymousAuth();
+  showToast('Logout လုပ်ပြီးပါပြီ — Guest အနေနဲ့ ဆက်ဝယ်လို့ရပါတယ်', 'success');
+}
+// Small header button beside the theme toggle: a guest taps it to log in
+// with Google (sign in and sign up are the same Google flow — the first
+// use creates the account); a Google user taps it to log out.
+const headerLoginBtn = document.getElementById('headerLoginBtn');
+if (headerLoginBtn) headerLoginBtn.addEventListener('click', async () => {
+  if (isGoogleUser()) {
+    if (confirm('Logout လုပ်မလား?')) await handleGoogleLogout();
+  } else {
+    await handleGoogleLogin();
+  }
+});
+const googleLogoutBtn = document.getElementById('googleLogoutBtn');
+if (googleLogoutBtn) googleLogoutBtn.addEventListener('click', handleGoogleLogout);
 
 /* ---------- Promo / event / price banner carousel ---------- */
 /* Banners are managed from admin-banners.html (upload / delete).
@@ -2317,7 +2647,7 @@ try {
 
     } catch (err) {
       console.error('Review submit failed:', err);
-      formMsg.textContent = 'တစ်ခုခုမှားယွင်းသွားပါသည် — ထပ်စမ်းကြည့်ပါ';
+      formMsg.textContent = 'Something Went Wrong Please try again';
       formMsg.className = 'review-form-msg err';
     } finally {
       submitBtn.classList.remove('loading');
@@ -2650,7 +2980,7 @@ async function loadPacks() {
   } catch (err) {
     console.error('Google Sheet ကနေ ဈေးနှုန်း ဆွဲမရပါ, fallback ဈေးနှုန်းဟောင်း သုံးထားပါတယ်:', err);
     PACKS = FALLBACK_PACKS;
-    showToast("MLBB ဈေးနှုန်းအသစ် sync မဖြစ်သေးပါ — နောက်ဆုံးသိမ်းထားသော ဈေးနှုန်းများ ပြသနေပါသည်", "error");
+    showToast("MLBB ဈေးနှုန်းအသစ် sync မဖြစ်သေးပါ — နောက်ဆုံးသိမ်းထားသော ဈေးနှုန်းများ ပြသနေပါသည်");
   }
 
   try {
@@ -2662,7 +2992,7 @@ async function loadPacks() {
   } catch (err) {
     console.error('HOK Token Sheet ကနေ ဈေးနှုန်း ဆွဲမရပါ:', err);
     PACKS_HOK = [];
-    showToast("HOK Token ဈေးနှုန်း sheet ကို ဖတ်မရပါ — HOK Token tab ရဲ့ gid နှင့် column header များကို စစ်ပေးပါ", "error");
+    showToast("HOK Token ဈေးနှုန်း sheet ကို ဖတ်မရပါ — HOK Token tab ရဲ့ gid နှင့် column header များကို စစ်ပေးပါ");
   }
 
   try {
@@ -2674,7 +3004,7 @@ async function loadPacks() {
   } catch (err) {
     console.error('PUBG UC Sheet ကနေ ဈေးနှုန်း ဆွဲမရပါ, fallback ဈေးနှုန်းဟောင်း သုံးထားပါတယ်:', err);
     PACKS_PUBG = FALLBACK_PACKS_PUBG;
-    showToast("PUBG UC ဈေးနှုန်းအသစ် sync မဖြစ်သေးပါ — နောက်ဆုံးသိမ်းထားသော ဈေးနှုန်းဟောင်း (fallback) ကိုပဲ ပြသနေပါသည်", "error");
+    showToast("PUBG UC ဈေးနှုန်းအသစ် sync မဖြစ်သေးပါ — နောက်ဆုံးသိမ်းထားသော ဈေးနှုန်းဟောင်း (fallback) ကိုပဲ ပြသနေပါသည်");
   }
 
   try {
@@ -2686,7 +3016,7 @@ async function loadPacks() {
   } catch (err) {
     console.error('Magic Chess Go Go Sheet ကနေ ဈေးနှုန်း ဆွဲမရပါ:', err);
     PACKS_MAGICCHESS = [];
-    showToast("Magic Chess: Go Go ဈေးနှုန်း sheet ကို ဖတ်မရပါ — tab ရဲ့ gid နှင့် column header များကို စစ်ပေးပါ", "error");
+    showToast("Magic Chess: Go Go ဈေးနှုန်း sheet ကို ဖတ်မရပါ — tab ရဲ့ gid နှင့် column header များကို စစ်ပေးပါ");
   }
 
   try {
@@ -2982,7 +3312,7 @@ function updatePackLockUI() {
       && (!gameNeedsServerStep(currentGame) || ZONE_PATTERN.test(zoneIdInput.value.trim()));
     packLockHint.querySelector('span').textContent = idZoneOk
       ? 'Username စစ်ဆေးနေဆဲ (သို့) Username မတွေ့ပါ — ID/Zone ID ကို ပြန်စစ်ပေးပါ'
-      : 'အပေါ်က Player ID (Zone ID အပါအဝင်) ကို အရင်ဖြည့်ပါ — ပြီးမှ Pack ရွေးလို့ရပါမည်';
+      : 'Player ID (Zone ID) ကို အရင်ဖြည့်ပါ — ပြီးမှ Pack ရွေးလို့ရပါမည်';
   }
 }
 
@@ -3434,6 +3764,8 @@ async function checkOrderStatus() {
       : '—';
     document.getElementById('trackStatusNote').textContent = TRACK_STATUS_NOTES[o.status] || '';
 
+    // Keep this order in My Orders history (local; merged with Firestore on render).
+    saveMyOrder({ ...o, orderId: o.orderId || orderId, createdAtMs: o.createdAt && o.createdAt.toDate ? o.createdAt.toDate().getTime() : Date.now(), source: 'firestore' });
     trackResult.style.display = 'block';
   } catch (err) {
     console.error(err);
@@ -3448,6 +3780,258 @@ async function checkOrderStatus() {
 
 trackCheckBtn.addEventListener('click', checkOrderStatus);
 trackOrderIdInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') checkOrderStatus(); });
+
+  /* =====================================================================
+     My Orders history — localStorage (this device) + Firestore (by Player ID)
+     - Every successful order is saved locally (see the submit handler below).
+     - Manually-checked orders are saved too (see checkOrderStatus above).
+     - Firestore query: orders where playerId == <typed Player ID>,
+       newest first. Needs a composite index (playerId ASC + createdAt DESC)
+       and Firestore Rules that allow this query; if either is missing the
+       page falls back to local history and explains why in #historyNote.
+     - Privacy: orders made after Anonymous login carry `ownerUid`, so
+       they are found by account, not by Player ID. The Player ID query
+       remains only for older orders made before login existed — a Player
+       ID is semi-public, so anyone who knows it can still see those
+       older orders. Phase 2 (Telegram link) will let the same account
+       follow the customer to another device.
+     ===================================================================== */
+  const HISTORY_KEY = 'kds_myOrders';
+  const HISTORY_MAX = 30;
+  let historyFilter = 'all';
+  let firestoreOrders = []; // latest Firestore results for the searched Player ID
+  let firestoreHistoryNote = '';
+
+  function readLocalOrders() {
+    try {
+      const raw = localStorage.getItem(HISTORY_KEY);
+      const arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch (e) { return []; }
+  }
+  function writeLocalOrders(list) {
+    try { localStorage.setItem(HISTORY_KEY, JSON.stringify(list.slice(0, HISTORY_MAX))); } catch (e) { /* private mode — ignore */ }
+  }
+  function normaliseOrder(o) {
+    if (!o || !o.orderId) return null;
+    let createdAtMs = o.createdAtMs;
+    if (!createdAtMs && o.createdAt && typeof o.createdAt.toDate === 'function') {
+      try { createdAtMs = o.createdAt.toDate().getTime(); } catch (e) { createdAtMs = Date.now(); }
+    }
+    if (!createdAtMs && typeof o.createdAt === 'number') createdAtMs = o.createdAt;
+    if (!createdAtMs) createdAtMs = Date.now();
+    return {
+      orderId: String(o.orderId).toUpperCase(),
+      game: o.game || null,
+      gameName: o.gameName || (o.game ? gameDisplayName(o.game) : ''),
+      packLabel: o.packLabel || '',
+      quantity: o.quantity || 1,
+      totalPrice: (o.totalPrice !== undefined && o.totalPrice !== null) ? o.totalPrice : (o.packPrice || 0),
+      playerId: o.playerId ? String(o.playerId) : '',
+      ownerUid: o.ownerUid || null,
+      status: o.status || 'pending',
+      createdAtMs: createdAtMs,
+      source: o.source || 'local'
+    };
+  }
+  function saveMyOrder(order) {
+    const item = normaliseOrder(order);
+    if (!item) return;
+    const list = readLocalOrders().filter(x => String(x.orderId).toUpperCase() !== item.orderId);
+    list.unshift(item);
+    writeLocalOrders(list);
+    renderMyOrders();
+  }
+  function formatHistoryDate(ms) {
+    try {
+      return new Date(ms).toLocaleString('en-GB', { timeZone: 'Asia/Yangon', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+    } catch (e) { return '—'; }
+  }
+  function historyStatusLabel(s) {
+    return s === 'completed' ? '✓ Completed' : s === 'rejected' ? '✕ Rejected' : '⏳ Pending';
+  }
+  function mergedHistoryOrders() {
+    const map = new Map();
+    readLocalOrders().forEach(o => { const n = normaliseOrder(o); if (n) map.set(n.orderId, n); });
+    // Firestore wins on status/date when the same orderId exists in both.
+    firestoreOrders.forEach(o => { const n = normaliseOrder(o); if (n) map.set(n.orderId, n); });
+    return Array.from(map.values()).sort((a, b) => (b.createdAtMs || 0) - (a.createdAtMs || 0));
+  }
+  function renderMyOrders() {
+    const listEl = document.getElementById('myOrdersList');
+    const emptyEl = document.getElementById('myOrdersEmpty');
+    const noteEl = document.getElementById('historyNote');
+    if (!listEl) return;
+    const all = mergedHistoryOrders();
+    const shown = historyFilter === 'all' ? all : all.filter(o => o.status === historyFilter);
+    if (noteEl) {
+      if (firestoreHistoryNote) { noteEl.textContent = firestoreHistoryNote; noteEl.style.display = 'block'; }
+      else noteEl.style.display = 'none';
+    }
+    if (!shown.length) {
+      listEl.innerHTML = '';
+      if (emptyEl) emptyEl.style.display = 'block';
+      return;
+    }
+    if (emptyEl) emptyEl.style.display = 'none';
+    listEl.innerHTML = shown.map(o => `
+      <div class="history-item">
+        <div class="history-top">
+          <span class="history-id">#${escapeHtml(o.orderId)}</span>
+          <span class="history-badge ${escapeHtml(o.status)}">${historyStatusLabel(o.status)}</span>
+        </div>
+        <div class="history-meta">${escapeHtml(o.gameName || '')}${o.gameName && o.packLabel ? ' • ' : ''}${escapeHtml(o.packLabel)}${o.quantity > 1 ? ' x' + o.quantity : ''}</div>
+        <div class="history-meta">${(o.totalPrice || 0).toLocaleString()} Ks • ${formatHistoryDate(o.createdAtMs)}${o.playerId ? ' • ID: ' + escapeHtml(o.playerId) : ''}</div>
+        <div class="history-actions">
+          <button type="button" class="history-btn" data-check="${escapeHtml(o.orderId)}">Status စစ်မည်</button>
+          <button type="button" class="history-btn" data-copy="${escapeHtml(o.orderId)}">Copy ID</button>
+          <button type="button" class="history-btn danger" data-remove="${escapeHtml(o.orderId)}">ဖျက်မည်</button>
+        </div>
+      </div>`).join('');
+  }
+  // History items are re-rendered, so handle their buttons by delegation.
+  document.getElementById('myOrdersList').addEventListener('click', (e) => {
+    const checkBtn = e.target.closest('[data-check]');
+    const copyBtn = e.target.closest('[data-copy]');
+    const removeBtn = e.target.closest('[data-remove]');
+    if (checkBtn) {
+      trackOrderIdInput.value = checkBtn.dataset.check;
+      checkOrderStatus();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (copyBtn) {
+      navigator.clipboard.writeText(copyBtn.dataset.copy)
+        .then(() => showToast('Order ID ကူးယူပြီးပါပြီ', 'success'))
+        .catch(() => showToast('Copy မအောင်မြင်ပါ — manual ကူးပါ', 'error'));
+    } else if (removeBtn) {
+      const id = removeBtn.dataset.remove;
+      writeLocalOrders(readLocalOrders().filter(x => String(x.orderId).toUpperCase() !== id));
+      firestoreOrders = firestoreOrders.filter(x => String(x.orderId).toUpperCase() !== id);
+      renderMyOrders();
+    }
+  });
+  async function queryFirestoreHistory(field, value) {
+    const snap = await db.collection('orders').where(field, '==', value).orderBy('createdAt', 'desc').limit(20).get();
+    return snap.docs.map(d => {
+      const o = d.data() || {};
+      return { ...o, orderId: o.orderId || d.id, source: 'firestore' };
+    });
+  }
+  async function loadFirestoreHistory(playerId) {
+    const pid = String(playerId || '').trim();
+    const byUid = [];
+    const byPid = [];
+    let sawPermissionDenied = false;
+    let sawMissingIndex = false;
+    let sawOtherError = false;
+    const noteError = (err, where) => {
+      console.error('Firestore history failed (' + where + '):', err);
+      if (err && err.code === 'permission-denied') sawPermissionDenied = true;
+      else if (err && err.code === 'failed-precondition') sawMissingIndex = true;
+      else sawOtherError = true;
+    };
+    // 1) This account's own orders — private, no Player ID needed.
+    //    Needs composite index: ownerUid ASC + createdAt DESC.
+    if (currentUid) {
+      try { byUid.push(...await queryFirestoreHistory('ownerUid', currentUid)); }
+      catch (err) { noteError(err, 'ownerUid'); }
+    }
+    // 2) Older orders made before Anonymous login (no ownerUid on them),
+    //    found by Player ID. Needs composite index: playerId ASC + createdAt DESC.
+    if (pid) {
+      try { byPid.push(...await queryFirestoreHistory('playerId', pid)); }
+      catch (err) { noteError(err, 'playerId'); }
+    }
+    // Merge, deduped by orderId (an order can match both queries).
+    const seen = new Set();
+    firestoreOrders = [...byUid, ...byPid].filter(o => {
+      const id = String(o.orderId || '').toUpperCase();
+      if (!id || seen.has(id)) return false;
+      seen.add(id);
+      return true;
+    });
+    if (!currentUid && !pid) {
+      firestoreHistoryNote = 'History ကြည့်ဖို့ Player ID ရိုက်ထည့်ပေးပါ။ Account အသင့် ဖြစ်နေရင် အလိုအလျောက် ပြပေးပါမယ်။';
+    } else if (firestoreOrders.length) {
+      const parts = [];
+      if (byUid.length) parts.push('သင့် Account ရဲ့ Order ' + byUid.length + ' ခု');
+      if (byPid.length) parts.push('Player ID နဲ့ ရှာတွေ့တာ ' + byPid.length + ' ခု');
+      firestoreHistoryNote = 'Firestore ကနေ ' + parts.join('၊ ') + ' တွေ့ပါတယ်။';
+      if (sawPermissionDenied || sawMissingIndex) firestoreHistoryNote += ' (တစ်ချို့ ရှာဖွေမှု မအောင်မြင်ပါ — အောက်က မှတ်ချက်ကြည့်ပါ။)';
+    } else if (sawMissingIndex) {
+      firestoreHistoryNote = 'Firestore index မရှိသေးလို့ History ရှာမရပါ — Firebase Console မှာ ownerUid + createdAt နဲ့ playerId + createdAt အတွက် composite index ၂ ခု ဆောက်ပေးဖို့ လိုပါတယ်။ ဒီ ဖုန်းထဲက မှတ်တမ်းပဲ ပြထားပါတယ်။';
+    } else if (sawPermissionDenied) {
+      firestoreHistoryNote = 'Firestore rule မှာ History ရှာခွင့် မပေးသေးလို့ ဒီ ဖုန်းထဲက မှတ်တမ်းပဲ ပြထားပါတယ်။ Admin က Firestore Rules မှာ orders collection အတွက် query ခွင့် ဖွင့်ပေးဖို့ လိုပါတယ်။';
+    } else if (sawOtherError) {
+      firestoreHistoryNote = 'Firestore နဲ့ ချိတ်ဆက်၍ မရပါ — Network စစ်ပြီး ပြန်စမ်းကြည့်ပါ။ ဒီ ဖုန်းထဲက မှတ်တမ်းပဲ ပြထားပါတယ်။';
+    } else {
+      firestoreHistoryNote = 'Firestore မှာ Order မတွေ့ပါ — ဒီ ဖုန်းထဲက မှတ်တမ်းပဲ ပြထားပါတယ်။';
+    }
+    if (authStatus === 'disabled') {
+      firestoreHistoryNote += ' (Anonymous login မဖွင့်ရသေးလို့ Account history မရပါ — Firebase Console မှာ Anonymous ကို Enable လုပ်ပေးပါ။)';
+    }
+    // Keep local copies in sync so the list survives offline / later visits.
+    firestoreOrders.forEach(o => {
+      const n = normaliseOrder(o);
+      if (n && !readLocalOrders().some(x => String(x.orderId).toUpperCase() === n.orderId)) {
+        const list = readLocalOrders();
+        list.unshift(n);
+        writeLocalOrders(list);
+      }
+    });
+    renderMyOrders();
+    return firestoreOrders;
+  }
+  function savedPlayerId() {
+    try { return localStorage.getItem('kds_playerId') || ''; } catch (e) { return ''; }
+  }
+  document.getElementById('loadHistoryBtn').addEventListener('click', () => {
+    const pid = document.getElementById('historyPlayerIdInput').value.trim();
+    if (pid) { try { localStorage.setItem('kds_playerId', pid); } catch (e) { /* ignore */ } }
+    loadFirestoreHistory(pid);
+  });
+  document.getElementById('refreshHistoryBtn').addEventListener('click', async () => {
+    const pid = document.getElementById('historyPlayerIdInput').value.trim() || savedPlayerId();
+    await loadFirestoreHistory(pid);
+    showToast('History ပြန်စစ်ပြီးပါပြီ', 'success');
+  });
+  // Phase 2 placeholder: Telegram linking needs a Cloud Function to verify
+  // the Telegram login and mint a Firebase custom token — it cannot be
+  // done safely from this file alone, so this only explains that for now.
+  document.getElementById('linkTelegramBtn').addEventListener('click', () => {
+    showToast('Telegram ချိတ်ဆက်မှု မကြာမီ လာပါမယ် — Cloud Function နဲ့ အတည်ပြုပေးဖို့ လိုပါတယ်', 'success');
+  });
+  document.querySelectorAll('#historyFilters .history-filter').forEach(btn => {
+    btn.addEventListener('click', () => {
+      historyFilter = btn.dataset.filter;
+      document.querySelectorAll('#historyFilters .history-filter').forEach(b => b.classList.toggle('active', b === btn));
+      renderMyOrders();
+    });
+  });
+  document.getElementById('clearHistoryBtn').addEventListener('click', () => {
+    if (!confirm('ဒီ ဖုန်းထဲက Order History အားလုံး ဖျက်မှာလား? Firestore ထဲက မှတ်တမ်းကတော့ မပျက်ပါဘူး။')) return;
+    try { localStorage.removeItem(HISTORY_KEY); } catch (e) { /* ignore */ }
+    firestoreOrders = [];
+    renderMyOrders();
+    showToast('Local History ဖျက်ပြီးပါပြီ', 'success');
+  });
+  // Opening the track tab re-prefills the Player ID and refreshes the list.
+  trackTabBtn.addEventListener('click', () => {
+    const input = document.getElementById('historyPlayerIdInput');
+    const pid = savedPlayerId();
+    if (input && pid && !input.value) input.value = pid;
+    renderMyOrders();
+    loadFirestoreHistory(pid);
+  });
+  // Prefill Player ID + render local history immediately; try Firestore in the background.
+  (function initMyOrders() {
+    try {
+      const pid = savedPlayerId();
+      const input = document.getElementById('historyPlayerIdInput');
+      if (input && pid) input.value = pid;
+    } catch (e) { /* ignore */ }
+    renderMyOrders();
+    loadFirestoreHistory(savedPlayerId());
+  })();
 
 document.getElementById('goToTrackLink').addEventListener('click', (e) => {
   e.preventDefault();
@@ -3999,11 +4583,16 @@ finalConfirmBtn.addEventListener('click', async () => {
   finalConfirmBtn.classList.add('loading');
   finalConfirmBtn.disabled = true;
   setProgress(0, 'Order စာရင်းသွင်းနေသည်...');
+  // Phase 1 login: make sure the anonymous account exists before saving,
+  // so this order is tied to the customer's account. Never blocks the
+  // order if auth is unavailable (ownerUid just stays null).
+  await ensureAnonymousAuth();
 
   try {
     try {
       const firestoreWrite = db.collection("orders").doc(orderId).set({
         orderId,
+        ownerUid: currentUid || null,
         game: currentGame,
         server: gameNeedsServerStep(currentGame) ? currentServer : null,
         playerId,
@@ -4052,6 +4641,10 @@ finalConfirmBtn.addEventListener('click', async () => {
     }
 
     lastOrderAt = Date.now();
+    // Save to My Orders history (localStorage) so the customer keeps the
+    // order code even after closing the tab. Firestore already has the
+    // same order; the history list merges the two by orderId.
+    saveMyOrder({ orderId, game: currentGame, gameName: gameDisplayName(currentGame), playerId, zoneId, ownerUid: currentUid || null, packLabel: item.label, quantity: qty, totalPrice, paymentMethod: selectedMethod, status: 'pending', createdAtMs: Date.now(), source: 'local' });
     closeModal();
     document.getElementById('orderIdDisplay').textContent = "#" + orderId;
     document.getElementById('orderSummary').innerHTML = `
