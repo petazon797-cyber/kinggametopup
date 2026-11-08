@@ -1427,6 +1427,9 @@
   }
   .history-badge.completed{background:rgba(52,199,89,0.14);color:var(--success);}
   .history-badge.rejected{background:rgba(255,59,48,0.12);color:var(--danger);}
+  .live-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:var(--success);margin-left:8px;vertical-align:1px;}
+  .live-badge::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--success);animation:livePulse 1.6s ease-in-out infinite;}
+  @keyframes livePulse{0%,100%{opacity:1;}50%{opacity:.35;}}
   .history-meta{font-size:12.5px;color:var(--text-muted);line-height:1.55;}
   .history-actions{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap;}
   .history-btn{
@@ -1950,7 +1953,7 @@
 
   <div id="trackTabPanel" style="display:none;">
     <div class="card">
-      <div class="section-label"><span class="num">🔍</span> Order Status စစ်ရန်</div>
+      <div class="section-label"><span class="num">🔍</span> Order Status စစ်ရန် <span id="trackLiveBadge" class="live-badge" style="display:none;">Live</span></div>
       <div class="field">
         <label for="trackOrderIdInput">Order ID</label>
         <input type="text" id="trackOrderIdInput" placeholder="ဥပမာ KDSMH7X2K9A1B2C" style="text-transform:uppercase;">
@@ -1977,7 +1980,7 @@
 
       <!-- ===== My Orders history: local (this device) + Firestore (by Player ID) ===== -->
       <div id="myOrdersSection" style="margin-top:22px;">
-        <div class="section-label"><span class="num">📋</span> ကျွန်တော့် Order များ</div>
+        <div class="section-label"><span class="num">📋</span> ကျွန်တော့် Order များ <span id="liveHistoryBadge" class="live-badge" style="display:none;">Live</span></div>
         <div id="authStatusLine" class="hint" style="text-align:left;margin:0 0 12px;">🔒 Account စစ်ဆေးနေသည်…</div>
         <p class="hint" style="text-align:left;margin:0 0 12px;">ဒီ ဖုန်းထဲမှာ တင်ထားတဲ့ Order တွေ အလိုအလျောက် မှတ်ထားပေးပါတယ်။ သင့် Account ရဲ့ Order တွေကို အလိုအလျောက် ပြပေးတယ် — အရင် Order (Account မပါတဲ့) တွေအတွက်တော့ Player ID ရိုက်ထည့်ပြီး ရှာနိုင်ပါတယ်။</p>
         <div class="field">
@@ -2753,7 +2756,7 @@ if (auth) {
         // History helpers are defined later in this script; wait a tick
         // so their `let` bindings are initialised before we call them.
         setTimeout(() => {
-          try { if (typeof loadFirestoreHistory === 'function') loadFirestoreHistory(savedPlayerId()); } catch (e) { console.warn('Auth history reload failed:', e); }
+          try { if (typeof startLiveHistory === 'function') startLiveHistory(savedPlayerId()); } catch (e) { console.warn('Auth history reload failed:', e); }
         }, 0);
       }
     });
@@ -4154,6 +4157,13 @@ const trackBtnText = document.getElementById('trackBtnText');
 const trackMsg = document.getElementById('trackMsg');
 const trackResult = document.getElementById('trackResult');
 
+// Live status state — top-level so both the check logic and the history
+// listeners can share them.
+let liveHistoryUnsubs = [];
+let liveByUid = [];
+let liveByPid = [];
+let liveTrackUnsub = null;
+
 const TRACK_STATUS_NOTES = {
   pending: "Order ကို လက်ခံရရှိပြီး admin မှ စစ်ဆေးနေဆဲဖြစ်ပါသည်။ ပုံမှန်အားဖြင့် ၅-၁၀ မိနစ်အတွင်း Diamond ဖြည့်ပေးပါမည်။",
   completed: "Diamond ကို အောင်မြင်စွာ ဖြည့်သွင်းပြီးပါပြီ။ ကျေးဇူးတင်ပါသည်။",
@@ -4184,26 +4194,8 @@ async function checkOrderStatus() {
     }
     const o = doc.data();
 
-    const badge = document.getElementById('trackStatusBadge');
-    badge.textContent = o.status === 'completed' ? '✓ Completed'
-      : o.status === 'rejected' ? '✕ Rejected'
-      : '⏳ Pending';
-    badge.style.color = o.status === 'completed' ? 'var(--success)'
-      : o.status === 'rejected' ? 'var(--danger)'
-      : 'var(--accent-gold)';
-
-    document.getElementById('trOrderId').textContent = '#' + o.orderId;
-    document.getElementById('trPack').textContent = o.packLabel + (o.quantity > 1 ? ' x' + o.quantity : '');
-    document.getElementById('trTotal').textContent = (o.totalPrice || o.packPrice || 0).toLocaleString() + ' Ks';
-    document.getElementById('trPlayerId').textContent = o.playerId + (o.username ? ' (' + o.username + ')' : '');
-    document.getElementById('trTime').textContent = o.createdAt && o.createdAt.toDate
-      ? o.createdAt.toDate().toLocaleString('en-GB', { timeZone: 'Asia/Yangon', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
-      : '—';
-    document.getElementById('trackStatusNote').textContent = TRACK_STATUS_NOTES[o.status] || '';
-
-    // Keep this order in My Orders history (local; merged with Firestore on render).
-    saveMyOrder({ ...o, orderId: o.orderId || orderId, createdAtMs: o.createdAt && o.createdAt.toDate ? o.createdAt.toDate().getTime() : Date.now(), source: 'firestore' });
-    trackResult.style.display = 'block';
+    renderTrackResult(o, orderId);
+    watchTrackOrder(orderId);
   } catch (err) {
     console.error(err);
     trackMsg.textContent = "Server error — နောက်မှ ပြန်စမ်းကြည့်ပါ";
@@ -4213,6 +4205,50 @@ async function checkOrderStatus() {
     trackCheckBtn.disabled = false;
     trackBtnText.textContent = 'Status စစ်မည်';
   }
+}
+
+// Renders the single-order check result; shared by the one-time check
+// (checkOrderStatus) and the live doc listener (watchTrackOrder).
+function renderTrackResult(o, orderId) {
+  const badge = document.getElementById('trackStatusBadge');
+  badge.textContent = o.status === 'completed' ? '✓ Completed'
+    : o.status === 'rejected' ? '✕ Rejected'
+    : '⏳ Pending';
+  badge.style.color = o.status === 'completed' ? 'var(--success)'
+    : o.status === 'rejected' ? 'var(--danger)'
+    : 'var(--accent-gold)';
+
+  document.getElementById('trOrderId').textContent = '#' + o.orderId;
+  document.getElementById('trPack').textContent = o.packLabel + (o.quantity > 1 ? ' x' + o.quantity : '');
+  document.getElementById('trTotal').textContent = (o.totalPrice || o.packPrice || 0).toLocaleString() + ' Ks';
+  document.getElementById('trPlayerId').textContent = o.playerId + (o.username ? ' (' + o.username + ')' : '');
+  document.getElementById('trTime').textContent = o.createdAt && o.createdAt.toDate
+    ? o.createdAt.toDate().toLocaleString('en-GB', { timeZone: 'Asia/Yangon', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
+    : '—';
+  document.getElementById('trackStatusNote').textContent = TRACK_STATUS_NOTES[o.status] || '';
+
+  // Keep this order in My Orders history (local; merged with Firestore on render).
+  saveMyOrder({ ...o, orderId: o.orderId || orderId, createdAtMs: o.createdAt && o.createdAt.toDate ? o.createdAt.toDate().getTime() : Date.now(), source: 'firestore' });
+  trackResult.style.display = 'block';
+}
+function stopTrackWatch() {
+  if (liveTrackUnsub) { try { liveTrackUnsub(); } catch (e) { /* ignore */ } liveTrackUnsub = null; }
+  showTrackLiveBadge(false);
+}
+// Live doc listener for the checked order — an Admin approve/reject while
+// the customer is looking at the result flips the badge by itself.
+// The doc read rule is public (allow get: if true), so this works even
+// for guests with no account.
+function watchTrackOrder(orderId) {
+  stopTrackWatch();
+  if (!db) return;
+  try {
+    liveTrackUnsub = db.collection('orders').doc(orderId).onSnapshot(doc => {
+      if (!doc.exists) return;
+      renderTrackResult(doc.data(), orderId);
+      showTrackLiveBadge(true);
+    }, err => { console.error('Live track failed:', err); showTrackLiveBadge(false); });
+  } catch (e) { console.warn('Live track unavailable:', e); }
 }
 
 trackCheckBtn.addEventListener('click', checkOrderStatus);
@@ -4226,6 +4262,9 @@ trackOrderIdInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') ch
        newest first. Needs a composite index (playerId ASC + createdAt DESC)
        and Firestore Rules that allow this query; if either is missing the
        page falls back to local history and explains why in #historyNote.
+     - Live: onSnapshot listeners (startLiveHistory) keep the list fresh —
+       an Admin approve/reject flips the badge with no refresh tap. Same
+       queries, indexes and rules as the one-time fetch.
      - Privacy: orders made after Anonymous login carry `ownerUid`, so
        they are found by account, not by Player ID. The Player ID query
        remains only for older orders made before login existed — a Player
@@ -4353,31 +4392,13 @@ trackOrderIdInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') ch
       return { ...o, orderId: o.orderId || d.id, source: 'firestore' };
     });
   }
-  async function loadFirestoreHistory(playerId) {
-    const pid = String(playerId || '').trim();
-    const byUid = [];
-    const byPid = [];
-    let sawPermissionDenied = false;
-    let sawMissingIndex = false;
-    let sawOtherError = false;
-    const noteError = (err, where) => {
-      console.error('Firestore history failed (' + where + '):', err);
-      if (err && err.code === 'permission-denied') sawPermissionDenied = true;
-      else if (err && err.code === 'failed-precondition') sawMissingIndex = true;
-      else sawOtherError = true;
-    };
-    // 1) This account's own orders — private, no Player ID needed.
-    //    Needs composite index: ownerUid ASC + createdAt DESC.
-    if (currentUid) {
-      try { byUid.push(...await queryFirestoreHistory('ownerUid', currentUid)); }
-      catch (err) { noteError(err, 'ownerUid'); }
-    }
-    // 2) Older orders made before Anonymous login (no ownerUid on them),
-    //    found by Player ID. Needs composite index: playerId ASC + createdAt DESC.
-    if (pid) {
-      try { byPid.push(...await queryFirestoreHistory('playerId', pid)); }
-      catch (err) { noteError(err, 'playerId'); }
-    }
+  // Shared tail of loadFirestoreHistory + the live listeners below: merge
+  // Firestore results (they win over the local copy), build the #historyNote
+  // text, sync the local copies' status, and re-render.
+  function applyFirestoreHistory(byUid, byPid, flags, pid) {
+    const sawPermissionDenied = !!(flags && flags.permissionDenied);
+    const sawMissingIndex = !!(flags && flags.missingIndex);
+    const sawOtherError = !!(flags && flags.otherError);
     // Merge, deduped by orderId (an order can match both queries).
     const seen = new Set();
     firestoreOrders = [...byUid, ...byPid].filter(o => {
@@ -4406,29 +4427,122 @@ trackOrderIdInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') ch
     if (authStatus === 'disabled') {
       firestoreHistoryNote += ' (Anonymous login မဖွင့်ရသေးလို့ Account history မရပါ — Firebase Console မှာ Anonymous ကို Enable လုပ်ပေးပါ။)';
     }
-    // Keep local copies in sync so the list survives offline / later visits.
+    // Keep local copies in sync (add new ones, update status of known ones)
+    // so the list stays right offline and on later visits.
+    const local = readLocalOrders();
+    let changed = false;
     firestoreOrders.forEach(o => {
       const n = normaliseOrder(o);
-      if (n && !readLocalOrders().some(x => String(x.orderId).toUpperCase() === n.orderId)) {
-        const list = readLocalOrders();
-        list.unshift(n);
-        writeLocalOrders(list);
-      }
+      if (!n) return;
+      const idx = local.findIndex(x => String(x.orderId).toUpperCase() === n.orderId);
+      if (idx >= 0) {
+        if (local[idx].status !== n.status) { local[idx] = { ...local[idx], ...n }; changed = true; }
+      } else { local.unshift(n); changed = true; }
     });
+    if (changed) writeLocalOrders(local);
     renderMyOrders();
     return firestoreOrders;
   }
+
+  async function loadFirestoreHistory(playerId) {
+    const pid = String(playerId || '').trim();
+    const byUid = [];
+    const byPid = [];
+    let sawPermissionDenied = false;
+    let sawMissingIndex = false;
+    let sawOtherError = false;
+    const noteError = (err, where) => {
+      console.error('Firestore history failed (' + where + '):', err);
+      if (err && err.code === 'permission-denied') sawPermissionDenied = true;
+      else if (err && err.code === 'failed-precondition') sawMissingIndex = true;
+      else sawOtherError = true;
+    };
+    // 1) This account's own orders — private, no Player ID needed.
+    //    Needs composite index: ownerUid ASC + createdAt DESC.
+    if (currentUid) {
+      try { byUid.push(...await queryFirestoreHistory('ownerUid', currentUid)); }
+      catch (err) { noteError(err, 'ownerUid'); }
+    }
+    // 2) Older orders made before Anonymous login (no ownerUid on them),
+    //    found by Player ID. Needs composite index: playerId ASC + createdAt DESC.
+    if (pid) {
+      try { byPid.push(...await queryFirestoreHistory('playerId', pid)); }
+      catch (err) { noteError(err, 'playerId'); }
+    }
+    return applyFirestoreHistory(byUid, byPid, { permissionDenied: sawPermissionDenied, missingIndex: sawMissingIndex, otherError: sawOtherError }, pid);
+  }
+  /* Live history — onSnapshot listeners so an Admin approve/reject flips
+     the badge on the customer's phone by itself, with no refresh tap.
+     Uses the same queries (and the same composite indexes + rules) as
+     loadFirestoreHistory above; onSnapshot fires immediately with the
+     current results, then again on every change. */
+  function showLiveHistoryBadge(on) {
+    const el = document.getElementById('liveHistoryBadge');
+    if (el) el.style.display = on ? '' : 'none';
+  }
+  function showTrackLiveBadge(on) {
+    const el = document.getElementById('trackLiveBadge');
+    if (el) el.style.display = on ? '' : 'none';
+  }
+  function stopLiveHistory() {
+    liveHistoryUnsubs.forEach(u => { try { u(); } catch (e) { /* ignore */ } });
+    liveHistoryUnsubs = [];
+    showLiveHistoryBadge(false);
+  }
+  function liveHistoryError(err, pid) {
+    console.error('Live history failed:', err);
+    const flags = {};
+    if (err && err.code === 'permission-denied') flags.permissionDenied = true;
+    else if (err && err.code === 'failed-precondition') flags.missingIndex = true;
+    else flags.otherError = true;
+    applyFirestoreHistory(liveByUid, liveByPid, flags, pid);
+    // One-time fetch as a fallback — it cannot restart listeners, so no loop.
+    try { loadFirestoreHistory(pid); } catch (e) { /* ignore */ }
+  }
+  function startLiveHistory(playerId) {
+    stopLiveHistory();
+    const pid = String(playerId || '').trim();
+    liveByUid = [];
+    liveByPid = [];
+    if (!db) return;
+    if (currentUid) {
+      try {
+        const unsub = db.collection('orders').where('ownerUid', '==', currentUid).orderBy('createdAt', 'desc').limit(20)
+          .onSnapshot(snap => {
+            liveByUid = snap.docs.map(d => { const o = d.data() || {}; return { ...o, orderId: o.orderId || d.id, source: 'firestore' }; });
+            applyFirestoreHistory(liveByUid, liveByPid, {}, pid);
+            showLiveHistoryBadge(true);
+          }, err => liveHistoryError(err, pid));
+        liveHistoryUnsubs.push(unsub);
+      } catch (e) { console.warn('Live history (ownerUid) unavailable:', e); }
+    }
+    if (pid) {
+      try {
+        const unsub = db.collection('orders').where('playerId', '==', pid).orderBy('createdAt', 'desc').limit(20)
+          .onSnapshot(snap => {
+            liveByPid = snap.docs.map(d => { const o = d.data() || {}; return { ...o, orderId: o.orderId || d.id, source: 'firestore' }; });
+            applyFirestoreHistory(liveByUid, liveByPid, {}, pid);
+            showLiveHistoryBadge(true);
+          }, err => liveHistoryError(err, pid));
+        liveHistoryUnsubs.push(unsub);
+      } catch (e) { console.warn('Live history (playerId) unavailable:', e); }
+    }
+    // Nothing to listen to (no account, no Player ID) — still render the note.
+    if (!liveHistoryUnsubs.length) applyFirestoreHistory([], [], {}, pid);
+  }
+
   function savedPlayerId() {
     try { return localStorage.getItem('kds_playerId') || ''; } catch (e) { return ''; }
   }
   document.getElementById('loadHistoryBtn').addEventListener('click', () => {
     const pid = document.getElementById('historyPlayerIdInput').value.trim();
     if (pid) { try { localStorage.setItem('kds_playerId', pid); } catch (e) { /* ignore */ } }
-    loadFirestoreHistory(pid);
+    startLiveHistory(pid);
   });
   document.getElementById('refreshHistoryBtn').addEventListener('click', async () => {
     const pid = document.getElementById('historyPlayerIdInput').value.trim() || savedPlayerId();
     await loadFirestoreHistory(pid);
+    startLiveHistory(pid);
     showToast('History ပြန်စစ်ပြီးပါပြီ', 'success');
   });
   // Phase 2 placeholder: Telegram linking needs a Cloud Function to verify
@@ -4457,7 +4571,7 @@ trackOrderIdInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') ch
     const pid = savedPlayerId();
     if (input && pid && !input.value) input.value = pid;
     renderMyOrders();
-    loadFirestoreHistory(pid);
+    startLiveHistory(pid);
   });
   // Prefill Player ID + render local history immediately; try Firestore in the background.
   (function initMyOrders() {
@@ -4467,7 +4581,7 @@ trackOrderIdInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') ch
       if (input && pid) input.value = pid;
     } catch (e) { /* ignore */ }
     renderMyOrders();
-    loadFirestoreHistory(savedPlayerId());
+    startLiveHistory(savedPlayerId());
   })();
 
 document.getElementById('goToTrackLink').addEventListener('click', (e) => {
