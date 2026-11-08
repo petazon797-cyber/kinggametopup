@@ -284,6 +284,35 @@
     border-color:var(--accent-cyan);
     box-shadow:0 0 0 3px rgba(255,45,120,0.15);
   }
+  /* ---------- Email + Password login form ---------- */
+  .field input[type=email], .field input[type=password]{
+    width:100%;
+    background:var(--input-bg);
+    border:1px solid var(--border-glass);
+    color:var(--text-primary);
+    padding:13px 15px;border-radius:15px;
+    font-family:var(--font-body);font-size:15px;
+    outline:none;transition:border-color .15s, box-shadow .15s, background .35s;
+  }
+  .field input[type=email]:focus, .field input[type=password]:focus{
+    border-color:var(--accent-cyan);
+    box-shadow:0 0 0 3px rgba(255,45,120,0.15);
+  }
+  .email-pw-row{display:flex;gap:8px;align-items:center;}
+  .email-pw-row input{flex:1;min-width:0;}
+  .email-auth-primary{
+    flex:1;padding:12px 16px;border:none;border-radius:999px;cursor:pointer;
+    background:linear-gradient(135deg,var(--accent-blue),var(--accent-cyan));
+    color:#FFFFFF;font-family:var(--font-display);font-weight:700;font-size:15px;
+    box-shadow:var(--shadow-soft-sm);
+  }
+  .email-auth-primary:active{transform:scale(0.98);}
+  .email-auth-secondary{
+    flex:1;padding:12px 16px;border-radius:999px;cursor:pointer;
+    background:var(--input-bg);border:1px solid var(--border-glass);
+    color:var(--text-primary);font-family:var(--font-display);font-weight:700;font-size:15px;
+  }
+  .email-auth-secondary:active{transform:scale(0.98);}
   .field select option{background:var(--panel-solid);color:var(--text-primary);}
   .field select optgroup{background:var(--panel-solid);color:var(--accent-gold);font-weight:700;}
 
@@ -1437,6 +1466,88 @@
     text-decoration:underline;text-underline-offset:3px;
   }
   #refreshPriceBtn{background:var(--accent-blue);}
+  /* ---------- Google-style login portal (modal) ---------- */
+  .login-modal-overlay{
+    position:fixed;inset:0;z-index:100;display:none;
+    align-items:center;justify-content:center;padding:16px;
+    background:rgba(15,20,40,0.55);
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  }
+  .login-modal-overlay.open{display:flex;}
+  .login-modal{
+    width:100%;max-width:420px;max-height:calc(100vh - 32px);overflow-y:auto;
+    background:var(--panel-solid);border:1px solid var(--border-glass);
+    border-radius:28px;padding:36px 40px 28px;position:relative;text-align:center;
+    box-shadow:0 24px 64px rgba(10,20,60,0.35);
+    animation:loginModalPop .18s ease;
+  }
+  @keyframes loginModalPop{from{transform:scale(.96) translateY(8px);opacity:0;}to{transform:scale(1) translateY(0);opacity:1;}}
+  .login-modal-close{
+    position:absolute;top:14px;right:14px;width:32px;height:32px;
+    border:none;border-radius:50%;background:transparent;
+    color:var(--text-muted);cursor:pointer;font-size:16px;line-height:1;
+  }
+  .login-modal-close:hover{background:var(--input-bg);}
+  .google-logo{width:40px;height:40px;margin:0 auto 16px;display:block;}
+  .google-logo-sm{width:20px;height:20px;flex-shrink:0;}
+  .login-modal h2{
+    font-family:var(--font-display);font-size:24px;font-weight:600;
+    margin:0 0 8px;color:var(--text-primary);
+  }
+  .login-modal .lm-sub{font-size:15px;color:var(--text-muted);margin:0 0 28px;}
+  .login-modal .lm-field{text-align:left;margin-bottom:16px;}
+  .lm-actions{display:flex;justify-content:space-between;align-items:center;margin-top:24px;}
+  .lm-next{
+    padding:10px 24px;border:none;border-radius:999px;cursor:pointer;
+    background:#0B57D0;color:#FFFFFF;
+    font-family:var(--font-display);font-weight:600;font-size:15px;
+  }
+  .lm-next:active{transform:scale(0.98);}
+  .lm-link{
+    background:none;border:none;cursor:pointer;padding:4px 2px;
+    color:var(--accent-blue);font-family:var(--font-body);
+    font-size:14px;font-weight:600;text-decoration:none;
+  }
+  .lm-divider{
+    display:flex;align-items:center;gap:12px;
+    color:var(--text-muted);font-size:13px;margin:24px 0 0;
+  }
+  .lm-divider::before,.lm-divider::after{
+    content:"";flex:1;height:1px;background:var(--border-glass);
+  }
+  .lm-google-btn{
+    width:100%;padding:12px 16px;margin-top:16px;border-radius:999px;cursor:pointer;
+    background:transparent;border:1px solid var(--border-glass);
+    color:var(--text-primary);font-family:var(--font-display);font-weight:600;font-size:15px;
+    display:flex;align-items:center;justify-content:center;gap:10px;
+  }
+  .lm-google-btn:active{transform:scale(0.98);}
+  .lm-email-chip{
+    display:inline-flex;align-items:center;gap:8px;cursor:pointer;
+    border:1px solid var(--border-glass);border-radius:999px;
+    padding:5px 12px 5px 5px;margin-bottom:24px;
+    background:transparent;color:var(--text-primary);
+    font-family:var(--font-body);font-size:14px;
+  }
+  .lm-avatar{
+    width:28px;height:28px;border-radius:50%;flex-shrink:0;
+    background:linear-gradient(135deg,var(--accent-blue),var(--accent-cyan));
+    color:#FFFFFF;display:flex;align-items:center;justify-content:center;
+    font-family:var(--font-display);font-weight:800;font-size:14px;
+  }
+  .lm-avatar-lg{
+    width:64px;height:64px;border-radius:50%;margin:0 auto 16px;
+    background:linear-gradient(135deg,var(--accent-blue),var(--accent-cyan));
+    color:#FFFFFF;display:flex;align-items:center;justify-content:center;
+    font-family:var(--font-display);font-weight:800;font-size:28px;
+  }
+  .lm-user-email{
+    font-family:var(--font-display);font-weight:700;font-size:16px;
+    color:var(--text-primary);margin:0 0 6px;word-break:break-all;
+  }
+  @media (max-width:480px){
+    .login-modal{padding:28px 24px 24px;border-radius:24px;}
+  }
 </style>
 </head>
 <body>
@@ -1450,6 +1561,56 @@
   <button type="button" id="lightBtn" title="Light mode" aria-label="Light mode">
     <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
   </button>
+</div>
+
+<!-- Login portal: Google-style sign-in dialog. Opens only from the small
+     header 👤 button beside the theme toggle; nothing is shown inline. -->
+<div class="login-modal-overlay" id="loginModalOverlay">
+  <div class="login-modal" role="dialog" aria-modal="true" aria-labelledby="loginModalTitle">
+    <button type="button" class="login-modal-close" id="loginModalCloseBtn" aria-label="Close">✕</button>
+    <div id="loginModalGuestView">
+      <svg class="google-logo" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      <h2 id="loginModalTitle">Sign in</h2>
+      <p class="lm-sub" id="loginModalSub">to continue to King Games-Shop</p>
+      <div id="emailLoginBox">
+        <div id="portalStepEmail">
+          <div class="field lm-field">
+            <label for="emailLoginEmail">Email</label>
+            <input type="email" id="emailLoginEmail" placeholder="Email" autocomplete="email" inputmode="email">
+          </div>
+          <div class="lm-actions">
+            <button type="button" class="lm-link" id="portalCreateBtn">Create account</button>
+            <button type="button" class="lm-next" id="portalNextBtn">Next</button>
+          </div>
+          <div class="lm-divider">or</div>
+          <button type="button" class="lm-google-btn" id="portalGoogleBtn"><svg class="google-logo-sm" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg> Continue with Google</button>
+        </div>
+        <div id="portalStepPassword" style="display:none;">
+          <button type="button" class="lm-email-chip" id="portalEmailChipBtn"><span class="lm-avatar" id="portalChipAvatar">G</span><span id="portalEmailChip"></span><span style="color:var(--text-muted);">✎</span></button>
+          <div class="field lm-field">
+            <label for="emailLoginPassword">Password</label>
+            <div class="email-pw-row">
+              <input type="password" id="emailLoginPassword" placeholder="Enter your password" autocomplete="current-password" minlength="6">
+              <button type="button" class="google-link-btn" id="emailPwToggleBtn" style="flex-shrink:0;">ပြမယ်</button>
+            </div>
+          </div>
+          <div class="lm-actions">
+            <button type="button" class="lm-link" id="emailForgotBtn">Forgot password?</button>
+            <button type="button" class="lm-next" id="portalSubmitBtn">Sign in</button>
+          </div>
+        </div>
+      </div>
+      <p class="hint" style="margin-top:20px;">⚠️ Password က <b>ဆိုင်အတွက် အသစ်ထားရမယ့် password</b> ပါ — Google password ကို ဒီမှာ မရိုက်ပါနဲ့။</p>
+      <p class="hint" style="margin-top:6px;">💡 <b>Guest အနေနဲ့လည်း ဝယ်လို့ရပါတယ်</b> — Login မလုပ်လည်း Order တင်နိုင်သည်။ Login လုပ်ထားရင် Order History ကို ဖုန်းပြောင်းလည်း ပြန်ရမယ်။</p>
+    </div>
+    <div id="loginModalUserView" style="display:none;">
+      <div class="lm-avatar-lg" id="loginModalAvatar">G</div>
+      <p class="lm-user-email" id="loginModalUserEmail"></p>
+      <p class="lm-sub" id="loginModalUserMethod" style="margin-bottom:24px;"></p>
+      <button type="button" class="email-auth-primary" id="googleLogoutBtn" style="width:100%;">Logout</button>
+      <p class="hint" style="margin-top:16px;">Order History ကို ဖုန်းပြောင်းလည်း ပြန်ရမယ်။</p>
+    </div>
+  </div>
 </div>
 
 <div class="wrap">
@@ -1475,12 +1636,6 @@
 
   <div id="orderTabPanel">
 
-  <!-- Account: slim status strip — login lives in the small header button
-       beside the theme toggle; guest checkout always works -->
-  <div class="card" id="accountCard" style="padding:14px 18px;">
-    <div id="accountStatusLine" class="hint" style="text-align:left;margin:0;">🔒 Account စစ်ဆေးနေသည်…</div>
-    <p class="hint" style="margin:8px 0 0;">💡 <b>Guest အနေနဲ့လည်း ဝယ်လို့ရပါတယ်</b> — Login မလုပ်လည်း Order တင်နိုင်သည်။ <button type="button" class="google-link-btn" id="googleLogoutBtn" style="display:none;">Logout</button></p>
-  </div>
 
   <div class="price-notice" id="priceNotice">
     <svg class="icon" viewBox="0 0 24 24" style="width:18px;height:18px;flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
@@ -2188,14 +2343,31 @@ function isGoogleUser() {
   const u = auth && auth.currentUser;
   return !!u && !u.isAnonymous && (u.providerData || []).some(p => p.providerId === 'google.com');
 }
+function currentAccountEmail() {
+  const u = auth && auth.currentUser;
+  if (!u) return '';
+  if (u.email) return u.email;
+  return currentGoogleEmail();
+}
+function isEmailUser() {
+  const u = auth && auth.currentUser;
+  return !!u && !u.isAnonymous && (u.providerData || []).some(p => p.providerId === 'password');
+}
+// Logged in with a named account (Google or Gmail + Password) — not a guest.
+function isLoggedInUser() {
+  const u = auth && auth.currentUser;
+  return !!u && !u.isAnonymous;
+}
 function updateAuthStatusUI() {
   let text;
   if (authStatus === 'ready' && currentUid && isGoogleUser()) {
     text = '✅ Google နဲ့ ဝင်ထားပါတယ် — ' + currentGoogleEmail() + ' — Order History ကို ဖုန်းပြောင်းလည်း ပြန်ရမယ်။';
+  } else if (authStatus === 'ready' && currentUid && isEmailUser()) {
+    text = '✅ Gmail + Password နဲ့ ဝင်ထားပါတယ် — ' + currentAccountEmail() + ' — Order History ကို ဖုန်းပြောင်းလည်း ပြန်ရမယ်။';
   } else if (authStatus === 'ready' && currentUid) {
     text = '🔒 Guest Account အသင့် — Order တွေကို သင့် Account နဲ့ပဲ တွဲသိမ်းထားပါတယ်။ ID: ' + currentUid.slice(0, 8) + '… (Browser data မရှင်းပါနဲ့)';
   } else if (authStatus === 'disabled') {
-    text = '⚠️ Anonymous login ကို Firebase Console မှာ မဖွင့်ရသေးပါ — Authentication → Sign-in method → Anonymous → Enable လုပ်ပေးပါ။ Google နဲ့တော့ ဝင်လို့ရပါသေးတယ် — အဲဒီအထိ Guest history က Local ပဲ အလုပ်လုပ်ပါမယ်။';
+    text = '⚠️ Anonymous login ကို Firebase Console မှာ မဖွင့်ရသေးပါ — Authentication → Sign-in method → Anonymous → Enable လုပ်ပေးပါ။ Google / Gmail နဲ့တော့ ဝင်လို့ရပါသေးတယ် — အဲဒီအထိ Guest history က Local ပဲ အလုပ်လုပ်ပါမယ်။';
   } else if (authStatus === 'unavailable') {
     text = '⚠️ Account ချိတ်ဆက်၍ မရပါ — Network စစ်ပြီး Refresh လုပ်ကြည့်ပါ။ Local history ပဲ အလုပ်လုပ်နေပါတယ်။';
   } else {
@@ -2204,24 +2376,29 @@ function updateAuthStatusUI() {
   [document.getElementById('authStatusLine'), document.getElementById('accountStatusLine')].forEach(el => {
     if (el) el.textContent = text;
   });
-  const loggedInGoogle = isGoogleUser();
+  const loggedIn = isLoggedInUser();
+  // Email form shows only for guests; the Logout button only when logged in.
+  const emailBox = document.getElementById('emailLoginBox');
+  if (emailBox) emailBox.style.display = loggedIn ? 'none' : 'block';
+  const loggedInBox = document.getElementById('accountLoggedInBox');
+  if (loggedInBox) loggedInBox.style.display = loggedIn ? 'block' : 'none';
   const logoutBtn = document.getElementById('googleLogoutBtn');
-  if (logoutBtn) logoutBtn.style.display = loggedInGoogle ? 'inline-block' : 'none';
+  if (logoutBtn) logoutBtn.style.display = loggedIn ? 'block' : 'none';
   // Small header button beside the theme toggle: person icon for a guest,
-  // first letter of the Gmail when logged in (tap it to log out).
+  // first letter of the email when logged in (tap it to log out).
   const headerBtn = document.getElementById('headerLoginBtn');
   if (headerBtn) {
-    if (loggedInGoogle) {
-      const email = currentGoogleEmail();
+    if (loggedIn) {
+      const email = currentAccountEmail();
       headerBtn.textContent = email ? email.charAt(0).toUpperCase() : 'G';
       headerBtn.classList.add('logged-in');
-      headerBtn.title = email + ' — နှိပ်ရင် Logout လုပ်မယ်';
-      headerBtn.setAttribute('aria-label', 'Logout — ' + email);
+      headerBtn.title = email + ' — Account ကြည့်မယ်';
+      headerBtn.setAttribute('aria-label', 'Account — ' + email);
     } else {
       headerBtn.innerHTML = HEADER_LOGIN_ICON;
       headerBtn.classList.remove('logged-in');
-      headerBtn.title = 'Google နဲ့ Login ဝင်မယ်';
-      headerBtn.setAttribute('aria-label', 'Google နဲ့ Login ဝင်မယ်');
+      headerBtn.title = 'Login ဝင်မယ် — Google သို့မဟုတ် Gmail + Password';
+      headerBtn.setAttribute('aria-label', 'Login ဝင်မယ် — Google သို့မဟုတ် Gmail + Password');
     }
   }
 }
@@ -2343,6 +2520,229 @@ async function handleGoogleRedirectResult() {
   }
 }
 
+/* =====================================================================
+   Email + Password login (Gmail as the email, SHOP-ONLY password) — Phase 2b
+   - The customer types their own Gmail address and a password THEY
+     CHOOSE for this shop. It is NOT their Google password — Firebase
+     Email/Password auth is a separate account; the form warns about
+     this in Burmese and the password is cleared from the field after
+     a successful login.
+   - Anonymous users are LINKED (linkWithCredential), so the UID and
+     its history follow the email account to a new device. If the
+     email already has an account, linking fails with
+     email-already-in-use and we sign in as that existing account
+     instead (its history comes back; this device's anonymous orders
+     stay findable by Order ID / Player ID / local history).
+   - Requires Email/Password to be enabled in Firebase Console:
+     Authentication -> Sign-in method -> Email/Password -> Enable.
+     No email verification is enforced here (can be added later).
+   ===================================================================== */
+function readEmailAuthForm() {
+  const emailEl = document.getElementById('emailLoginEmail');
+  const pwEl = document.getElementById('emailLoginPassword');
+  return {
+    email: (emailEl && emailEl.value || '').trim(),
+    password: (pwEl && pwEl.value) || '',
+    emailEl: emailEl,
+    pwEl: pwEl
+  };
+}
+function clearEmailPassword() {
+  const pwEl = document.getElementById('emailLoginPassword');
+  if (pwEl) pwEl.value = '';
+}
+function validEmailAuthForm() {
+  const form = readEmailAuthForm();
+  if (!form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+    showToast('Gmail လိပ်စာ မမှန်ပါ — ဥပမာ name@gmail.com', 'error');
+    return null;
+  }
+  if (!form.password || form.password.length < 6) {
+    showToast('Password အနည်းဆုံး ၆ လုံး ထားပါ', 'error');
+    return null;
+  }
+  return form;
+}
+function emailAuthErrorToast(err) {
+  console.warn('Email login failed:', err);
+  const code = err && err.code;
+  if (code === 'auth/email-already-in-use') showToast('ဒီ Gmail နဲ့ account ရှိပြီးသား — Sign in နှိပ်ပါ', 'error');
+  else if (code === 'auth/invalid-email') showToast('Gmail လိပ်စာ မမှန်ပါ', 'error');
+  else if (code === 'auth/weak-password') showToast('Password အားနည်းပါတယ် — အနည်းဆုံး ၆ လုံး ထားပါ', 'error');
+  else if (code === 'auth/user-not-found') showToast('ဒီ Gmail နဲ့ account မရှိသေးဘူး — Sign up နှိပ်ပါ', 'error');
+  else if (code === 'auth/wrong-password' || code === 'auth/invalid-credential') showToast('Password မှားနေပါတယ် — ပြန်စစ်ကြည့်ပါ', 'error');
+  else if (code === 'auth/too-many-requests') showToast('အကြိမ်များများ မှားနေလို့ ခဏစောင့်ပြီး ပြန်စမ်းပါ', 'error');
+  else if (code === 'auth/operation-not-allowed') showToast('Email/Password login ကို Firebase Console မှာ Enable လုပ်ပေးပါ', 'error');
+  else showToast('Login မအောင်မြင်ပါ — ပြန်စမ်းကြည့်ပါ', 'error');
+}
+async function handleEmailSignIn() {
+  const form = validEmailAuthForm();
+  if (!form || !auth) return false;
+  if (!firebase.auth.EmailAuthProvider) {
+    showToast('Email login ကို ဖွင့်မရပါ', 'error');
+    return;
+  }
+  try {
+    const user = auth.currentUser;
+    let alreadyHadAccount = false;
+    if (user && user.isAnonymous) {
+      try {
+        const cred = firebase.auth.EmailAuthProvider.credential(form.email, form.password);
+        await user.linkWithCredential(cred);
+      } catch (linkErr) {
+        if (linkErr && (linkErr.code === 'auth/email-already-in-use' || linkErr.code === 'auth/credential-already-in-use')) {
+          await auth.signInWithEmailAndPassword(form.email, form.password);
+          alreadyHadAccount = true;
+        } else { throw linkErr; }
+      }
+    } else if (user) {
+      showToast('Login ဝင်ထားပြီးပါပြီ', 'success');
+      return true;
+    } else {
+      await auth.signInWithEmailAndPassword(form.email, form.password);
+    }
+    clearEmailPassword();
+    showToast(alreadyHadAccount
+      ? 'ဒီ Gmail နဲ့ account ရှိပြီးသား — အဲဒီ account နဲ့ ဝင်လိုက်ပါပြီ'
+      : 'Login ဝင်ပြီးပါပြီ — ' + form.email, 'success');
+    return true;
+  } catch (err) {
+    emailAuthErrorToast(err);
+    return false;
+  }
+}
+async function handleEmailSignUp() {
+  const form = validEmailAuthForm();
+  if (!form || !auth) return false;
+  if (!firebase.auth.EmailAuthProvider) {
+    showToast('Email login ကို ဖွင့်မရပါ', 'error');
+    return;
+  }
+  try {
+    const user = auth.currentUser;
+    if (user && user.isAnonymous) {
+      const cred = firebase.auth.EmailAuthProvider.credential(form.email, form.password);
+      await user.linkWithCredential(cred);
+    } else if (user) {
+      showToast('Login ဝင်ထားပြီးပါပြီ', 'success');
+      return true;
+    } else {
+      await auth.createUserWithEmailAndPassword(form.email, form.password);
+    }
+    clearEmailPassword();
+    showToast('Account အသစ် ရသွားပါပြီ — ' + form.email, 'success');
+    return true;
+  } catch (err) {
+    emailAuthErrorToast(err);
+    return false;
+  }
+}
+async function handleEmailForgotPassword() {
+  const form = readEmailAuthForm();
+  if (!form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+    showToast('Password ပြန်သတ်မှတ်ဖို့ Gmail လိပ်စာ အရင်ဖြည့်ပါ', 'error');
+    return;
+  }
+  if (!auth) return;
+  try {
+    await auth.sendPasswordResetEmail(form.email);
+    showToast('Password ပြန်သတ်မှတ်တဲ့ link ကို ' + form.email + ' ပို့လိုက်ပါပြီ — Inbox / Spam စစ်ကြည့်ပါ', 'success');
+  } catch (err) {
+    emailAuthErrorToast(err);
+  }
+}
+
+/* =====================================================================
+   Login portal (Google-style sign-in dialog)
+   - Opens ONLY from the small header 👤 button beside the theme toggle.
+     Nothing login-related is shown inline on the page any more.
+   - Two-step flow like the standard Google portal: email -> Next ->
+     password -> Sign in / Sign up. "Create account" switches the
+     password step to sign-up mode; "Continue with Google" runs the
+     header Google flow (redirect). A signed-in user sees their
+     avatar initial + email + Logout instead.
+   - Close via X, backdrop click, or Escape; background scroll locks.
+   ===================================================================== */
+let portalMode = 'signin'; // 'signin' | 'signup'
+function updatePortalTitle() {
+  const title = document.getElementById('loginModalTitle');
+  const sub = document.getElementById('loginModalSub');
+  if (!title) return;
+  if (portalMode === 'signup') {
+    title.textContent = 'Create account';
+    if (sub) sub.textContent = 'to continue to King Games-Shop';
+  } else {
+    title.textContent = 'Sign in';
+    if (sub) sub.textContent = 'to continue to King Games-Shop';
+  }
+}
+function showPortalStep(step) {
+  const emailStep = document.getElementById('portalStepEmail');
+  const pwStep = document.getElementById('portalStepPassword');
+  if (emailStep) emailStep.style.display = step === 'email' ? 'block' : 'none';
+  if (pwStep) pwStep.style.display = step === 'password' ? 'block' : 'none';
+  if (step === 'password') {
+    const form = readEmailAuthForm();
+    const chip = document.getElementById('portalEmailChip');
+    if (chip) chip.textContent = form.email;
+    const chipAv = document.getElementById('portalChipAvatar');
+    if (chipAv) chipAv.textContent = form.email ? form.email.charAt(0).toUpperCase() : 'G';
+    const submitBtn = document.getElementById('portalSubmitBtn');
+    if (submitBtn) submitBtn.textContent = portalMode === 'signup' ? 'Sign up' : 'Sign in';
+    const forgotBtn = document.getElementById('emailForgotBtn');
+    if (forgotBtn) forgotBtn.style.display = portalMode === 'signup' ? 'none' : 'inline-block';
+    updatePortalTitle();
+  }
+}
+async function handlePortalNext() {
+  const form = readEmailAuthForm();
+  if (!form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+    showToast('Gmail လိပ်စာ မမှန်ပါ — ဥပမာ name@gmail.com', 'error');
+    return;
+  }
+  showPortalStep('password');
+  const pwEl = document.getElementById('emailLoginPassword');
+  if (pwEl) setTimeout(() => pwEl.focus(), 50);
+}
+function openLoginPortal() {
+  const overlay = document.getElementById('loginModalOverlay');
+  if (!overlay) return;
+  const loggedIn = isLoggedInUser();
+  const guestView = document.getElementById('loginModalGuestView');
+  const userView = document.getElementById('loginModalUserView');
+  if (guestView) guestView.style.display = loggedIn ? 'none' : 'block';
+  if (userView) userView.style.display = loggedIn ? 'block' : 'none';
+  if (loggedIn) {
+    const email = currentAccountEmail();
+    const avatar = document.getElementById('loginModalAvatar');
+    if (avatar) avatar.textContent = email ? email.charAt(0).toUpperCase() : 'G';
+    const emailEl = document.getElementById('loginModalUserEmail');
+    if (emailEl) emailEl.textContent = email;
+    const methodEl = document.getElementById('loginModalUserMethod');
+    if (methodEl) methodEl.textContent = isGoogleUser()
+      ? 'Google နဲ့ ဝင်ထားပါတယ်'
+      : 'Gmail + Password နဲ့ ဝင်ထားပါတယ်';
+  } else {
+    portalMode = 'signin';
+    const createBtn = document.getElementById('portalCreateBtn');
+    if (createBtn) createBtn.textContent = 'Create account';
+    updatePortalTitle();
+    showPortalStep('email');
+  }
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  if (!loggedIn) {
+    const emailEl = document.getElementById('emailLoginEmail');
+    if (emailEl) setTimeout(() => emailEl.focus(), 50);
+  }
+}
+function closeLoginPortal() {
+  const overlay = document.getElementById('loginModalOverlay');
+  if (overlay) overlay.classList.remove('open');
+  document.body.style.overflow = '';
+  clearEmailPassword();
+}
+
 if (auth) {
   try {
     auth.onAuthStateChanged((user) => {
@@ -2369,7 +2769,7 @@ if (auth) {
 }
 updateAuthStatusUI();
 
-async function handleGoogleLogout() {
+async function handleLogout() {
   if (!auth) return;
   try { await auth.signOut(); } catch (e) { /* ignore */ }
   // Back to a fresh guest account so ordering keeps working.
@@ -2377,19 +2777,56 @@ async function handleGoogleLogout() {
   await ensureAnonymousAuth();
   showToast('Logout လုပ်ပြီးပါပြီ — Guest အနေနဲ့ ဆက်ဝယ်လို့ရပါတယ်', 'success');
 }
-// Small header button beside the theme toggle: a guest taps it to log in
-// with Google (sign in and sign up are the same Google flow — the first
-// use creates the account); a Google user taps it to log out.
+// Small header button beside the theme toggle: opens the login portal
+// (Google-style sign-in dialog). Guests pick Google or Gmail + Password
+// there; a logged-in user sees their account + Logout there.
 const headerLoginBtn = document.getElementById('headerLoginBtn');
-if (headerLoginBtn) headerLoginBtn.addEventListener('click', async () => {
-  if (isGoogleUser()) {
-    if (confirm('Logout လုပ်မလား?')) await handleGoogleLogout();
-  } else {
-    await handleGoogleLogin();
-  }
-});
+if (headerLoginBtn) headerLoginBtn.addEventListener('click', openLoginPortal);
 const googleLogoutBtn = document.getElementById('googleLogoutBtn');
-if (googleLogoutBtn) googleLogoutBtn.addEventListener('click', handleGoogleLogout);
+if (googleLogoutBtn) googleLogoutBtn.addEventListener('click', async () => {
+  await handleLogout();
+  closeLoginPortal();
+});
+
+// Login portal buttons.
+const portalNextBtn = document.getElementById('portalNextBtn');
+if (portalNextBtn) portalNextBtn.addEventListener('click', handlePortalNext);
+const portalSubmitBtn = document.getElementById('portalSubmitBtn');
+if (portalSubmitBtn) portalSubmitBtn.addEventListener('click', async () => {
+  const ok = portalMode === 'signup' ? await handleEmailSignUp() : await handleEmailSignIn();
+  if (ok) closeLoginPortal();
+});
+const portalCreateBtn = document.getElementById('portalCreateBtn');
+if (portalCreateBtn) portalCreateBtn.addEventListener('click', () => {
+  portalMode = portalMode === 'signup' ? 'signin' : 'signup';
+  updatePortalTitle();
+  portalCreateBtn.textContent = portalMode === 'signup' ? 'Sign in instead' : 'Create account';
+  const em = document.getElementById('emailLoginEmail');
+  if (portalMode === 'signup' && em && em.value.trim()) showPortalStep('password');
+});
+const portalGoogleBtn = document.getElementById('portalGoogleBtn');
+if (portalGoogleBtn) portalGoogleBtn.addEventListener('click', handleGoogleLogin);
+const portalEmailChipBtn = document.getElementById('portalEmailChipBtn');
+if (portalEmailChipBtn) portalEmailChipBtn.addEventListener('click', () => showPortalStep('email'));
+const emailForgotBtn = document.getElementById('emailForgotBtn');
+if (emailForgotBtn) emailForgotBtn.addEventListener('click', handleEmailForgotPassword);
+const emailPwToggleBtn = document.getElementById('emailPwToggleBtn');
+if (emailPwToggleBtn) emailPwToggleBtn.addEventListener('click', () => {
+  const pwEl = document.getElementById('emailLoginPassword');
+  if (!pwEl) return;
+  const showing = pwEl.type === 'text';
+  pwEl.type = showing ? 'password' : 'text';
+  emailPwToggleBtn.textContent = showing ? 'ပြမယ်' : 'ဖျောက်မယ်';
+});
+const loginModalCloseBtn = document.getElementById('loginModalCloseBtn');
+if (loginModalCloseBtn) loginModalCloseBtn.addEventListener('click', closeLoginPortal);
+const loginModalOverlay = document.getElementById('loginModalOverlay');
+if (loginModalOverlay) loginModalOverlay.addEventListener('click', (e) => {
+  if (e.target === loginModalOverlay) closeLoginPortal();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeLoginPortal();
+});
 
 /* ---------- Promo / event / price banner carousel ---------- */
 /* Banners are managed from admin-banners.html (upload / delete).
