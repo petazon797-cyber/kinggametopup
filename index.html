@@ -677,6 +677,13 @@
   .price-notice svg{stroke:var(--accent-gold);fill:none;stroke-width:2;width:15px;height:15px;}
   .price-notice span{flex:1;min-width:180px;}
   .price-notice b{color:var(--accent-gold);}
+  /* Shop closed banner (Admin toggles it in config/shopStatus). */
+  .shop-closed-banner{
+    display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+    background:rgba(255,59,48,.12);border:1px solid rgba(255,59,48,.45);
+    border-radius:14px;padding:10px 12px;margin-bottom:16px;
+    color:var(--text-primary);font-size:13.5px;font-weight:600;line-height:1.45;
+  }
   #refreshPriceBtn{
     display:flex;align-items:center;gap:4px;
     padding:5px 10px;border-radius:999px;border:none;cursor:pointer;
@@ -1691,6 +1698,12 @@
   <div class="main-tabs" id="mainTabsRow">
     <button type="button" class="main-tab active" id="orderTabBtn">💎 Order တင်ရန်</button>
     <button type="button" class="main-tab" id="trackTabBtn">📋 Order Status စစ်ရန်</button>
+  </div>
+
+  <!-- SHOP CLOSED BANNER (Admin toggles it in config/shopStatus) -->
+  <div id="shopClosedBanner" class="shop-closed-banner" style="display:none;">
+    <span style="font-size:18px;">🔴</span>
+    <span><b>ဆိုင်ခဏပိတ်ထားပါတယ်</b><span id="shopClosedMsg"></span></span>
   </div>
 
   <div id="orderTabPanel">
@@ -3432,6 +3445,50 @@ async function loadDigitalCatalog() {
 }
 loadDigitalCatalog();
 
+// ---------- Shop open / close (Admin toggle) ----------
+// config/shopStatus: { open: true/false, message: '' }. Public read,
+// admin-only write. Missing doc or read error -> shop stays OPEN
+// (fail-open: a hiccup must never block sales by itself). Live listener,
+// so closing the shop takes effect on open pages without a refresh.
+let shopOpen = true;
+let shopClosedMessage = '';
+function shopClosedToast() {
+  showToast('ဆိုင်ခဏပိတ်ထားပါတယ်' + (shopClosedMessage ? ' — ' + shopClosedMessage : ''), 'error');
+}
+function applyShopStatus(open, message) {
+  shopOpen = open !== false;
+  shopClosedMessage = (message || '').trim();
+  const banner = document.getElementById('shopClosedBanner');
+  if (banner) {
+    banner.style.display = shopOpen ? 'none' : 'flex';
+    const msgEl = document.getElementById('shopClosedMsg');
+    if (msgEl) msgEl.textContent = shopClosedMessage ? ' — ' + shopClosedMessage : '';
+  }
+  try { localStorage.setItem('kds_shopStatus', JSON.stringify({ open: shopOpen, message: shopClosedMessage })); } catch (e) {}
+}
+function loadShopStatus() {
+  try {
+    const cached = JSON.parse(localStorage.getItem('kds_shopStatus') || 'null');
+    if (cached && typeof cached.open === 'boolean') applyShopStatus(cached.open, cached.message);
+  } catch (e) {}
+  if (typeof db === 'undefined' || !db) return;
+  try {
+    db.collection('config').doc('shopStatus').onSnapshot(snap => {
+      if (snap.exists) {
+        const d = snap.data() || {};
+        applyShopStatus(d.open, d.message);
+      } else {
+        applyShopStatus(true, '');
+      }
+    }, err => {
+      console.error('Shop status listen failed — cached status in use:', err);
+    });
+  } catch (err) {
+    console.error('Shop status load failed — cached status in use:', err);
+  }
+}
+loadShopStatus();
+
 // ---------- Digital product meta (from Admin) ----------
 // config/digitalCatalog.meta: { express: { name, cat, logo, field,
 //   needsKey, platforms: ['PC','Mobile'], active } ... }
@@ -4197,6 +4254,7 @@ function resetDownstreamSelections() {
 }
 
 function selectGame(game, cardEl) {
+  if (!shopOpen) { shopClosedToast(); return; }
   currentGame = game;
   currentServer = null;
   gameGrid.querySelectorAll('.server-card').forEach(c => c.classList.remove('selected', 'pop'));
@@ -4548,6 +4606,7 @@ function selectServer(server, cardEl) {
 wireServerCards();
 
 function selectPack(gi, ii, cardEl) {
+  if (!shopOpen) { shopClosedToast(); return; }
   const item = activePacks()[gi].items[ii];
   selectedPackValue = `${gi}-${ii}`;
 
@@ -5628,6 +5687,7 @@ function sendToTelegramWithProgress(fd) {
 }
 
 finalConfirmBtn.addEventListener('click', async () => {
+  if (!shopOpen) { shopClosedToast(); return; }
   if (!pendingOrder || !confirmRegionCheck.checked) return;
 
   const { playerId, zoneId, file, item } = pendingOrder;
