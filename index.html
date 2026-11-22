@@ -1007,6 +1007,14 @@
   .pack-card .pc-oos{display:inline-block;margin-top:6px;padding:2px 8px;border-radius:999px;background:rgba(255,59,48,.14);color:#ff453a;font-size:11px;font-weight:700;}
   /* Key delivery time (buy-on-demand: key is bought after the order). */
   .key-delivery-note{margin:10px 2px 4px;padding:10px 12px;border-radius:12px;background:rgba(255,204,0,.12);border:1px solid rgba(255,204,0,.35);color:var(--text-primary);font-size:13px;line-height:1.5;}
+  .pc-instant{display:inline-block;margin-top:6px;padding:3px 9px;border-radius:999px;background:rgba(46,204,113,.16);border:1px solid rgba(46,204,113,.5);color:#2ecc71;font-size:11.5px;font-weight:700;}
+  .wallet-amounts{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;}
+  .wallet-amt{padding:8px 14px;border-radius:999px;border:1px solid rgba(127,127,127,.4);background:transparent;color:var(--text-primary);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body);}
+  .wallet-amt.active{border-color:var(--accent-gold);color:var(--accent-gold);}
+  .wallet-balance{text-align:center;padding:14px;border-radius:14px;background:rgba(255,204,0,.08);border:1px solid rgba(255,204,0,.3);margin-bottom:12px;}
+  .wallet-balance .lbl{font-size:12px;color:var(--text-muted);}
+  .wallet-balance .num{font-size:26px;font-weight:800;color:var(--accent-gold);}
+  #restOfForm.wallet-pay .pay-number,#restOfForm.wallet-pay #uploadBox{display:none;}
   .pack-card{position:relative;overflow:visible;}
   .pack-card .pc-best-badge{
     position:absolute;top:-9px;left:50%;transform:translateX(-50%);
@@ -1164,6 +1172,8 @@
   .theme-toggle .theme-divider{width:1px;height:22px;background:var(--border-glass);margin:0 2px;flex-shrink:0;}
   #headerLoginBtn{font-family:var(--font-display);font-weight:800;font-size:15px;}
   #headerLoginBtn.logged-in{background:linear-gradient(135deg,var(--accent-blue),var(--accent-cyan));color:#FFFFFF;}
+  #walletHeaderBtn{width:auto;height:32px;padding:0 11px;border-radius:999px;font-size:12.5px;font-weight:800;gap:5px;}
+  #walletHeaderBtn span{font-size:12px;}
   .icon{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
 
   /* Username lookup */
@@ -1620,6 +1630,7 @@
 
 <div class="theme-toggle" id="themeToggle">
   <button type="button" id="headerLoginBtn" title="Google နဲ့ Login ဝင်မယ်" aria-label="Google နဲ့ Login ဝင်မယ်"><svg class="icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></button>
+  <button type="button" id="walletHeaderBtn" title="Wallet" aria-label="Wallet">👛 <span id="walletHeaderBalance">—</span></button>
   <span class="theme-divider" aria-hidden="true"></span>
   <button type="button" id="darkBtn" title="Dark mode" aria-label="Dark mode">
     <svg class="icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
@@ -1911,7 +1922,10 @@
         <div class="pay-chip" data-method="WavePay"><img class="pc-logo" src="data:image/webp;base64,UklGRjQFAABXRUJQVlA4ICgFAACQGwCdASpgAGAAPm0ylkekIqIhKB44mIANiWpEdyFrnn+S/kBsxvWuKF5b5juQ7OLyS+0D3yf132AfjP0I9wB+w/7M9g/0AP2N6x/9jPYA/YD0vf23+CT+2/6X90fgJ/bDAws5vCHwL+zcQDvyxAuvv8hnMMZlxE94r+P/7TkJaAH8h/pf+k+7f49/oD0DfSX/U9wr9U/+QPaSwj4PSwbzw+Go7aiCKI/apn1P1KJhnmGyKQsrQyGJL7DAL7LhJ47medYGc3OC6mgw9UbZJNmuhsuhDYLSw7xU5C8z2ByjMqhf3BAAAP74MsIAP/FHf/FHVTQBtei0CEAA/XiduWlCYpOOyjzVCVYIU632OL/+U8F7aTtjZ8q2eu3U2yTrkF3yjyK1Nd2PSWgQRTzehDdZTX6XP5odfATWx0SfzDIKJs4Ef+h1heWFvMdfAgt25bfIhn/+6UsBYSeuMTeeQ+xO2I4ZVdwOf+pWrGYNJAAePMStGOkoUNJFrJdDCPCOiPpFDHjlg81DsXiexD8PTybI0L3FeTB75d5mR7OhAMgtKYUnijHTjOo+1qk3a8UeQKVduzvLbLLF4aNSFaN2ITWn12f7gkKVByZCUv7r7YVMIkiAblVMme99FwcFrhp8JhU6LAcJ6ILxwqD2PDevTPSdClufz0OaUPaS31gj+9om/QH9p9YLpM0wCWbJ4vLeV4a008x/7V7o5iWnToxoIo6uJi2+rXKKdgXojA/l31nHPIGf+JNZLzlt/ord3joxgbmHz3ZenfLlXAWV1IyE8cVlR8+m3Vx4V37eaDY9GSvUsu3/x68yrrP+ZfkuhIfVrwcZeyeqgt81Xbf+E7kbjP7uHs6edVpM9f989dgrnfUX/7G27Rn44WSq2uZf9DQa0VFvzDz/nDaSbRf//c0RE92EyfpL8/TRT3TrMwXIfMR40MJ12/H5OsqFhZtOJ7XA5r/rXrq9sOiO+1pheUMsT0FUy8/wFwcAIWt24B3SqUZg40WOMCS2O+ZxqqFj/gf9wZ3aqFm1MjOdYbwvwqwUry8wbxdRQAYykhZ8QFxaK7qx/HtoFpXtuqPAXp2Dnv3g1o+XYQ8V1rxGhHUpB+QwKDsMS8GKQsJfHZ5+I5mj0u7zZ+Hcf1eMhVFpKEZ2THlCBd7BfO0TmqVuf/vDoSMHvAC0P7MKxRvN0f60ehi4O8l8Gh0rnVo/Ns4uQQcqCJPq8x+MTfivuYH+EovkPBE4szekur3tfjVd1XIgbaJ4/9tbJ9J+EG0uuIZNxuNDZlpCfcOT/71//a+8rDoEhA+ECMrlSqL/Bb//MyvjA0vvxuk4h1rtALK6Bmke/X+kBaOxM8OopALv/Du8bzqFIFp1zUEzy/MAkFTsZE/Lor/qykjYGnl+9DxwH8d4ur/5KEf4zx5vATbbLuURCWeR/YjDlxhmsNp3RvkZDHrzuEu3hdb6y8xFdHoalwY0Ou8QlyWbY0qEnmLN8znVqgeLuV42Cgi3Q6XB9gD7phm29sV6ARLlB8tB4qgJrZ4DfLAfXR+4/Vn8PVm+kX9ku2yMg3B/ld1szwOUGlmSXvv3zlWvOj6sogGuXVnZP5VGN9y+ID1hERPdhMn+Ytg/VSxOw/o/uUweaThpXfwZSkNFrWWaOFzhbvPI6t93V67T58eXuGsQw/ufkrTgbB8jriNkFscSrjj8Pr1q2sClU+VTE7IYRO8h20JXN9pi5gM5SzXJv5P9uaVdh98hhisyNW13t3QC8BjDo0SRNAAAAAA=" alt="Wave Pay">Wave Pay</div>
         <div class="pay-chip" data-method="AYAPay"><img class="pc-logo" src="data:image/webp;base64,UklGRnwEAABXRUJQVlA4IHAEAABQGQCdASpgAGAAPm0uk0WkIqGYCc2MQAbEsjZfMATQ8m3y/KBcad+OQDQhye6TniAdO/zJ/sV6vPpA9AD+zf47rWv1m9gDy1PZX/cb9o/a3vCv9FXeb/Xd6GMNJsiq4fMzAQIjuyONTlZjfY+C/67i/yHGE7hg8loNfskvcU1ZTVpPO9E+NRpMRwcugeBFKXwXnEVTVHGkegx6lcJRSKhJTMVV6PczVPkZ1cGge/H/4A9f+QuHdUsMLfwjIvM3cqfUL2QAaOOLRb/symO2SQdF01IAAP7848eKB7kbsb6tkulnAW9hHESH/k7STAxuQ+BeKuzYDg1Bna1vuC+gv98YuKQ6zh1TIyW3wdPNcUc1S9iVq4YydzF9AZBYSfWk8gy8Wc6ttxLJC7+rGVJYB6+1VwWECp/zYWCzsewWGiQpJCtDaGv3F7aag4nU2rUuJlOeV4Prfnm/KhJf0/VxV5rs0y5tjUlE/fWxknaiz8G5WcaH8Hzfje6dwodGqTpeFjeW69cyHrjbjg/+dNZSCNu6IG3VpUjPm/pNg1H1FSFV+RH2izJz38OxE64guD6ysj2/Po4d4+lgp/AhRkEkCGT6aaNlBoE2hdYme4ROZVXulgvTb9chGL/TphloaNdbkHrPS2B6u+m+C//ra8SH6r5gjr6b0CXG+SdYYw09RZbB+xuW4w+J2rrjxHi2eWqpb0GpiY2gFvxP1mXxebJ3gN0UK5LkL77fTjsivmvZ29+df/hLMRd1ohZVbJQXnCcalPJZfRg8Gt1mq9Pm5LDA+JL/+99o8p4H/HIPW1Yq8fc3ZiBictpGZNkJjA/jV0fdOzYXC/lEU98wJ7aB1cWomku0G0xD/LjPRFAN90dyNAUN7ohF49kMIMMgLCwXjYMyQ2dNQmZxTijeJp8xMLKw0OQXvPE+wBVv5ZohhyFP336FHuybo8XjsdjBIEL+jL5uzKhISZc/pu3bwWas8qc2GpKfTdY4r9gwGnSNAyGaoE4XTJLZck7c+mn64jH/6Mpq0l5Lf/V+NSPDDNEewuwP1/SVsVzUkXts/Y3K1hO0BMHCdgNp4NQ/qZH35QyaHx3/K4IjbEkhtDFrWJIC9fD83vH2hlEqdXQSjksW8Fhqpv7SnMd3BGXh2T1Fro4CSUIkkoy9l8QAZDry1czb35abxx2B82x7t7eOmHy04eTRvZ6o7fRia51eLxtxbkEM1ZTB1d+c4rxTHq9ddK0j907DLJQV5X5LHXBeNEt1CFlA15hdYnODnudcoFyWHtdTALdMEhFufjQlmCgP2HC6IDYIDJr2aFEikbDhE0z9Kje5u3MREKipjx8zhUx9+98x9ztJX7X3cHCQhbc7Cyhnwz7+jrR9jXpNf8di78fn4mWTctITklqXYQcdQpaIK6Fq6b9/5pVCry/2392KhkoQAAf94lCx3PXtEuHjnTTpNW96AA6f/G56B76FTiCYZc5ecdMHXBfLEH0GF3wfCLOG4loHizJa/oNwVYZOpQOJXW9BBBkAAA==" alt="AYA Pay">AYA Pay</div>
         <div class="pay-chip" data-method="UABPay"><img class="pc-logo" src="data:image/webp;base64,UklGRjQFAABXRUJQVlA4ICgFAADQGwCdASpgAGAAPm0ykkakIyGhJltuCIANiWUAS6JCA22/PgWTJgLvX3/Y+hk8b+yecd+2H378wPyZ1hX+Nf378pvyx5CflH9I/4f2n+kd/JejHbR/ljzMPgHsAfnL/i+mP9Hedz6F/8P+O+Ab9V/TA9kJxeDgQ7Do0mMqv7FhIY8NIqaElCVwnWz1oJYKm0tJaDjMX1IAcu+53E5OnxoHAKQqvr8JnKWzi0hVDZVoHv93am40jIJRi6oDegaK0Ase9YPDOk1D8xEzUvc2h0QUOEpqwPXSNnBBdfpx0tKqBhDYR1BeuyAA/vySAp5rD819p/Q8RISoj6Nkymqvq/VoLrR7J2jSUrO0olOfET1Xsv5+guVU3qw3LpSupqHOrB6jsb2A+IzGAFkYf+UKtBExancJ8bNNhdsYhY35aM4+lv19JblSIRp8th+j7XNuBnO0XuUZYVIIUX7SPiEFR5AlXBfIRChE1GLOygz2/gPM+poi3qQ0uq6qjl5xXCQakl4PwTGX/v+a00RPUJyi7/sW50sBdbYgT72FBL9cB7ezILkWljIMIZni8CKwUYWRCSjc6rGI9KMCssr+X/U+3uzRScWv1xVjp2UVUPh8d+Xl1M33WvNH//mHBkrO3log633MjDe6g+vprn3N/hauWhS2mxUCnaxRx099UtdrDzaDu9iFI5dYJflrOLjyURE9xTzx//kRMlVdO//HtkdYTGZfGW5pLZKUXXcCGZUMevYAC5pW4AHuyBkBq7A5I4Qcit3DQwnxXSU+YBDmTGsOvQ0bX8LDWhpnZ5NYRSz02IcSdMM3AYVzzfMI7hbc7WPXVjRZURvC7ySsCWUBR4cUsfQ8sW+yJCDl42IbAvnJPBVd0pq6QItsxbrTZptwIhxH1cUoJ7pGjwYJJ72uPNKojfeujbBDMCPzhbDNPt8tqgpVXahkXNyStHIl7p+m/QQsR08Xp+ym0AB+f+WaocBdlR/1BUjOOn5wZNaIPe8briE3DJOU+YGzELtivXmj/d9ZOYf2R1FoJG9NFw+SCKf/IPaYH/DIT4MWdSP1By3lwzUdd3j9NxcZbJ+951pFjEBMMP4KYEplovUOp813QpN9sQDelGdanXCBbPaO/MSnclXlyVGe3yKEmKO5O5GPjsM1rxSikewz2v8/e/6+mUpx/DsQAk7uIC1z9auV5G7sGPjEL5B+B6q85KZL2sn7yZSgrlvzNRmk/Zv5iHVdh/RIQTd+wwD2P7YeNtDtv/+hCp2XDikR+l3SCtr1ISUatrv9qNj6JTBk0kruxrfqzmF1Ay06wE2YASecuXog1z1obBZZQ7GiJvAO/uHS26Dmb3+FjJQfylzIZt7/18rUVEBp4msZGrVyD+E4dLVAxdo9J8wzcqjtLwf+679TfC+5V0JgrktVi02h1rgcRekoZGWke1+CubP68UKO9qFm9MEIiXbr8GcK4nH81mDzTf0SU0/Cn5/vlhEyThBEY8H/p93z4Fo/k+KcQHJXXnPy1vMdcCglbNUn665KccPQG2OdqzgDi/MY6szTHEY1ORJ52+y5UnNOBp1TGW+qmunElk9f3vjWydrKO2Na/ejwN6E8yr/cSxHy7YbKRLKKl1EJA1RiR8mqV4cehb7hX9W2JfVLG5wHfgDrEu+9edgZH3iZaBHDqI3f1pjvz37lkJnl4X8glWcBH0cj+DCsA6ga/yWyXb7EK06SqsCdwAnTKy+FLO2+2/tAutvx4ONrN11WVxxIZjzpNSuge6TAAAA=" alt="UAB Pay">UAB Pay</div>
+        <div class="pay-chip" data-method="wallet">👛 Wallet</div>
       </div>
+
+      <div class="hint" id="walletPayHint" style="display:none;margin-bottom:14px;">👛 Wallet လက်ကျန်: <b id="walletPayBalance">—</b> — မလုံလောက်ရင် အပေါ်က 👛 Wallet ခလုတ်ကနေ ငွေဖြည့်ပါ။</div>
 
       <div class="pay-number">
         <div class="pay-number-left">
@@ -2050,6 +2064,7 @@
   </div>
 
 
+
   <!-- SUCCESS CARD -->
   <div class="card success-panel" id="successPanel">
     <div class="check"><svg class="icon" viewBox="0 0 24 24" style="width:26px;height:26px;stroke-width:2.2;"><path d="M20 6L9 17l-5-5"/></svg></div>
@@ -2125,6 +2140,42 @@
       </div>
     </div>
   </div><!-- /trackTabPanel -->
+
+  <!-- WALLET MODAL — opened from the header 👛 button, next to Login -->
+  <div class="modal-overlay" id="walletModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>👛 Wallet</h3>
+        <button type="button" class="modal-close" id="walletModalCloseBtn" aria-label="Close">
+          <svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <!-- ===== Wallet: top-up balance, pay from balance ===== -->
+      <div class="card" id="walletCard" style="margin:0;">
+        <div class="section-label"><span class="num">👛</span> Wallet <span id="walletLiveBadge" class="live-badge" style="display:none;">Live</span></div>
+        <div class="wallet-balance"><div class="lbl">လက်ကျန် Balance</div><div class="num" id="walletBalanceBig">—</div></div>
+        <p class="hint" style="text-align:left;margin:0 0 12px;">Wallet သုံးဖို့ Google/Email နဲ့ Login ဝင်ရပါမယ် — Login ဝင်ထားရင် Balance က ဘယ် Device ကနေမဆို ပြန်ရပါတယ်။ ငွေကြိုဖြည့်ထားရင် Order တင်တိုင်း Balance ထဲက ဖြတ်ပါတယ် — ငွေလွှဲပြေစာ ထပ်တင်စရာ မလိုပါဘူး။ Stock ရှိတဲ့ Product ဆိုရင် Key ကို ချက်ချင်း ရပါမယ်။</p>
+        <div class="field">
+          <label>ဖြည့်မယ့် ပမာဏ (Ks)</label>
+          <div class="wallet-amounts" id="walletAmounts"></div>
+          <input type="number" id="topupCustomAmount" placeholder="တခြား ပမာဏ ရိုက်ထည့်ပါ — ဥပမာ 27500" min="1" inputmode="numeric">
+        </div>
+        <div class="field">
+          <label for="topupMethod">ငွေလွှဲနည်း</label>
+          <select id="topupMethod"><option value="KBZPay">KBZPay</option><option value="WavePay">WavePay</option><option value="AYAPay">AYAPay</option><option value="UABPay">UABPay</option></select>
+        </div>
+        <p class="hint" style="text-align:left;margin:0 0 12px;">ငွေလွှဲရန် — KBZPay / WavePay: <b>09 446 627 892</b> / <b>09 440 147 197</b> (Order တင်တဲ့ ဖုန်းနံပါတ်တွေနဲ့ အတူတူပါ)</p>
+        <div class="upload-box" id="topupUploadBox">
+          <input type="file" id="topupReceipt" accept="image/*">
+          <div class="upload-text" id="topupUploadText">ငွေလွှဲပြေစာ Screenshot ကို နှိပ်ပြီး တင်ပါ</div>
+        </div>
+        <button type="button" class="submit-btn" id="topupSubmitBtn" style="margin-top:12px;">💰 ငွေဖြည့်မည်</button>
+        <div class="hint" id="topupMsg" style="display:none;margin-top:10px;"></div>
+        <div class="section-label" style="margin-top:18px;"><span class="num">🧾</span> ငွေဖြည့်မှတ်တမ်း</div>
+        <div id="topupHistoryList"><div class="hint">မှတ်တမ်း မရှိသေးပါ</div></div>
+      </div>
+    </div>
+  </div>
 
 </div><!-- /pageHome -->
 
@@ -2875,6 +2926,7 @@ if (auth) {
         // so their `let` bindings are initialised before we call them.
         setTimeout(() => {
           try { if (typeof startLiveHistory === 'function') startLiveHistory(savedPlayerId()); } catch (e) { console.warn('Auth history reload failed:', e); }
+          try { if (typeof startWalletListeners === 'function') startWalletListeners(); } catch (e) { console.warn('Wallet listeners failed:', e); }
         }, 0);
       }
     });
@@ -3402,6 +3454,18 @@ try {
   const cachedCatalog = JSON.parse(localStorage.getItem('kds_digitalCatalog') || 'null');
   if (cachedCatalog && typeof cachedCatalog === 'object') DIGITAL_CATALOG = cachedCatalog;
 } catch (e) { /* corrupted cache — ignore, Firestore/fallback take over */ }
+// ---------- Key stock counts (public — counts only, never the keys) ----------
+// config/digitalCatalog.stock: { "game|server|label": n }. The Admin keeps
+// these counts in sync with config/digitalKeys; the storefront only reads
+// them to show the "instant" badge.
+let DIGITAL_STOCK = {};
+try { DIGITAL_STOCK = JSON.parse(localStorage.getItem('kds_digitalStock') || '{}') || {}; } catch (e) { DIGITAL_STOCK = {}; }
+function stockKey(game, server, label) { return game + '|' + (server || '') + '|' + label; }
+function stockCount(game, server, label) {
+  const v = DIGITAL_STOCK[stockKey(game, server, label)];
+  return typeof v === 'number' ? v : 0;
+}
+
 function digitalCatalogPacks(game, fallback) {
   const entry = DIGITAL_CATALOG && DIGITAL_CATALOG[game];
   // No catalog entry at all -> baked-in fallback prices. But once the Admin
@@ -3433,6 +3497,11 @@ async function loadDigitalCatalog() {
     }
     // Product meta (names, categories, logos, platforms, key flag) — this is
     // what lets the Admin add a brand or change variants without a file edit.
+    // Stock counts (public — counts only, never the keys).
+    if (data.stock && typeof data.stock === 'object') {
+      DIGITAL_STOCK = data.stock;
+      try { localStorage.setItem('kds_digitalStock', JSON.stringify(data.stock)); } catch (e) {}
+    }
     if (data.meta && typeof data.meta === 'object') {
       DIGITAL_META = data.meta;
       try { localStorage.setItem('kds_digitalMeta', JSON.stringify(data.meta)); } catch (e) {}
@@ -3488,6 +3557,170 @@ function loadShopStatus() {
   }
 }
 loadShopStatus();
+
+// ---------- Wallet: top-up balance + pay from balance ----------
+// Balance is DERIVED, never stored: approved top-ups minus wallet-paid
+// orders (pending + completed). A rejected wallet order frees the money
+// again automatically, because rejected orders are excluded from the
+// spend sum. No balance document exists, so a customer can never edit
+// a balance directly — creating an order is the only way to spend.
+let walletSettingsAmounts = [50, 500, 1000, 5000, 10000];
+let myTopups = [];
+let myWalletOrders = [];
+let walletBalance = 0;
+let walletListeningUid = null;
+let walletUnsubs = [];
+function computeWalletBalance() {
+  const topped = myTopups.filter(t => t.status === 'approved').reduce((s, t) => s + (Number(t.amount) || 0), 0);
+  const spent = myWalletOrders.filter(o => o.status === 'pending' || o.status === 'completed').reduce((s, o) => s + (Number(o.totalPrice) || (Number(o.packPrice) || 0) * (Number(o.quantity) || 1)), 0);
+  walletBalance = topped - spent;
+  const big = document.getElementById('walletBalanceBig');
+  if (big) big.textContent = walletBalance.toLocaleString() + ' Ks';
+  // Header pill shows the balance only for a real login; guests see '—'.
+  const hb = document.getElementById('walletHeaderBalance');
+  if (hb) hb.textContent = isLoggedInUser() ? walletBalance.toLocaleString() + ' Ks' : '—';
+  const hint = document.getElementById('walletPayBalance');
+  if (hint) hint.textContent = walletBalance.toLocaleString() + ' Ks';
+  return walletBalance;
+}
+function renderWalletAmounts() {
+  const wrap = document.getElementById('walletAmounts');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  walletSettingsAmounts.forEach(a => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'wallet-amt';
+    b.textContent = Number(a).toLocaleString();
+    b.addEventListener('click', () => {
+      document.getElementById('topupCustomAmount').value = a;
+      wrap.querySelectorAll('.wallet-amt').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+    });
+    wrap.appendChild(b);
+  });
+}
+async function loadWalletSettings() {
+  try {
+    const cached = JSON.parse(localStorage.getItem('kds_walletAmounts') || 'null');
+    if (Array.isArray(cached) && cached.length) { walletSettingsAmounts = cached; renderWalletAmounts(); }
+  } catch (e) {}
+  if (typeof db === 'undefined' || !db) return;
+  try {
+    const snap = await db.collection('config').doc('walletSettings').get();
+    if (snap.exists) {
+      const d = snap.data() || {};
+      if (Array.isArray(d.amounts) && d.amounts.length) {
+        walletSettingsAmounts = d.amounts.map(Number).filter(n => n > 0);
+        try { localStorage.setItem('kds_walletAmounts', JSON.stringify(walletSettingsAmounts)); } catch (e) {}
+        renderWalletAmounts();
+      }
+    }
+  } catch (err) { console.error('Wallet settings load failed — defaults in use:', err); }
+}
+loadWalletSettings();
+renderWalletAmounts();
+function renderTopupHistory() {
+  const list = document.getElementById('topupHistoryList');
+  if (!list) return;
+  if (!myTopups.length) { list.innerHTML = '<div class="hint">မှတ်တမ်း မရှိသေးပါ</div>'; return; }
+  const sorted = [...myTopups].sort((a, b) => (b.createdAtMs || 0) - (a.createdAtMs || 0));
+  list.innerHTML = sorted.slice(0, 20).map(t => {
+    const badge = t.status === 'approved' ? '✓ Approved' : t.status === 'rejected' ? '✕ Rejected' : '⏳ Pending';
+    const color = t.status === 'approved' ? 'var(--success)' : t.status === 'rejected' ? 'var(--danger)' : 'var(--accent-gold)';
+    return `<div class="os-row"><span class="os-k">${escapeHtml(t.paymentMethod || '')} • ${t.createdAtMs ? new Date(t.createdAtMs).toLocaleString('en-GB', { timeZone: 'Asia/Yangon', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''}</span><span class="os-v">${(Number(t.amount) || 0).toLocaleString()} Ks — <b style="color:${color}">${badge}</b></span></div>`;
+  }).join('');
+}
+function startWalletListeners() {
+  if (!currentUid || walletListeningUid === currentUid) return;
+  stopWalletListeners();
+  walletListeningUid = currentUid;
+  if (typeof db === 'undefined' || !db) return;
+  try {
+    // Equality-only queries: no composite index needed.
+    walletUnsubs.push(db.collection('topups').where('ownerUid', '==', currentUid).onSnapshot(snap => {
+      myTopups = snap.docs.map(d => { const t = d.data() || {}; return { ...t, createdAtMs: t.createdAt && t.createdAt.toDate ? t.createdAt.toDate().getTime() : Date.now() }; });
+      computeWalletBalance();
+      renderTopupHistory();
+      const b = document.getElementById('walletLiveBadge'); if (b) b.style.display = '';
+    }, err => console.error('Wallet topups listen failed:', err)));
+    walletUnsubs.push(db.collection('orders').where('ownerUid', '==', currentUid).where('paymentMethod', '==', 'wallet').onSnapshot(snap => {
+      myWalletOrders = snap.docs.map(d => d.data() || {});
+      computeWalletBalance();
+    }, err => console.error('Wallet orders listen failed:', err)));
+  } catch (err) { console.error('Wallet listeners failed:', err); }
+}
+function stopWalletListeners() {
+  walletUnsubs.forEach(u => { try { u(); } catch (e) {} });
+  walletUnsubs = [];
+  walletListeningUid = null;
+}
+document.getElementById('topupReceipt').addEventListener('change', (e) => {
+  const f = e.target.files[0];
+  const t = document.getElementById('topupUploadText');
+  if (t) t.textContent = f ? '✓ ' + f.name : 'ငွေလွှဲပြေစာ Screenshot ကို နှိပ်ပြီး တင်ပါ';
+});
+document.getElementById('topupSubmitBtn').addEventListener('click', async () => {
+  const amount = Math.floor(Number(document.getElementById('topupCustomAmount').value));
+  const method = document.getElementById('topupMethod').value;
+  const file = document.getElementById('topupReceipt').files[0];
+  const msgEl = document.getElementById('topupMsg');
+  const showMsg = (t, ok) => { if (msgEl) { msgEl.style.display = 'block'; msgEl.textContent = t; msgEl.style.color = ok ? 'var(--success)' : 'var(--danger)'; } };
+  if (!isLoggedInUser()) { closeWalletModal(); openLoginPortal(); showToast('Wallet သုံးဖို့ အရင် Login ဝင်ပေးပါ', 'error'); return; }
+  if (!currentUid) { showMsg('Account စစ်ဆေးလို့ မရပါ — Refresh လုပ်ပြီး ထပ်စမ်းကြည့်ပါ', false); return; }
+  if (!(amount > 0)) { showMsg('ဖြည့်မယ့် ပမာဏ ရိုက်ထည့်ပါ', false); return; }
+  if (!file) { showMsg('ငွေလွှဲပြေစာ Screenshot တင်ပေးပါ', false); return; }
+  if (!file.type.startsWith('image/')) { showMsg('ပုံဖိုင် (Image) သာ တင်ပေးပါ', false); return; }
+  const btn = document.getElementById('topupSubmitBtn');
+  btn.disabled = true;
+  const topupId = 'TP' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 6).toUpperCase();
+  try {
+    await db.collection('topups').doc(topupId).set({
+      topupId, ownerUid: currentUid, amount, paymentMethod: method, status: 'pending',
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    const caption = `💰 Wallet ငွေဖြည့်တောင်းဆိုမှု #${topupId}\n👤 UID: ${currentUid.slice(0, 8)}…\n💵 ပမာဏ: ${amount.toLocaleString()} Ks\n💳 နည်းလမ်း: ${method}\n🕒 ${new Date().toLocaleString('en-GB', { timeZone: 'Asia/Yangon' })}`;
+    const fd = new FormData();
+    fd.append('caption', caption);
+    fd.append('photo', file);
+    try { await sendToTelegramWithProgress(fd); } catch (tgErr) { console.error('Top-up Telegram notify failed (request already saved):', tgErr); }
+    showMsg('✓ တောင်းဆိုမှု ပို့ပြီးပါပြီ — Admin Approve လုပ်တာနဲ့ Balance ထဲ ငွေရောက်ပါမယ်', true);
+    document.getElementById('topupCustomAmount').value = '';
+    document.getElementById('topupReceipt').value = '';
+    document.getElementById('topupUploadText').textContent = 'ငွေလွှဲပြေစာ Screenshot ကို နှိပ်ပြီး တင်ပါ';
+    document.querySelectorAll('#walletAmounts .wallet-amt').forEach(x => x.classList.remove('active'));
+  } catch (err) {
+    console.error(err);
+    showMsg('မအောင်မြင်ပါ: ' + err.message, false);
+  } finally { btn.disabled = false; }
+});
+
+// ---------- Wallet modal (header 👛 button, next to Login) ----------
+// Wallet needs a real login (Google/Email) — not a guest account —
+// because a balance must survive browser-data clears and device changes.
+// Google login links the guest account, so a guest's balance follows
+// them when they log in (same UID).
+const walletModal = document.getElementById('walletModal');
+function openWalletModal() {
+  computeWalletBalance();
+  renderTopupHistory();
+  walletModal.classList.add('shown');
+  htmlEl.classList.add('modal-open');
+}
+function closeWalletModal() {
+  walletModal.classList.remove('shown');
+  htmlEl.classList.remove('modal-open');
+}
+document.getElementById('walletModalCloseBtn').addEventListener('click', closeWalletModal);
+walletModal.addEventListener('click', (e) => { if (e.target === walletModal) closeWalletModal(); });
+document.getElementById('walletHeaderBtn').addEventListener('click', () => {
+  if (!isLoggedInUser()) {
+    openLoginPortal();
+    showToast('Wallet သုံးဖို့ အရင် Login ဝင်ပေးပါ', 'error');
+    return;
+  }
+  openWalletModal();
+});
 
 // ---------- Digital product meta (from Admin) ----------
 // config/digitalCatalog.meta: { express: { name, cat, logo, field,
@@ -4183,6 +4416,7 @@ function buildPackDropdown() {
   }
 
   let found = false;
+  let anyStock = false;
   packs.forEach((grp, gi) => {
     if (gameNeedsPickerStep(currentGame) && !groupMatchesServer(currentGame, grp)) return;
     if (currentCategory !== 'all' && classifyCategory(grp.group) !== currentCategory) return;
@@ -4199,11 +4433,14 @@ function buildPackDropdown() {
     grp.items.forEach((item, ii) => {
       const card = document.createElement('div');
       const outOfStock = item.active === false;
+      const inStock = !outOfStock && isDigitalGame(currentGame) && productNeedsKey(currentGame) && stockCount(currentGame, grp.server, item.label) > 0;
+      if (inStock) anyStock = true;
       card.className = 'pack-card' + (outOfStock ? ' out-of-stock' : '');
       card.dataset.value = `${gi}-${ii}`;
       card.innerHTML = `
         <div class="pc-label">${item.label}</div>
         <div class="pc-price">${item.price.toLocaleString()} Ks</div>
+        ${inStock ? '<div class="pc-instant">⚡ ချက်ချင်းရမယ်</div>' : ''}
         ${outOfStock ? '<div class="pc-oos">ပစ္စည်းပြတ်နေပါတယ်</div>' : ''}
       `;
       card.addEventListener('click', () => {
@@ -4229,7 +4466,9 @@ function buildPackDropdown() {
   if (found && isDigitalGame(currentGame) && productNeedsKey(currentGame)) {
     const note = document.createElement('div');
     note.className = 'key-delivery-note';
-    note.innerHTML = '⏱️ Key ကို Order တင်ပြီးမှ ဝယ်ပေးတာမို့ <b>မိနစ် ၃၀ မှ ၁ နာရီအတွင်း</b> ရရှိပါမည်။';
+    note.innerHTML = anyStock
+      ? '⚡ <b>ချက်ချင်းရမယ်</b> တံဆိပ်ပါတဲ့ Pack တွေက Stock ရှိလို့ Key ကို ချက်ချင်း ရပါမယ် — တံဆိပ်မပါတဲ့ Pack ဆိုရင် Key ကို Order တင်ပြီးမှ ဝယ်ပေးတာမို့ <b>မိနစ် ၃၀ မှ ၁ နာရီအတွင်း</b> ရရှိပါမည်။'
+      : '⏱️ Key ကို Order တင်ပြီးမှ ဝယ်ပေးတာမို့ <b>မိနစ် ၃၀ မှ ၁ နာရီအတွင်း</b> ရရှိပါမည်။';
     packGrid.appendChild(note);
   }
 
@@ -5162,6 +5401,20 @@ document.querySelectorAll('.pay-chip').forEach(chip => {
     document.querySelectorAll('.pay-chip').forEach(c => c.classList.remove('active'));
     chip.classList.add('active');
     selectedMethod = chip.dataset.method;
+    if (selectedMethod === 'wallet' && !isLoggedInUser()) {
+      openLoginPortal();
+      showToast('Wallet နဲ့ ဝယ်ဖို့ အရင် Login ဝင်ပေးပါ', 'error');
+      document.querySelectorAll('.pay-chip').forEach(c => c.classList.remove('active'));
+      document.querySelector('.pay-chip[data-method="KBZPay"]').classList.add('active');
+      selectedMethod = 'KBZPay';
+    }
+    // Wallet payment needs no transfer numbers and no receipt screenshot.
+    const rest = document.getElementById('restOfForm');
+    if (rest) rest.classList.toggle('wallet-pay', selectedMethod === 'wallet');
+    const sc = document.getElementById('screenshot');
+    if (sc) sc.required = selectedMethod !== 'wallet';
+    const wh = document.getElementById('walletPayHint');
+    if (wh) { wh.style.display = selectedMethod === 'wallet' ? 'block' : 'none'; if (selectedMethod === 'wallet') computeWalletBalance(); }
   });
 });
 
@@ -5652,7 +5905,7 @@ form.addEventListener('submit', (e) => {
   if (gameNeedsServerStep(currentGame) && !ZONE_PATTERN.test(zoneId)) { showToast("Zone ID မှားနေပါသည် — ဂဏန်း ၃-၅ လုံးသာ ထည့်ပါ", "error"); return; }
   if (gameNeedsServerStep(currentGame) && !verifiedUsername && !usernameLookupFailed) { showToast("Username မစစ်ရသေးပါ — ID/Zone ID ကို ပြန်ရိုက်ပြီး Username ရလာအောင် စောင့်ပေးပါ", "error"); return; }
   if (!selectedPackValue) { showToast("Pack ရွေးချယ်ပေးပါ", "error"); return; }
-  if (!file) { showToast("ငွေလွှဲပြေစာ Screenshot တင်ပေးပါ", "error"); return; }
+  if (!file && selectedMethod !== 'wallet') { showToast("ငွေလွှဲပြေစာ Screenshot တင်ပေးပါ", "error"); return; }
 
   const now = Date.now();
   if (now - lastOrderAt < COOLDOWN_MS) {
@@ -5693,6 +5946,15 @@ finalConfirmBtn.addEventListener('click', async () => {
   const { playerId, zoneId, file, item } = pendingOrder;
   const qty = modalQty;
   const totalPrice = item.price * qty;
+  // Wallet payment: the balance check happens here, before anything is
+  // written, so a wallet order can never overspend the balance.
+  if (selectedMethod === 'wallet') {
+    computeWalletBalance();
+    if (walletBalance < totalPrice) {
+      showToast('Wallet Balance မလုံလောက်ပါ — ' + walletBalance.toLocaleString() + ' Ks ပဲ ရှိပါတယ်။ Wallet မှာ ငွေဖြည့်ပါ', 'error');
+      return;
+    }
+  }
   // High-entropy ID: doubles as the Firestore doc ID so customers can look
   // up their own order later (see track.html) without exposing everyone
   // else's orders — knowing this exact string is required to read it.
@@ -5746,12 +6008,12 @@ finalConfirmBtn.addEventListener('click', async () => {
       (gameNeedsServerStep(currentGame) ? `🌍 Zone ID: ${zoneId}\n` : '') +
       `💎 Pack: ${item.label} x${qty}\n` +
       `💰 စုစုပေါင်း: ${totalPrice.toLocaleString()} Ks\n` +
-      `💳 ငွေလွှဲနည်း: ${selectedMethod}\n` +
+      `💳 ငွေလွှဲနည်း: ${selectedMethod === 'wallet' ? '👛 Wallet Balance' : selectedMethod}\n` +
       `🕒 ${new Date().toLocaleString('en-GB', { timeZone: 'Asia/Yangon' })}`;
 
     const fd = new FormData();
     fd.append("caption", caption);
-    fd.append("photo", file);
+    if (file) fd.append("photo", file);
 
     try {
       const tgJson = await sendToTelegramWithProgress(fd);
@@ -5773,7 +6035,8 @@ finalConfirmBtn.addEventListener('click', async () => {
       <div class="os-row"><span class="os-k">စုစုပေါင်း</span><span class="os-v">${totalPrice.toLocaleString()} Ks</span></div>
       <div class="os-row"><span class="os-k">${escapeHtml(accountFieldLabel())}</span><span class="os-v">${escapeHtml(playerId)}${verifiedUsername ? ' (' + escapeHtml(verifiedUsername) + ')' : ''}</span></div>
       ${gameNeedsServerStep(currentGame) ? `<div class="os-row"><span class="os-k">Zone ID</span><span class="os-v">${escapeHtml(zoneId)}</span></div>` : ''}
-      ${isDigitalGame(currentGame) && productNeedsKey(currentGame) ? `<div class="os-row"><span class="os-k">⏱️ Key</span><span class="os-v">မိနစ် ၃၀ မှ ၁ နာရီအတွင်း ရရှိပါမည်</span></div>` : ''}
+      ${selectedMethod === 'wallet' ? `<div class="os-row"><span class="os-k">ငွေပေးချေမှု</span><span class="os-v">👛 Wallet Balance</span></div>` : ''}
+      ${isDigitalGame(currentGame) && productNeedsKey(currentGame) ? `<div class="os-row"><span class="os-k">⏱️ Key</span><span class="os-v">${stockCount(currentGame, currentServer, item.label) > 0 ? '⚡ Stock ရှိပါတယ် — Key ကို ချက်ချင်း ပို့ပေးပါမယ်' : 'မိနစ် ၃၀ မှ ၁ နာရီအတွင်း ရရှိပါမည်'}</span></div>` : ''}
     `;
     form.style.display = 'none';
     document.getElementById('successPanel').style.display = 'block';
@@ -5835,6 +6098,12 @@ document.getElementById('newOrderBtn').addEventListener('click', () => {
   document.querySelectorAll('.pay-chip').forEach(c => c.classList.remove('active'));
   document.querySelector('.pay-chip[data-method="KBZPay"]').classList.add('active');
   selectedMethod = "KBZPay";
+  const rest = document.getElementById('restOfForm');
+  if (rest) rest.classList.remove('wallet-pay');
+  const sc = document.getElementById('screenshot');
+  if (sc) sc.required = true;
+  const wh = document.getElementById('walletPayHint');
+  if (wh) wh.style.display = 'none';
 });
 
 /* ---------- Ambient floating diamonds ---------- */
