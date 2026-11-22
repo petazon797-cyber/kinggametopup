@@ -5919,6 +5919,39 @@ form.addEventListener('submit', (e) => {
   openConfirmModal();
 });
 
+// Wallet orders have no receipt screenshot, so the Telegram proxy
+// (which requires a photo - it answers photo_missing without one)
+// rejects the notice and Telegram never gets it. Render the order
+// summary as a simple receipt image and send that as the photo instead.
+function makeWalletReceiptImage(captionText) {
+  return new Promise((resolve) => {
+    try {
+      const stripEmoji = (s) => [...s].filter((ch) => {
+        const cp = ch.codePointAt(0);
+        return !((cp >= 0x1F000 && cp <= 0x1FAFF) || (cp >= 0x2600 && cp <= 0x27BF) || (cp >= 0x2B00 && cp <= 0x2BFF) || cp === 0xFE0F);
+      }).join('').replace(/  +/g, ' ').trim();
+      const lines = captionText.split('\n').map(stripEmoji).filter(Boolean);
+      const W = 760, pad = 36, titleH = 92, lineH = 46;
+      const H = titleH + lines.length * lineH + pad;
+      const cv = document.createElement('canvas');
+      cv.width = W; cv.height = H;
+      const ctx = cv.getContext('2d');
+      ctx.fillStyle = '#0B0B0F'; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = '#E50914'; ctx.fillRect(0, 0, W, 8);
+      ctx.fillStyle = '#FFD700'; ctx.font = 'bold 34px sans-serif';
+      ctx.fillText('Wallet Order', pad, 64);
+      ctx.fillStyle = '#FFFFFF';
+      lines.forEach((ln, idx) => {
+        let size = 26;
+        ctx.font = size + 'px sans-serif';
+        while (ctx.measureText(ln).width > W - pad * 2 && size > 18) { size -= 2; ctx.font = size + 'px sans-serif'; }
+        ctx.fillText(ln, pad, titleH + pad + idx * lineH);
+      });
+      cv.toBlob((b) => resolve(b), 'image/png');
+    } catch (e) { resolve(null); }
+  });
+}
+
 /* ---------- Step 2: actual submission, triggered from the modal ---------- */
 function sendToTelegramWithProgress(fd) {
   return new Promise((resolve, reject) => {
@@ -6009,11 +6042,22 @@ finalConfirmBtn.addEventListener('click', async () => {
       `💎 Pack: ${item.label} x${qty}\n` +
       `💰 စုစုပေါင်း: ${totalPrice.toLocaleString()} Ks\n` +
       `💳 ငွေလွှဲနည်း: ${selectedMethod === 'wallet' ? '👛 Wallet Balance' : selectedMethod}\n` +
+      (isDigitalGame(currentGame) && productNeedsKey(currentGame) ? `⏱️ Key: ${stockCount(currentGame, currentServer, item.label) > 0 ? '⚡ Stock ရှိ — Key ချက်ချင်း' : 'မိနစ် ၃၀–၁ နာရီ (ဝယ်ပေးရန်)'}\n` : '') +
       `🕒 ${new Date().toLocaleString('en-GB', { timeZone: 'Asia/Yangon' })}`;
 
     const fd = new FormData();
     fd.append("caption", caption);
-    if (file) fd.append("photo", file);
+    if (file) {
+      fd.append("photo", file);
+    } else {
+      // Wallet order: no receipt screenshot. Render the order summary as
+      // a receipt image and send that as the photo, otherwise the proxy
+      // rejects the notice with photo_missing.
+      try {
+        const receiptBlob = await makeWalletReceiptImage(caption);
+        if (receiptBlob) fd.append("photo", receiptBlob, "wallet-order.png");
+      } catch (e) { console.error("receipt image failed:", e); }
+    }
 
     try {
       const tgJson = await sendToTelegramWithProgress(fd);
