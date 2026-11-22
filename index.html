@@ -687,6 +687,17 @@
   #refreshPriceBtn svg{stroke:#FFFFFF;width:11px;height:11px;}
   #refreshPriceBtn:active{transform:scale(0.92);}
 
+  .history-key{
+    margin-top:8px;padding:10px 12px;border-radius:12px;
+    background:rgba(16,185,129,.10);border:1px solid rgba(16,185,129,.35);
+    color:var(--text-primary);font-size:13px;line-height:1.5;
+    display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  }
+  .history-key code,.os-key-code{
+    font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;font-weight:700;
+    color:var(--text-primary);word-break:break-all;
+  }
+
   /* ---------- Pack selection cards ---------- */
   .pack-group-label{
     font-size:13px;font-weight:700;color:var(--accent-cyan);
@@ -982,6 +993,13 @@
     box-shadow:0 8px 22px rgba(255,45,120,0.18), 0 0 0 1px rgba(139,92,246,0.25), inset 0 1px 0 rgba(255,255,255,0.32);
   }
   .pack-card.selected .pc-price{color:var(--accent-cyan);font-weight:700;}
+  /* Out-of-stock packs (Admin switched off): greyed out, not clickable. */
+  .pack-card.out-of-stock{opacity:.55;cursor:not-allowed;}
+  .pack-card.out-of-stock:active{transform:none;}
+  .pack-card.out-of-stock:hover{transform:none;border-color:var(--border-glass);}
+  .pack-card .pc-oos{display:inline-block;margin-top:6px;padding:2px 8px;border-radius:999px;background:rgba(255,59,48,.14);color:#ff453a;font-size:11px;font-weight:700;}
+  /* Key delivery time (buy-on-demand: key is bought after the order). */
+  .key-delivery-note{margin:10px 2px 4px;padding:10px 12px;border-radius:12px;background:rgba(255,204,0,.12);border:1px solid rgba(255,204,0,.35);color:var(--text-primary);font-size:13px;line-height:1.5;}
   .pack-card{position:relative;overflow:visible;}
   .pack-card .pc-best-badge{
     position:absolute;top:-9px;left:50%;transform:translateX(-50%);
@@ -1729,10 +1747,15 @@
         <div class="server-name">Canva Pro</div>
         <div class="server-sub">Canva • Pro</div>
       </div>
-      <div class="server-card" data-game="vpn" data-dcat="vpn">
-        <div class="server-icon"><span class="digital-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></span></div>
-        <div class="server-name">VPN Premium</div>
-        <div class="server-sub">VPN • 1 Device</div>
+      <div class="server-card" data-game="express" data-dcat="vpn">
+        <div class="server-icon"><span class="digital-icon"><img src="https://cdn.simpleicons.org/expressvpn/DA3941" alt="ExpressVPN" loading="lazy" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/expressvpn.svg'"></span></div>
+        <div class="server-name">ExpressVPN</div>
+        <div class="server-sub">ExpressVPN • PC / Mobile</div>
+      </div>
+      <div class="server-card" data-game="nord" data-dcat="vpn">
+        <div class="server-icon"><span class="digital-icon"><img src="https://cdn.simpleicons.org/nordvpn/4687FF" alt="NordVPN" loading="lazy" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/nordvpn.svg'"></span></div>
+        <div class="server-name">NordVPN</div>
+        <div class="server-sub">NordVPN • PC / Mobile</div>
       </div>
     </div>
     <div class="server-grid game-select-grid" id="gameGrid">
@@ -1813,7 +1836,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><line x1="12" y1="8" x2="12" y2="13"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
         <p style="margin:0;color:var(--text-primary);">မလေး၊ စင်ကာပူ၊ ဖိလစ်ပိုင်၊ အင်ဒို၊ ရုရှား ဆာဗာ အကောင့်များအတွက် လိုအပ်ပါက Ban Sever Box တွင်ဝယ်ယူနိုင်ပါသည်။</p>
       </div>
-      <div class="section-label" style="margin-top:2px;"><span class="num">2</span> Server ရွေးရန်</div>
+      <div class="section-label" id="serverSectionLabel" style="margin-top:2px;"><span class="num">2</span> Server ရွေးရန်</div>
       <div class="server-grid" id="serverGrid">
         <div class="server-card" data-server="global">
           <div class="server-icon">
@@ -2055,6 +2078,7 @@
           <div class="os-row"><span class="os-k">စုစုပေါင်း</span><span class="os-v" id="trTotal">—</span></div>
           <div class="os-row"><span class="os-k">Player ID</span><span class="os-v" id="trPlayerId">—</span></div>
           <div class="os-row"><span class="os-k">တင်သွင်းချိန်</span><span class="os-v" id="trTime">—</span></div>
+          <div class="os-row" id="trKeyRow" style="display:none;"><span class="os-k">🔑 License Key</span><span class="os-v"><code id="trLicenseKey" class="os-key-code">—</code> <button type="button" class="history-btn" id="trCopyKeyBtn">Copy</button></span></div>
         </div>
         <div class="id-help-box shown" id="trackStatusNote" style="margin-top:12px;"></div>
       </div>
@@ -3280,15 +3304,16 @@ let PACKS_MAGICCHESS = [];
 // ဈေးနှုန်းများသည် စမ်းသပ်ဈေး (2026-11-22 ဈေးကွက် ဈေးအခြေခံ) — supplier ဈေး
 // ရပြီးရင် ဒီနေရာမှာ (သို့) Google Sheet tab အသစ်မှာ ပြင်ပါ။ VPN ဈေးက
 // ခန့်မှန်းဈေးသက်သက်ဖြစ်ပြီး supplier နဲ့ အတည်ပြုပြီးမှ ရောင်းပါ။
-const DIGITAL_GAMES = ['telegram', 'gemini', 'chatgpt', 'claude', 'canva', 'vpn'];
+const DIGITAL_GAMES = ['telegram', 'gemini', 'chatgpt', 'claude', 'canva', 'express', 'nord'];
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const DIGITAL_INFO = {
-  telegram: { name: 'Telegram Premium', fieldLabel: 'Telegram Username', placeholder: 'ဥပမာ @username', inputmode: 'text', maxLength: 33, packLabel: 'Telegram Premium Pack ရွေးရန်' },
-  gemini: { name: 'Google AI Pro (Gemini)', fieldLabel: 'Gmail', placeholder: 'ဥပမာ name@gmail.com', inputmode: 'email', maxLength: 60, packLabel: 'Gemini AI Pack ရွေးရန်' },
-  chatgpt: { name: 'ChatGPT Plus', fieldLabel: 'Gmail', placeholder: 'ဥပမာ name@gmail.com', inputmode: 'email', maxLength: 60, packLabel: 'ChatGPT Plus Pack ရွေးရန်' },
-  claude: { name: 'Claude Pro', fieldLabel: 'Gmail', placeholder: 'ဥပမာ name@gmail.com', inputmode: 'email', maxLength: 60, packLabel: 'Claude Pro Pack ရွေးရန်' },
-  canva: { name: 'Canva Pro', fieldLabel: 'Email', placeholder: 'ဥပမာ name@gmail.com', inputmode: 'email', maxLength: 60, packLabel: 'Canva Pro Pack ရွေးရန်' },
-  vpn: { name: 'VPN Premium', fieldLabel: 'Email', placeholder: 'ဥပမာ name@gmail.com', inputmode: 'email', maxLength: 60, packLabel: 'VPN Pack ရွေးရန်' }
+  telegram: { name: 'Telegram Premium', field: 'telegram', fieldLabel: 'Telegram Username', placeholder: 'ဥပမာ @username', inputmode: 'text', maxLength: 33, packLabel: 'Telegram Premium Pack ရွေးရန်' },
+  gemini: { name: 'Google AI Pro (Gemini)', field: 'email', fieldLabel: 'Gmail', placeholder: 'ဥပမာ name@gmail.com', inputmode: 'email', maxLength: 60, packLabel: 'Gemini AI Pack ရွေးရန်' },
+  chatgpt: { name: 'ChatGPT Plus', field: 'email', fieldLabel: 'Gmail', placeholder: 'ဥပမာ name@gmail.com', inputmode: 'email', maxLength: 60, packLabel: 'ChatGPT Plus Pack ရွေးရန်' },
+  claude: { name: 'Claude Pro', field: 'email', fieldLabel: 'Gmail', placeholder: 'ဥပမာ name@gmail.com', inputmode: 'email', maxLength: 60, packLabel: 'Claude Pro Pack ရွေးရန်' },
+  canva: { name: 'Canva Pro', field: 'email', fieldLabel: 'Email', placeholder: 'ဥပမာ name@gmail.com', inputmode: 'email', maxLength: 60, packLabel: 'Canva Pro Pack ရွေးရန်' },
+  express: { name: 'ExpressVPN', field: 'email', fieldLabel: 'Email', placeholder: 'ဥပမာ name@gmail.com', inputmode: 'email', maxLength: 60, packLabel: 'ExpressVPN Pack ရွေးရန်' },
+  nord: { name: 'NordVPN', field: 'email', fieldLabel: 'Email', placeholder: 'ဥပမာ name@gmail.com', inputmode: 'email', maxLength: 60, packLabel: 'NordVPN Pack ရွေးရန်' }
 };
 const PACKS_TELEGRAM = [
   { group: 'Telegram Premium 👑', items: [
@@ -3321,11 +3346,33 @@ const PACKS_CANVA = [
     { label: '1 နှစ်', price: 102000 }
   ] }
 ];
-const PACKS_VPN = [
-  { group: 'VPN Premium 🛡️', items: [
-    { label: '1 လ', price: 20000 },
-    { label: '3 လ', price: 50000 },
-    { label: '1 နှစ်', price: 120000 }
+// VPN fallback packs — DRAFT prices only (retail-based estimates, NOT
+// verified reseller prices). Set the real prices in the Admin panel
+// (Digital tab); the Admin catalog overrides these as soon as it is saved.
+// Groups carry .server = the Platform (PC / Mobile); the pack grid shows
+// only the groups of the Platform the customer picked.
+const PACKS_EXPRESS = [
+  { server: 'PC', group: 'ExpressVPN — PC 💻', items: [
+    { label: '1 လ', price: 65000 },
+    { label: '3 လ', price: 175000 },
+    { label: '1 နှစ်', price: 450000 }
+  ] },
+  { server: 'Mobile', group: 'ExpressVPN — Mobile 📱', items: [
+    { label: '1 လ', price: 45000 },
+    { label: '3 လ', price: 120000 },
+    { label: '1 နှစ်', price: 320000 }
+  ] }
+];
+const PACKS_NORD = [
+  { server: 'PC', group: 'NordVPN — PC 💻', items: [
+    { label: '1 လ', price: 65000 },
+    { label: '3 လ', price: 170000 },
+    { label: '1 နှစ်', price: 380000 }
+  ] },
+  { server: 'Mobile', group: 'NordVPN — Mobile 📱', items: [
+    { label: '1 လ', price: 40000 },
+    { label: '3 လ', price: 110000 },
+    { label: '1 နှစ်', price: 280000 }
   ] }
 ];
 
@@ -3344,32 +3391,121 @@ try {
 } catch (e) { /* corrupted cache — ignore, Firestore/fallback take over */ }
 function digitalCatalogPacks(game, fallback) {
   const entry = DIGITAL_CATALOG && DIGITAL_CATALOG[game];
-  if (!Array.isArray(entry) || !entry.length) return fallback;
-  const cleaned = entry
+  // No catalog entry at all -> baked-in fallback prices. But once the Admin
+  // has saved this product, its entry is authoritative: an empty list means
+  // "nothing for sale" (shows "Pack မရှိသေးပါ"), NOT the fallback prices —
+  // otherwise packs the Admin switched off would come back. Items the Admin
+  // switched off stay in the list with active:false so the shop shows them
+  // greyed out as "ပစ္စည်းပြတ်နေပါတယ်" instead of hiding them.
+  if (!Array.isArray(entry)) return fallback;
+  return entry
     .map(g => ({
       group: g.group,
+      server: g.server || null,
       items: (Array.isArray(g.items) ? g.items : []).filter(it =>
-        it && it.active !== false && typeof it.label === 'string' &&
+        it && typeof it.label === 'string' &&
         typeof it.price === 'number' && it.price > 0)
     }))
     .filter(g => g.items.length);
-  return cleaned.length ? cleaned : fallback;
 }
 async function loadDigitalCatalog() {
   try {
     if (typeof db === 'undefined' || !db) return;
     const snap = await db.collection('config').doc('digitalCatalog').get();
     if (!snap.exists) return;
-    const products = snap.data() && snap.data().products;
-    if (!products || typeof products !== 'object') return;
-    DIGITAL_CATALOG = products;
-    try { localStorage.setItem('kds_digitalCatalog', JSON.stringify(products)); } catch (e) {}
-    if (typeof currentGame !== 'undefined' && currentGame && DIGITAL_GAMES.indexOf(currentGame) !== -1) buildPackDropdown();
+    const data = snap.data() || {};
+    if (data.products && typeof data.products === 'object') {
+      DIGITAL_CATALOG = data.products;
+      try { localStorage.setItem('kds_digitalCatalog', JSON.stringify(data.products)); } catch (e) {}
+    }
+    // Product meta (names, categories, logos, platforms, key flag) — this is
+    // what lets the Admin add a brand or change variants without a file edit.
+    if (data.meta && typeof data.meta === 'object') {
+      DIGITAL_META = data.meta;
+      try { localStorage.setItem('kds_digitalMeta', JSON.stringify(data.meta)); } catch (e) {}
+      renderDigitalGridFromMeta();
+    }
+    if (typeof currentGame !== 'undefined' && currentGame && isDigitalGame(currentGame)) buildPackDropdown();
   } catch (err) {
     console.error('Digital catalog load failed — fallback prices in use:', err);
   }
 }
 loadDigitalCatalog();
+
+// ---------- Digital product meta (from Admin) ----------
+// config/digitalCatalog.meta: { express: { name, cat, logo, field,
+//   needsKey, platforms: ['PC','Mobile'], active } ... }
+// The Admin edits this; the storefront renders product cards from it, so a
+// new brand or a new variant needs no file edit. When the Admin has never
+// saved meta, DEFAULT_DIGITAL_META below is used instead.
+const DEFAULT_DIGITAL_META = {
+  telegram: { name: 'Telegram Premium', cat: 'telegram', logo: 'https://cdn.simpleicons.org/telegram/26A5E4', field: 'telegram', needsKey: false, platforms: [] },
+  gemini: { name: 'Google AI Pro (Gemini)', cat: 'ai', logo: 'https://cdn.simpleicons.org/googlegemini/4285F4', field: 'email', needsKey: false, platforms: [] },
+  chatgpt: { name: 'ChatGPT Plus', cat: 'ai', logo: 'https://cdn.simpleicons.org/openai/000000', field: 'email', needsKey: false, platforms: [] },
+  claude: { name: 'Claude Pro', cat: 'ai', logo: 'https://cdn.simpleicons.org/anthropic/D97757', field: 'email', needsKey: false, platforms: [] },
+  canva: { name: 'Canva Pro', cat: 'design', logo: 'https://cdn.simpleicons.org/canva/00C4CC', field: 'email', needsKey: false, platforms: [] },
+  express: { name: 'ExpressVPN', cat: 'vpn', logo: 'https://cdn.simpleicons.org/expressvpn/DA3941', field: 'email', needsKey: true, platforms: ['PC', 'Mobile'] },
+  nord: { name: 'NordVPN', cat: 'vpn', logo: 'https://cdn.simpleicons.org/nordvpn/4687FF', field: 'email', needsKey: true, platforms: ['PC', 'Mobile'] }
+};
+let DIGITAL_META = null;
+try {
+  const cachedMeta = JSON.parse(localStorage.getItem('kds_digitalMeta') || 'null');
+  if (cachedMeta && typeof cachedMeta === 'object') DIGITAL_META = cachedMeta;
+} catch (e) { /* corrupted cache — defaults take over */ }
+function digitalMeta(game) {
+  if (DIGITAL_META && DIGITAL_META[game]) return DIGITAL_META[game];
+  return DEFAULT_DIGITAL_META[game] || null;
+}
+function digitalMetaIds() {
+  if (DIGITAL_META) return Object.keys(DIGITAL_META);
+  return Object.keys(DEFAULT_DIGITAL_META);
+}
+function productPlatforms(game) {
+  const m = digitalMeta(game);
+  return (m && Array.isArray(m.platforms)) ? m.platforms : [];
+}
+function productNeedsKey(game) {
+  const m = digitalMeta(game);
+  return !!(m && m.needsKey);
+}
+function isPlatformGame(g) { return productPlatforms(g).length > 0; }
+function gameNeedsPlatformStep(g) { return isPlatformGame(g); }
+function gameNeedsPickerStep(g) { return gameNeedsServerStep(g) || gameNeedsPlatformStep(g); }
+// Info for the order wizard; falls back to meta for products added in Admin.
+function digitalInfoFor(game) {
+  if (DIGITAL_INFO[game]) return DIGITAL_INFO[game];
+  const m = digitalMeta(game);
+  const field = (m && m.field) || 'email';
+  const name = (m && m.name) || game;
+  return { name, field, fieldLabel: field === 'telegram' ? 'Telegram Username' : 'Email',
+    placeholder: field === 'telegram' ? 'ဥပမာ @username' : 'ဥပမာ name@gmail.com',
+    inputmode: field === 'telegram' ? 'text' : 'email', maxLength: field === 'telegram' ? 33 : 60,
+    packLabel: name + ' Pack ရွေးရန်' };
+}
+function digitalCardLogoHtml(m) {
+  const shield = '<svg viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>';
+  if (m && m.logo) {
+    return '<img src="' + escapeHtml(m.logo) + '" alt="" loading="lazy" onerror="this.onerror=null;this.style.display=\'none\';this.nextElementSibling.style.display=\'block\';">' + shield.replace('<svg ', '<svg style="display:none;" ');
+  }
+  return shield;
+}
+// Rebuild the Digital product cards from catalog meta (Admin-added brands
+// appear automatically). No meta yet -> keep the static cards in the HTML.
+function renderDigitalGridFromMeta() {
+  if (typeof digitalGrid === 'undefined' || !digitalGrid || !DIGITAL_META) return;
+  const ids = Object.keys(DIGITAL_META).filter(id => DIGITAL_META[id] && DIGITAL_META[id].active !== false);
+  if (!ids.length) return;
+  digitalGrid.innerHTML = ids.map(id => {
+    const m = DIGITAL_META[id];
+    const sub = escapeHtml(m.name || id) + ((m.platforms && m.platforms.length) ? ' • ' + m.platforms.map(escapeHtml).join(' / ') : '');
+    return '<div class="server-card" data-game="' + escapeHtml(id) + '" data-dcat="' + escapeHtml(m.cat || 'vpn') + '">' +
+      '<div class="server-icon"><span class="digital-icon">' + digitalCardLogoHtml(m) + '</span></div>' +
+      '<div class="server-name">' + escapeHtml(m.name || id) + '</div>' +
+      '<div class="server-sub">' + sub + '</div></div>';
+  }).join('');
+  bindDigitalCards();
+  if (typeof filterDigitalCats === 'function') filterDigitalCats(currentDigitalCat);
+}
 // Flat list like PACKS, but each group also carries which Sever (country)
 // it belongs to — e.g. {server:"Malay/ Singapore", group:"2X Diamond", items:[...]}.
 // Populated from the "Ban Sever" sheet tab. BAN_SERVERS is the ordered list
@@ -3785,7 +3921,29 @@ function renderBanServerGrid() {
   `).join('');
   wireServerCards();
 }
+// Builds the PC / Mobile picker cards for VPN brands from the product's
+// platforms (Admin-editable), same card style as the server picker.
+function platformIcon(p) {
+  if (p === 'PC') return '<svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="var(--accent-cyan)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="16" x2="12" y2="20"/></svg>';
+  if (p === 'Mobile') return '<svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="var(--accent-cyan)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><line x1="10.5" y1="18.5" x2="13.5" y2="18.5"/></svg>';
+  return '<svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="var(--accent-cyan)" stroke-width="1.6"><circle cx="12" cy="12" r="9.5"/><ellipse cx="12" cy="12" rx="4.3" ry="9.5"/><line x1="2.5" y1="12" x2="21.5" y2="12"/></svg>';
+}
+function renderPlatformGrid(platforms) {
+  if (!platforms || !platforms.length) {
+    serverGrid.innerHTML = '<div class="pack-empty-msg">Platform မရှိသေးပါ</div>';
+    return;
+  }
+  serverGrid.innerHTML = platforms.map(p => `
+    <div class="server-card" data-server="${escapeHtml(p)}">
+      <div class="server-icon">${platformIcon(p)}</div>
+      <div class="server-name">${escapeHtml(p)}</div>
+      <div class="server-sub">${p === 'PC' ? 'Windows / Mac' : p === 'Mobile' ? 'Android / iOS' : 'VPN'}</div>
+    </div>
+  `).join('');
+  wireServerCards();
+}
 const afterServerSection = document.getElementById('afterServerSection');
+const serverSectionLabel = document.getElementById('serverSectionLabel');
 const restOfForm = document.getElementById('restOfForm');
 const zoneIdField = document.getElementById('zoneIdField');
 const packSectionLabel = document.getElementById('packSectionLabel');
@@ -3823,13 +3981,13 @@ let currentCategory = 'all';
 // MLBB (Normal/2X/Weekly Pass/Twilight Pass/Bundle groups) does.
 function buildCategoryTabs() {
   if (!categoryTabsEl) return;
-  if (!currentGame || (gameNeedsServerStep(currentGame) && !currentServer)) {
+  if (!currentGame || (gameNeedsPickerStep(currentGame) && !currentServer)) {
     categoryTabsEl.style.display = 'none';
     categoryTabsEl.innerHTML = '';
     return;
   }
   const visiblePacks = activePacks().filter(grp =>
-    !gameNeedsServerStep(currentGame) || groupMatchesServer(currentGame, grp)
+    !gameNeedsPickerStep(currentGame) || groupMatchesServer(currentGame, grp)
   );
   const present = new Set(visiblePacks.map(grp => classifyCategory(grp.group)));
   if (present.size <= 1) {
@@ -3864,6 +4022,9 @@ function gameNeedsServerStep(g) {
 function groupMatchesServer(game, grp) {
   if (game === 'mlbb') return classifyGroup(grp.group) === currentServer;
   if (game === 'mlbbban') return grp.server === currentServer;
+  // VPN brands: a group belongs to the picked Platform; groups with no
+  // .server at all show for every Platform (old catalog entries).
+  if (isPlatformGame(game)) return !grp.server || grp.server === currentServer;
   return true;
 }
 
@@ -3877,7 +4038,10 @@ function activePacks() {
   if (currentGame === 'chatgpt') return digitalCatalogPacks('chatgpt', PACKS_CHATGPT);
   if (currentGame === 'claude') return digitalCatalogPacks('claude', PACKS_CLAUDE);
   if (currentGame === 'canva') return digitalCatalogPacks('canva', PACKS_CANVA);
-  if (currentGame === 'vpn') return digitalCatalogPacks('vpn', PACKS_VPN);
+  if (currentGame === 'express') return digitalCatalogPacks('express', PACKS_EXPRESS);
+  if (currentGame === 'nord') return digitalCatalogPacks('nord', PACKS_NORD);
+  // Products added in Admin have no baked-in fallback — catalog only.
+  if (isDigitalGame(currentGame)) return digitalCatalogPacks(currentGame, []);
   return PACKS;
 }
 
@@ -3892,7 +4056,10 @@ function gameDisplayName(g) {
   if (g === 'chatgpt') return 'ChatGPT Plus';
   if (g === 'claude') return 'Claude Pro';
   if (g === 'canva') return 'Canva Pro';
-  if (g === 'vpn') return 'VPN Premium';
+  if (g === 'express') return 'ExpressVPN';
+  if (g === 'nord') return 'NordVPN';
+  const m = digitalMeta(g);
+  if (m && m.name) return m.name;
   return 'MLBB Diamond';
 }
 
@@ -3947,7 +4114,7 @@ function updatePackLockUI() {
 
 function buildPackDropdown() {
   if (!currentGame) return;
-  if (gameNeedsServerStep(currentGame) && !currentServer) return; // wait for server pick too
+  if (gameNeedsPickerStep(currentGame) && !currentServer) return; // wait for server/platform pick too
   updatePackLockUI();
   packGrid.innerHTML = '';
   buildCategoryTabs();
@@ -3960,7 +4127,7 @@ function buildPackDropdown() {
 
   let found = false;
   packs.forEach((grp, gi) => {
-    if (gameNeedsServerStep(currentGame) && !groupMatchesServer(currentGame, grp)) return;
+    if (gameNeedsPickerStep(currentGame) && !groupMatchesServer(currentGame, grp)) return;
     if (currentCategory !== 'all' && classifyCategory(grp.group) !== currentCategory) return;
     found = true;
 
@@ -3974,13 +4141,19 @@ function buildPackDropdown() {
 
     grp.items.forEach((item, ii) => {
       const card = document.createElement('div');
-      card.className = 'pack-card';
+      const outOfStock = item.active === false;
+      card.className = 'pack-card' + (outOfStock ? ' out-of-stock' : '');
       card.dataset.value = `${gi}-${ii}`;
       card.innerHTML = `
         <div class="pc-label">${item.label}</div>
         <div class="pc-price">${item.price.toLocaleString()} Ks</div>
+        ${outOfStock ? '<div class="pc-oos">ပစ္စည်းပြတ်နေပါတယ်</div>' : ''}
       `;
       card.addEventListener('click', () => {
+        if (outOfStock) {
+          showToast('ဒီ Pack က ခဏ ပစ္စည်းပြတ်နေပါတယ်', 'error');
+          return;
+        }
         if (!isPlayerInfoValid()) {
           showToast("ပထမဆုံး " + accountFieldLabel() + " ကို ဖြည့်ပါ", "error");
           playerIdInput.focus();
@@ -3993,6 +4166,15 @@ function buildPackDropdown() {
     });
     packGrid.appendChild(row);
   });
+
+  // Buy-on-demand: keys are bought only after the customer orders, so tell
+  // them up front how long the key takes (30 min – 1 hour).
+  if (found && isDigitalGame(currentGame) && productNeedsKey(currentGame)) {
+    const note = document.createElement('div');
+    note.className = 'key-delivery-note';
+    note.innerHTML = '⏱️ Key ကို Order တင်ပြီးမှ ဝယ်ပေးတာမို့ <b>မိနစ် ၃၀ မှ ၁ နာရီအတွင်း</b> ရရှိပါမည်။';
+    packGrid.appendChild(note);
+  }
 
   if (!found) {
     packGrid.innerHTML = '<div class="pack-empty-msg">Pack မရှိသေးပါ</div>';
@@ -4028,6 +4210,9 @@ function selectGame(game, cardEl) {
   cardEl.classList.add('pop');
   serverGrid.querySelectorAll('.server-card').forEach(c => c.classList.remove('selected'));
   resetDownstreamSelections();
+  // The picker label says "Server" for MLBB and "Platform" for VPN brands;
+  // reset it here, the platform branch below overrides it.
+  if (typeof serverSectionLabel !== 'undefined' && serverSectionLabel) serverSectionLabel.textContent = 'Server ရွေးရန်';
 
   // Move from the game-selection screen to the dedicated pack-selection
   // screen for this game, carrying its icon/name into a small header.
@@ -4124,7 +4309,7 @@ function selectGame(game, cardEl) {
       afterServerSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     });
   } else if (isDigitalGame(game)) {
-    const info = DIGITAL_INFO[game];
+    const info = digitalInfoFor(game);
     packSectionLabel.textContent = info.packLabel;
     zoneIdField.style.display = 'none';
     zoneIdInput.required = false;
@@ -4132,7 +4317,7 @@ function selectGame(game, cardEl) {
     // Digital orders need a username/email, not a numeric Player ID.
     playerIdLabel.textContent = info.fieldLabel;
     playerIdInput.setAttribute('inputmode', info.inputmode);
-    playerIdInput.pattern = game === 'telegram' ? '@?[A-Za-z0-9_]{5,32}' : '.+@.+\\..+';
+    playerIdInput.pattern = info.field === 'telegram' ? '@?[A-Za-z0-9_]{5,32}' : '.+@.+\\..+';
     playerIdInput.maxLength = info.maxLength;
     playerIdInput.placeholder = info.placeholder;
     playerIdInput.classList.remove('invalid');
@@ -4141,7 +4326,7 @@ function selectGame(game, cardEl) {
     // numeric game ID so it cannot block the pack grid.
     try {
       const savedDigital = localStorage.getItem('kds_digitalAccount') || '';
-      if (savedDigital && (game === 'telegram' ? /^@?[A-Za-z0-9_]{5,32}$/.test(savedDigital) : EMAIL_PATTERN.test(savedDigital))) playerIdInput.value = savedDigital;
+      if (savedDigital && (info.field === 'telegram' ? /^@?[A-Za-z0-9_]{5,32}$/.test(savedDigital) : EMAIL_PATTERN.test(savedDigital))) playerIdInput.value = savedDigital;
       else if (playerIdInput.value && !idPattern().test(playerIdInput.value)) playerIdInput.value = '';
     } catch (e) { if (playerIdInput.value && !idPattern().test(playerIdInput.value)) playerIdInput.value = ''; }
     verifiedUsername = null;
@@ -4151,15 +4336,28 @@ function selectGame(game, cardEl) {
     if (idHelpBoxEl) idHelpBoxEl.classList.remove('shown');
     setAccountLabel(true);
     restrictedServerNotice.style.display = 'none';
-    serverSection.classList.remove('shown');
-    serverSection.style.display = 'none';
-    // Digital products have no server step — go straight to the pack grid
-    buildPackDropdown();
-    afterServerSection.style.display = 'block';
-    requestAnimationFrame(() => {
-      afterServerSection.classList.add('shown');
-      afterServerSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    });
+    // VPN brands need a Platform step (PC / Mobile) before packs — the same
+    // picker flow MLBB uses for servers, but WITHOUT Zone ID or username
+    // verification (platform games are not server-step games).
+    if (gameNeedsPlatformStep(game)) {
+      if (serverSectionLabel) serverSectionLabel.textContent = 'Platform ရွေးရန်';
+      renderPlatformGrid(productPlatforms(game));
+      serverSection.style.display = 'block';
+      requestAnimationFrame(() => {
+        serverSection.classList.add('shown');
+        serverSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+    } else {
+      serverSection.classList.remove('shown');
+      serverSection.style.display = 'none';
+      // Digital products have no server step — go straight to the pack grid
+      buildPackDropdown();
+      afterServerSection.style.display = 'block';
+      requestAnimationFrame(() => {
+        afterServerSection.classList.add('shown');
+        afterServerSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+    }
   } else {
     packSectionLabel.textContent = 'Token Pack ရွေးရန်';
     zoneIdField.style.display = 'none';
@@ -4192,9 +4390,10 @@ gameGrid.querySelectorAll('.server-card').forEach(card => {
    (Telegram / AI / Design / VPN). A product card reuses the exact same
    wizard as a game (selectGame -> packs -> payment -> receipt), only the
    account field changes (Telegram @username, Gmail/Email for the rest). */
-function isDigitalGame(g) { return DIGITAL_GAMES.indexOf(g) !== -1; }
+function isDigitalGame(g) { return DIGITAL_GAMES.indexOf(g) !== -1 || !!(typeof DIGITAL_META !== 'undefined' && DIGITAL_META && DIGITAL_META[g]); }
 function accountFieldLabel() {
   if (currentGame && DIGITAL_INFO[currentGame]) return DIGITAL_INFO[currentGame].fieldLabel;
+  if (currentGame) { const m = digitalMeta(currentGame); if (m) return m.field === 'telegram' ? 'Telegram Username' : 'Email'; }
   return 'Player ID';
 }
 const digitalGrid = document.getElementById('digitalGrid');
@@ -4236,9 +4435,15 @@ document.querySelectorAll('.shop-mode-tab').forEach(function (btn) {
 document.querySelectorAll('.digital-cat').forEach(function (btn) {
   btn.addEventListener('click', function () { filterDigitalCats(btn.dataset.dcat); });
 });
-digitalGrid.querySelectorAll('.server-card').forEach(function (card) {
-  card.addEventListener('click', function () { selectGame(card.dataset.game, card); });
-});
+// Click binding for the Digital product cards — a function (not a one-off
+// loop) so the grid can be rebuilt from catalog meta and re-bound.
+function bindDigitalCards() {
+  digitalGrid.querySelectorAll('.server-card').forEach(function (card) {
+    card.addEventListener('click', function () { selectGame(card.dataset.game, card); });
+  });
+}
+bindDigitalCards();
+renderDigitalGridFromMeta();
 
 /* ---------- 3-page app shell: Home / Orders / Support ---------- */
 const appPages = {
@@ -4488,7 +4693,17 @@ function renderTrackResult(o, orderId) {
     : 'var(--accent-gold)';
 
   document.getElementById('trOrderId').textContent = '#' + o.orderId;
-  document.getElementById('trPack').textContent = o.packLabel + (o.quantity > 1 ? ' x' + o.quantity : '');
+  document.getElementById('trPack').textContent = o.packLabel + (o.quantity > 1 ? ' x' + o.quantity : '') + (o.productType === 'digital' && o.server ? ' • ' + o.server : '');
+  // License key: shown only once the order is completed and a key was assigned.
+  const keyRow = document.getElementById('trKeyRow');
+  if (keyRow) {
+    if (o.status === 'completed' && o.licenseKey) {
+      document.getElementById('trLicenseKey').textContent = o.licenseKey;
+      keyRow.style.display = '';
+    } else {
+      keyRow.style.display = 'none';
+    }
+  }
   document.getElementById('trTotal').textContent = (o.totalPrice || o.packPrice || 0).toLocaleString() + ' Ks';
   document.getElementById('trPlayerId').textContent = o.playerId + (o.username ? ' (' + o.username + ')' : '');
   document.getElementById('trTime').textContent = o.createdAt && o.createdAt.toDate
@@ -4521,6 +4736,13 @@ function watchTrackOrder(orderId) {
 }
 
 trackCheckBtn.addEventListener('click', checkOrderStatus);
+document.getElementById('trCopyKeyBtn').addEventListener('click', () => {
+  const key = document.getElementById('trLicenseKey').textContent;
+  if (!key || key === '—') return;
+  navigator.clipboard.writeText(key)
+    .then(() => showToast('Key ကူးယူပြီးပါပြီ', 'success'))
+    .catch(() => showToast('Copy မအောင်မြင်ပါ — manual ကူးပါ', 'error'));
+});
 trackOrderIdInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') checkOrderStatus(); });
 
   /* =====================================================================
@@ -4573,6 +4795,8 @@ trackOrderIdInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') ch
       quantity: o.quantity || 1,
       totalPrice: (o.totalPrice !== undefined && o.totalPrice !== null) ? o.totalPrice : (o.packPrice || 0),
       playerId: o.playerId ? String(o.playerId) : '',
+      server: o.server || '',
+      licenseKey: o.licenseKey || '',
       ownerUid: o.ownerUid || null,
       status: o.status || 'pending',
       createdAtMs: createdAtMs,
@@ -4625,7 +4849,8 @@ trackOrderIdInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') ch
           <span class="history-id">#${escapeHtml(o.orderId)}</span>
           <span class="history-badge ${escapeHtml(o.status)}">${historyStatusLabel(o.status)}</span>
         </div>
-        <div class="history-meta">${escapeHtml(o.gameName || '')}${o.gameName && o.packLabel ? ' • ' : ''}${escapeHtml(o.packLabel)}${o.quantity > 1 ? ' x' + o.quantity : ''}</div>
+        <div class="history-meta">${escapeHtml(o.gameName || '')}${o.gameName && o.packLabel ? ' • ' : ''}${escapeHtml(o.packLabel)}${o.quantity > 1 ? ' x' + o.quantity : ''}${o.server ? ' • ' + escapeHtml(o.server) : ''}</div>
+        ${o.status === 'completed' && o.licenseKey ? `<div class="history-key">🔑 License Key: <code>${escapeHtml(o.licenseKey)}</code> <button type="button" class="history-btn" data-copykey="${escapeHtml(o.licenseKey)}">Copy</button></div>` : ''}
         <div class="history-meta">${(o.totalPrice || 0).toLocaleString()} Ks • ${formatHistoryDate(o.createdAtMs)}${o.playerId ? ' • ID: ' + escapeHtml(o.playerId) : ''}</div>
         <div class="history-actions">
           <button type="button" class="history-btn" data-check="${escapeHtml(o.orderId)}">Status စစ်မည်</button>
@@ -4638,6 +4863,7 @@ trackOrderIdInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') ch
   document.getElementById('myOrdersList').addEventListener('click', (e) => {
     const checkBtn = e.target.closest('[data-check]');
     const copyBtn = e.target.closest('[data-copy]');
+    const copyKeyBtn = e.target.closest('[data-copykey]');
     const removeBtn = e.target.closest('[data-remove]');
     if (checkBtn) {
       trackOrderIdInput.value = checkBtn.dataset.check;
@@ -4646,6 +4872,10 @@ trackOrderIdInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') ch
     } else if (copyBtn) {
       navigator.clipboard.writeText(copyBtn.dataset.copy)
         .then(() => showToast('Order ID ကူးယူပြီးပါပြီ', 'success'))
+        .catch(() => showToast('Copy မအောင်မြင်ပါ — manual ကူးပါ', 'error'));
+    } else if (copyKeyBtn) {
+      navigator.clipboard.writeText(copyKeyBtn.dataset.copykey)
+        .then(() => showToast('Key ကူးယူပြီးပါပြီ', 'success'))
         .catch(() => showToast('Copy မအောင်မြင်ပါ — manual ကူးပါ', 'error'));
     } else if (removeBtn) {
       const id = removeBtn.dataset.remove;
@@ -5423,7 +5653,7 @@ finalConfirmBtn.addEventListener('click', async () => {
         ownerUid: currentUid || null,
         game: currentGame,
         productType: isDigitalGame(currentGame) ? 'digital' : 'game',
-        server: gameNeedsServerStep(currentGame) ? currentServer : null,
+        server: gameNeedsPickerStep(currentGame) ? currentServer : null,
         playerId,
         zoneId: gameNeedsServerStep(currentGame) ? zoneId : null,
         username: verifiedUsername || null,
@@ -5445,12 +5675,13 @@ finalConfirmBtn.addEventListener('click', async () => {
 
     const serverDisplayName = gameNeedsServerStep(currentGame)
       ? (currentGame === 'mlbbban' ? currentServer : (currentServer === 'mm' ? 'Myanmar Server' : 'Global Server'))
+      : gameNeedsPlatformStep(currentGame) ? (currentServer || gameDisplayName(currentGame))
       : gameDisplayName(currentGame);
 
     const caption =
       `🆕 Order အသစ် #${orderId}\n` +
       `🎮 ${gameDisplayName(currentGame)}\n` +
-      `🖥️ Sever: ${serverDisplayName}\n` +
+      `🖥️ ${isPlatformGame(currentGame) ? 'Platform' : 'Sever'}: ${serverDisplayName}\n` +
       `👤 ${accountFieldLabel()}: ${playerId}${verifiedUsername ? ' (' + verifiedUsername + ')' : ''}\n` +
       (gameNeedsServerStep(currentGame) ? `🌍 Zone ID: ${zoneId}\n` : '') +
       `💎 Pack: ${item.label} x${qty}\n` +
@@ -5473,15 +5704,16 @@ finalConfirmBtn.addEventListener('click', async () => {
     // Save to My Orders history (localStorage) so the customer keeps the
     // order code even after closing the tab. Firestore already has the
     // same order; the history list merges the two by orderId.
-    saveMyOrder({ orderId, game: currentGame, gameName: gameDisplayName(currentGame), playerId, zoneId, ownerUid: currentUid || null, packLabel: item.label, quantity: qty, totalPrice, paymentMethod: selectedMethod, status: 'pending', createdAtMs: Date.now(), source: 'local' });
+    saveMyOrder({ orderId, game: currentGame, gameName: gameDisplayName(currentGame), playerId, zoneId, server: gameNeedsPickerStep(currentGame) ? currentServer : null, ownerUid: currentUid || null, packLabel: item.label, quantity: qty, totalPrice, paymentMethod: selectedMethod, status: 'pending', createdAtMs: Date.now(), source: 'local' });
     closeModal();
     document.getElementById('orderIdDisplay').textContent = "#" + orderId;
     document.getElementById('orderSummary').innerHTML = `
-      <div class="os-row"><span class="os-k">Server</span><span class="os-v">${escapeHtml(serverDisplayName)}</span></div>
+      <div class="os-row"><span class="os-k">${isPlatformGame(currentGame) ? 'Platform' : 'Server'}</span><span class="os-v">${escapeHtml(serverDisplayName)}</span></div>
       <div class="os-row"><span class="os-k">Pack</span><span class="os-v">${escapeHtml(item.label)} x${qty}</span></div>
       <div class="os-row"><span class="os-k">စုစုပေါင်း</span><span class="os-v">${totalPrice.toLocaleString()} Ks</span></div>
       <div class="os-row"><span class="os-k">${escapeHtml(accountFieldLabel())}</span><span class="os-v">${escapeHtml(playerId)}${verifiedUsername ? ' (' + escapeHtml(verifiedUsername) + ')' : ''}</span></div>
       ${gameNeedsServerStep(currentGame) ? `<div class="os-row"><span class="os-k">Zone ID</span><span class="os-v">${escapeHtml(zoneId)}</span></div>` : ''}
+      ${isDigitalGame(currentGame) && productNeedsKey(currentGame) ? `<div class="os-row"><span class="os-k">⏱️ Key</span><span class="os-v">မိနစ် ၃၀ မှ ၁ နာရီအတွင်း ရရှိပါမည်</span></div>` : ''}
     `;
     form.style.display = 'none';
     document.getElementById('successPanel').style.display = 'block';
