@@ -335,6 +335,21 @@
   .cat-product h3{font-family:var(--font-display);font-size:15px;font-weight:700;}
   .cat-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;}
   .cat-group{margin-bottom:14px;}
+  .cat-group-top{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px;}
+  .cat-group-top .cat-group-name{flex:1;margin-bottom:0;}
+  .cat-group-server{padding:9px 10px;border-radius:12px;background:var(--input-bg);border:1px solid var(--border-glass);color:var(--text-primary);font-family:var(--font-body);font-size:13px;outline:none;max-width:170px;}
+  .cat-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:12px;padding:10px;border:1px solid var(--border-glass);border-radius:12px;background:var(--panel);}
+  .cat-meta label{font-size:11.5px;color:var(--text-muted);display:flex;flex-direction:column;gap:4px;font-weight:700;}
+  .cat-meta input[type=text], .cat-meta select{padding:8px 10px;border-radius:10px;background:var(--input-bg);border:1px solid var(--border-glass);color:var(--text-primary);font-family:var(--font-body);font-size:13px;outline:none;min-width:0;}
+  .cat-meta input:focus, .cat-meta select:focus{border-color:var(--accent-cyan);}
+  .cat-meta-key{flex-direction:row !important;align-items:center;gap:6px !important;color:var(--text-primary) !important;}
+  .cat-meta-key input[type=checkbox]{width:18px;height:18px;accent-color:var(--accent-blue);cursor:pointer;}
+  .key-form{display:grid;gap:8px;}
+  .key-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:7px 10px;border:1px solid var(--border-glass);border-radius:10px;margin-bottom:6px;font-size:12.5px;}
+  .key-row code{font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:700;}
+  .key-row.used{opacity:.65;}
+  .key-row .cat-del{margin-left:auto;}
+  .manual-key-input{padding:9px 10px;border-radius:12px;background:var(--input-bg);border:1px solid var(--border-glass);color:var(--text-primary);font-family:var(--font-body);font-size:13px;outline:none;}
   .cat-group-name{width:100%;padding:9px 10px;border-radius:12px;background:var(--input-bg);border:1px solid var(--border-glass);color:var(--text-primary);font-family:var(--font-display);font-size:13.5px;font-weight:700;margin-bottom:8px;outline:none;}
   .cat-group-name:focus{border-color:var(--accent-cyan);}
   .cat-row{display:grid;grid-template-columns:1.2fr 1fr 1fr auto auto auto;gap:8px;align-items:center;margin-bottom:8px;}
@@ -450,11 +465,27 @@
 
       <div class="card">
         <div class="section-label">Digital Product ဈေးနှုန်း သတ်မှတ်ရန်</div>
-        <p class="hint" style="margin-bottom:14px;">ရောင်းဈေးက ဆိုင်မှာ ချက်ချင်းပြောင်းပါတယ်။ အရင်းဈေးက Admin ပဲမြင်ရပါတယ် — ဝယ်သူ မမြင်ရပါဘူး။ Pack ကို ပိတ်ထားရင် ဆိုင်မှာ မပြတော့ပါဘူး။ ပြင်ပြီးရင် အောက်က <b>သိမ်းမည်</b> ကို နှိပ်ပါ။</p>
+        <p class="hint" style="margin-bottom:14px;">ရောင်းဈေးက ဆိုင်မှာ ချက်ချင်းပြောင်းပါတယ်။ အရင်းဈေးက Admin ပဲမြင်ရပါတယ် — ဝယ်သူ မမြင်ရပါဘူး။ Pack ကို ပိတ်ထားရင် ဆိုင်မှာ <b>“ပစ္စည်းပြတ်နေပါတယ်”</b> လို့ မီးခိုးရောင်နဲ့ ပြပါမယ်။ Key လိုတဲ့ Product (VPN) တွေက Order ရမှ Key ဝယ်ပေးတာမို့ Stock ဖြည့်စရာ မလိုပါဘူး — Order ပြီးရင် Order Card ကနေ Key ထည့်ပေးပါ။ ပြင်ပြီးရင် အောက်က <b>သိမ်းမည်</b> ကို နှိပ်ပါ။</p>
         <div id="catalogEditor"><div class="empty-msg">Loading...</div></div>
         <div class="save-row">
           <button type="button" class="submit-btn" id="saveCatalogBtn" style="width:auto;padding:13px 28px;font-size:15px;">💾 ဈေးနှုန်းများ သိမ်းမည်</button>
           <span class="save-status" id="catalogSaveStatus"></span>
+        </div>
+      </div>
+    </div>
+
+      <div class="card">
+        <div class="section-label">Product အသစ် ထည့်ရန်</div>
+        <p class="hint" style="margin-bottom:14px;">Brand အသစ် (ဥပမာ Surfshark) ထည့်ချင်ရင် ဒီမှာ ထည့်ပါ — ထည့်ပြီးရင် အပေါ်က Editor မှာ Pack တွေ ထည့်ပြီး <b>သိမ်းမည်</b> ကို နှိပ်မှ ဆိုင်မှာ ပေါ်ပါမယ်။</p>
+        <div class="key-form">
+          <input type="text" id="addProductId" class="cat-group-name" placeholder="id — ဥပမာ surfshark (အင်္ဂလိပ်စာလုံးအသေးသာ)" style="margin-bottom:0;">
+          <input type="text" id="addProductName" class="cat-group-name" placeholder="နာမည် — ဥပမာ Surfshark" style="margin-bottom:0;">
+          <select id="addProductCat" class="cat-group-name" style="margin-bottom:0;"><option value="vpn">VPN</option><option value="ai">AI</option><option value="design">Design</option><option value="telegram">Telegram</option></select>
+          <input type="text" id="addProductLogo" class="cat-group-name" placeholder="Logo URL (မရှိရင် ဗလာ)" style="margin-bottom:0;">
+          <select id="addProductField" class="cat-group-name" style="margin-bottom:0;"><option value="email">Email</option><option value="telegram">Telegram @username</option></select>
+          <input type="text" id="addProductPlatforms" class="cat-group-name" placeholder="Platform များ — ဥပမာ PC, Mobile" style="margin-bottom:0;">
+          <label class="cat-meta-key"><input type="checkbox" id="addProductNeedsKey"> 🔑 Key လိုတယ်</label>
+          <button type="button" class="mini-btn" id="addProductBtn">＋ Product ထည့်မည်</button>
         </div>
       </div>
     </div>
@@ -672,7 +703,7 @@ function renderOrders() {
         </div>
         <div class="col">
           <div class="k">Pack</div>
-          <div class="v">${escapeHtml(o.packLabel)}${o.quantity && o.quantity > 1 ? ` x${o.quantity}` : ''}${o.productType === 'digital' ? `<div style="font-size:11px;color:var(--text-muted);margin-top:2px;">💎 ${escapeHtml(DIGITAL_PRODUCT_NAMES[o.game] || o.game || '')}</div>` : ''}</div>
+          <div class="v">${escapeHtml(o.packLabel)}${o.quantity && o.quantity > 1 ? ` x${o.quantity}` : ''}${o.productType === 'digital' ? `<div style="font-size:11px;color:var(--text-muted);margin-top:2px;">💎 ${escapeHtml(liveProductName(o.game))}${o.server ? ' • ' + escapeHtml(o.server) : ''}</div>` : ''}</div>
         </div>
         <div class="col">
           <div class="k">Total</div>
@@ -688,6 +719,7 @@ function renderOrders() {
       </div>
       ${o.email ? `<div style="font-size:11.5px;color:var(--text-muted);margin-top:6px;">✉️ ${escapeHtml(o.email)}</div>` : ''}
       ${digitalProfitLine(o)}
+      ${digitalKeyLine(o)}
       <div class="order-actions">
         ${o.status === 'pending' ? `
           <button class="act-btn approve" data-action="completed" data-id="${o.id}">✓ Approve</button>
@@ -706,6 +738,31 @@ function renderOrders() {
   list.querySelectorAll('.act-btn.delete').forEach(btn => {
     btn.addEventListener('click', () => deleteOrder(btn.dataset.deleteId, btn.dataset.orderLabel, btn));
   });
+  list.querySelectorAll('[data-copykey]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      navigator.clipboard.writeText(btn.dataset.copykey)
+        .then(() => showToast('Key ကူးယူပြီးပါပြီ', 'success'))
+        .catch(() => showToast('Copy မအောင်မြင်ပါ — manual ကူးပါ', 'error'));
+    });
+  });
+  list.querySelectorAll('[data-manual-key]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const input = btn.closest('.order-card').querySelector('.manual-key-input');
+      const key = input ? input.value.trim() : '';
+      if (!key) { showToast('Key ရိုက်ထည့်ပေးပါ', 'error'); return; }
+      btn.disabled = true;
+      try {
+        await db.collection('orders').doc(btn.dataset.manualKey).update({ licenseKey: key });
+        showToast('Key ထည့်ပြီးပါပြီ — ဝယ်သူ Order Status မှာ မြင်ရပါပြီ', 'success');
+      } catch (err) { console.error(err); showToast('Key ထည့်ခြင်း မအောင်မြင်ပါ: ' + err.message, 'error'); btn.disabled = false; }
+    });
+  });
+}
+function digitalKeyLine(o) {
+  if (o.productType !== 'digital') return '';
+  if (o.licenseKey) return `<div style="font-size:12px;margin-top:6px;">🔑 Key: <code style="font-family:ui-monospace,Menlo,Consolas,monospace;font-weight:700;">${escapeHtml(o.licenseKey)}</code> <button type="button" class="mini-btn" data-copykey="${escapeHtml(o.licenseKey)}">Copy</button></div>`;
+  if (o.status === 'completed' && productNeedsKey(o.game)) return `<div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;"><span style="font-size:12px;color:var(--text-muted);">🔑 Key မပါသေးပါ:</span><input type="text" class="manual-key-input" placeholder="License Key ရိုက်ထည့်ပါ" style="flex:1;min-width:140px;"><button type="button" class="act-btn approve" data-manual-key="${o.id}">Key ထည့်မည်</button></div>`;
+  return '';
 }
 
 async function deleteOrder(docId, label, btn) {
@@ -734,16 +791,22 @@ async function updateStatus(docId, newStatus, btn) {
     const order = allOrders.find(o => o.id === docId);
     if (order && order.productType === 'digital') {
       if (newStatus === 'completed') {
-        const cost = costOf(order.game, order.packLabel);
+        const cost = costOf(order.game, order.server, order.packLabel);
         if (cost !== null) {
           const qty = order.quantity || 1;
           const revenue = order.totalPrice || (order.packPrice || 0) * qty;
           update.costPrice = cost;
           update.profit = revenue - cost * qty;
         }
+        // Buy-on-demand: no key stock — the Admin buys the key after the
+        // order and pastes it into the order card (manual key field).
       } else {
         update.costPrice = firebase.firestore.FieldValue.delete();
         update.profit = firebase.firestore.FieldValue.delete();
+        // Re-opening keeps the key on the order; rejecting removes it.
+        if (newStatus === 'rejected' && order.licenseKey) {
+          update.licenseKey = firebase.firestore.FieldValue.delete();
+        }
       }
     }
     await db.collection('orders').doc(docId).update(update);
@@ -768,10 +831,10 @@ async function updateStatus(docId, newStatus, btn) {
    stamps its per-unit cost + total profit onto the order doc, so later
    cost changes never rewrite history. Re-opening/rejecting clears the stamp.
    ========================================================= */
-const DIGITAL_PRODUCT_IDS = ['telegram', 'gemini', 'chatgpt', 'claude', 'canva', 'vpn'];
+const DIGITAL_PRODUCT_IDS = ['telegram', 'gemini', 'chatgpt', 'claude', 'canva', 'express', 'nord'];
 const DIGITAL_PRODUCT_NAMES = {
   telegram: 'Telegram Premium', gemini: 'Google AI Pro (Gemini)', chatgpt: 'ChatGPT Plus',
-  claude: 'Claude Pro', canva: 'Canva Pro', vpn: 'VPN Premium'
+  claude: 'Claude Pro', canva: 'Canva Pro', express: 'ExpressVPN', nord: 'NordVPN'
 };
 const DEFAULT_DIGITAL_CATALOG = {
   telegram: [{ group: 'Telegram Premium 👑', items: [
@@ -790,17 +853,63 @@ const DEFAULT_DIGITAL_CATALOG = {
     { label: '3 လ', price: 27000, active: true },
     { label: '6 လ', price: 54000, active: true },
     { label: '1 နှစ်', price: 102000, active: true } ] }],
-  vpn: [{ group: 'VPN Premium 🛡️', items: [
-    { label: '1 လ', price: 20000, active: true },
-    { label: '3 လ', price: 50000, active: true },
-    { label: '1 နှစ်', price: 120000, active: true } ] }]
+  express: [{ server: 'PC', group: 'ExpressVPN — PC 💻', items: [
+    { label: '1 လ', price: 65000, active: true },
+    { label: '3 လ', price: 175000, active: true },
+    { label: '1 နှစ်', price: 450000, active: true } ] },
+    { server: 'Mobile', group: 'ExpressVPN — Mobile 📱', items: [
+    { label: '1 လ', price: 45000, active: true },
+    { label: '3 လ', price: 120000, active: true },
+    { label: '1 နှစ်', price: 320000, active: true } ] }],
+  nord: [{ server: 'PC', group: 'NordVPN — PC 💻', items: [
+    { label: '1 လ', price: 65000, active: true },
+    { label: '3 လ', price: 170000, active: true },
+    { label: '1 နှစ်', price: 380000, active: true } ] },
+    { server: 'Mobile', group: 'NordVPN — Mobile 📱', items: [
+    { label: '1 လ', price: 40000, active: true },
+    { label: '3 လ', price: 110000, active: true },
+    { label: '1 နှစ်', price: 280000, active: true } ] }]
 };
 let digitalCatalog = null;
 let digitalCosts = {};
-
-function costKey(game, label) { return game + '|' + label; }
-function costOf(game, label) {
-  const v = digitalCosts[costKey(game, label)];
+// Product meta — the Admin-editable product list (names, categories, logos,
+// account field, platforms, key flag). Lives in config/digitalCatalog.meta.
+// DEFAULT_DIGITAL_META is the fallback before the Admin saves anything;
+// once meta is saved, ITS keys are the product list (a deleted product stays
+// deleted). The storefront renders its product cards from the same meta.
+const DEFAULT_DIGITAL_META = {
+  telegram: { name: 'Telegram Premium', cat: 'telegram', logo: 'https://cdn.simpleicons.org/telegram/26A5E4', field: 'telegram', needsKey: false, platforms: [] },
+  gemini: { name: 'Google AI Pro (Gemini)', cat: 'ai', logo: 'https://cdn.simpleicons.org/googlegemini/4285F4', field: 'email', needsKey: false, platforms: [] },
+  chatgpt: { name: 'ChatGPT Plus', cat: 'ai', logo: 'https://cdn.simpleicons.org/openai/000000', field: 'email', needsKey: false, platforms: [] },
+  claude: { name: 'Claude Pro', cat: 'ai', logo: 'https://cdn.simpleicons.org/anthropic/D97757', field: 'email', needsKey: false, platforms: [] },
+  canva: { name: 'Canva Pro', cat: 'design', logo: 'https://cdn.simpleicons.org/canva/00C4CC', field: 'email', needsKey: false, platforms: [] },
+  express: { name: 'ExpressVPN', cat: 'vpn', logo: 'https://cdn.simpleicons.org/expressvpn/DA3941', field: 'email', needsKey: true, platforms: ['PC', 'Mobile'] },
+  nord: { name: 'NordVPN', cat: 'vpn', logo: 'https://cdn.simpleicons.org/nordvpn/4687FF', field: 'email', needsKey: true, platforms: ['PC', 'Mobile'] }
+};
+let digitalMeta = null;
+function metaOf(game) {
+  if (digitalMeta && digitalMeta[game]) return digitalMeta[game];
+  return DEFAULT_DIGITAL_META[game] || { name: game, cat: 'vpn', logo: '', field: 'email', needsKey: false, platforms: [] };
+}
+function liveProductIds() {
+  if (digitalMeta) return Object.keys(digitalMeta);
+  return Object.keys(DEFAULT_DIGITAL_META);
+}
+function liveProductName(game) {
+  const m = metaOf(game);
+  return (m && m.name) || DIGITAL_PRODUCT_NAMES[game] || game;
+}
+function productNeedsKey(game) {
+  const m = metaOf(game);
+  return !!(m && m.needsKey);
+}
+// Costs are per pack AND per Platform: "express|PC|1 လ" is a different
+// cost from "express|Mobile|1 လ". Old "game|label" keys (saved before the
+// Platform split) still work as a fallback.
+function costKey(game, server, label) { return game + '|' + (server || '') + '|' + label; }
+function costOf(game, server, label) {
+  let v = digitalCosts[costKey(game, server, label)];
+  if (typeof v !== 'number') v = digitalCosts[game + '|' + label];
   return (typeof v === 'number' && v >= 0) ? v : null;
 }
 function catalogProducts() {
@@ -811,7 +920,10 @@ function catalogProducts() {
 async function loadDigitalData() {
   try {
     const catSnap = await db.collection('config').doc('digitalCatalog').get();
-    if (catSnap.exists) digitalCatalog = catSnap.data();
+    if (catSnap.exists) {
+      digitalCatalog = catSnap.data();
+      digitalMeta = (catSnap.data() && catSnap.data().meta) || null;
+    }
   } catch (err) { console.error('digitalCatalog load failed:', err); }
   try {
     const costSnap = await db.collection('config').doc('digitalCosts').get();
@@ -829,7 +941,7 @@ function orderProfit(o) {
   const qty = o.quantity || 1;
   const revenue = o.totalPrice || (o.packPrice || 0) * qty;
   if (typeof o.profit === 'number') return { revenue, cost: revenue - o.profit, profit: o.profit, known: true };
-  const cost = costOf(o.game, o.packLabel);
+  const cost = costOf(o.game, o.server, o.packLabel);
   if (cost === null) return { revenue, cost: null, profit: null, known: false };
   const c = cost * qty;
   return { revenue, cost: c, profit: revenue - c, known: true };
@@ -859,9 +971,9 @@ function renderProfit() {
     wrap.innerHTML = '<div class="empty-msg">ရောင်းပြီး Digital Order မရှိသေးပါ</div>';
     return;
   }
-  const rows = DIGITAL_PRODUCT_IDS.filter(id => byProduct[id]).map(id => {
+  const rows = liveProductIds().filter(id => byProduct[id]).map(id => {
     const b = byProduct[id];
-    return `<tr><td>${escapeHtml(DIGITAL_PRODUCT_NAMES[id])}</td><td class="num">${b.orders}</td><td class="num">${b.revenue.toLocaleString()}</td><td class="num">${b.cost.toLocaleString()}</td><td class="num" style="color:var(--success);">${b.profit.toLocaleString()}</td><td class="num">${b.unknown ? 'အရင်း မသိ ' + b.unknown + ' ခု' : '—'}</td></tr>`;
+    return `<tr><td>${escapeHtml(liveProductName(id))}</td><td class="num">${b.orders}</td><td class="num">${b.revenue.toLocaleString()}</td><td class="num">${b.cost.toLocaleString()}</td><td class="num" style="color:var(--success);">${b.profit.toLocaleString()}</td><td class="num">${b.unknown ? 'အရင်း မသိ ' + b.unknown + ' ခု' : '—'}</td></tr>`;
   }).join('');
   wrap.innerHTML = `<table class="profit-table"><thead><tr><th>Product</th><th class="num">Orders</th><th class="num">ရောင်းရငွေ</th><th class="num">အရင်း</th><th class="num">အမြတ်</th><th class="num">မှတ်ချက်</th></tr></thead><tbody>${rows}</tbody></table>${unknown ? `<p class="hint">အရင်းဈေး မထည့်ထားတဲ့ Order ${unknown} ခုကို အမြတ်ထဲ ထည့်မတွက်ထားပါ — အရင်းဈေး ထည့်ပေးမှ အမြတ်မှန်ပါမယ်။</p>` : ''}`;
 }
@@ -883,8 +995,8 @@ function digitalAccountValue(o) {
 }
 
 /* ---------- Catalog editor ---------- */
-function rowHtml(game, item) {
-  const cost = costOf(game, item.label);
+function rowHtml(game, item, server) {
+  const cost = costOf(game, server, item.label);
   return `<div class="cat-row">
     <input type="text" class="cat-label" value="${escapeHtml(item.label)}" placeholder="Pack နာမည် (ဥပမာ 1 လ)">
     <input type="number" class="cat-sell" value="${item.price}" min="0" step="500" placeholder="ရောင်းဈေး">
@@ -903,23 +1015,55 @@ function updateRowProfit(row) {
   el.textContent = (p >= 0 ? '+' : '') + p.toLocaleString() + ' Ks';
   el.classList.remove('none');
 }
+function platformOptionsFor(prodEl) {
+  const raw = prodEl.querySelector('.cat-meta-platforms');
+  return raw ? raw.value.split(',').map(s => s.trim()).filter(Boolean) : [];
+}
+function productSectionHtml(game, meta, groups) {
+  const m = meta || {};
+  const platforms = Array.isArray(m.platforms) ? m.platforms : [];
+  const groupHtml = (groups && groups.length ? groups : [{ group: m.name || game, items: [] }]).map(g => {
+    const opts = platforms.map(p => `<option value="${escapeHtml(p)}" ${g.server === p ? 'selected' : ''}>${escapeHtml(p)}</option>`).join('');
+    return `<div class="cat-group">
+      <div class="cat-group-top">
+        <input type="text" class="cat-group-name" value="${escapeHtml(g.group)}" placeholder="Group နာမည်">
+        <select class="cat-group-server" title="ဒီ Group က ဘယ် Platform အတွက်လဲ">
+          <option value="">— Platform အားလုံး —</option>${opts}
+        </select>
+        <button type="button" class="mini-btn" data-del-group title="ဒီ Group ကို ဖျက်မည်">🗑</button>
+      </div>
+      <div class="cat-rows">${(g.items || []).map(it => rowHtml(game, it, g.server)).join('')}</div>
+      <button type="button" class="mini-btn" data-add-pack>＋ Pack အသစ်</button>
+    </div>`;
+  }).join('');
+  return `<div class="cat-product" data-game="${escapeHtml(game)}">
+    <div class="cat-head"><h3>${escapeHtml(m.name || game)}</h3><button type="button" class="mini-btn" data-add-group>＋ Group အသစ်</button><button type="button" class="mini-btn" data-del-product>🗑 Product ဖျက်မည်</button></div>
+    <div class="cat-meta">
+      <label>နာမည်<input type="text" class="cat-meta-name" value="${escapeHtml(m.name || '')}"></label>
+      <label>Category<select class="cat-meta-cat">
+        <option value="telegram" ${m.cat === 'telegram' ? 'selected' : ''}>Telegram</option>
+        <option value="ai" ${m.cat === 'ai' ? 'selected' : ''}>AI</option>
+        <option value="design" ${m.cat === 'design' ? 'selected' : ''}>Design</option>
+        <option value="vpn" ${m.cat === 'vpn' ? 'selected' : ''}>VPN</option>
+      </select></label>
+      <label>Logo URL<input type="text" class="cat-meta-logo" value="${escapeHtml(m.logo || '')}" placeholder="https://... (မရှိရင် ဗလာ)"></label>
+      <label>အကောင့်<select class="cat-meta-field">
+        <option value="email" ${m.field !== 'telegram' ? 'selected' : ''}>Email</option>
+        <option value="telegram" ${m.field === 'telegram' ? 'selected' : ''}>Telegram @username</option>
+      </select></label>
+      <label>Platform များ<input type="text" class="cat-meta-platforms" value="${escapeHtml(platforms.join(', '))}" placeholder="ဥပမာ PC, Mobile"></label>
+      <label class="cat-meta-key"><input type="checkbox" class="cat-meta-needskey" ${m.needsKey ? 'checked' : ''}> 🔑 Key လိုတယ်</label>
+    </div>
+    ${groupHtml}
+  </div>`;
+}
 function renderCatalogEditor() {
   const ed = document.getElementById('catalogEditor');
   if (!ed) return;
   const products = catalogProducts();
   let html = `<div class="cat-row cat-head-row"><span>Pack</span><span>ရောင်းဈေး (Ks)</span><span>အရင်းဈေး (Ks)</span><span style="text-align:right;">အမြတ်</span><span>ပြမည်</span><span></span></div>`;
-  DIGITAL_PRODUCT_IDS.forEach(game => {
-    const groups = products[game] || [{ group: DIGITAL_PRODUCT_NAMES[game], items: [] }];
-    html += `<div class="cat-product" data-game="${game}">
-      <div class="cat-head"><h3>${escapeHtml(DIGITAL_PRODUCT_NAMES[game])}</h3><button type="button" class="mini-btn" data-add-group>＋ Group အသစ်</button></div>`;
-    groups.forEach(g => {
-      html += `<div class="cat-group">
-        <input type="text" class="cat-group-name" value="${escapeHtml(g.group)}" placeholder="Group နာမည်">
-        <div class="cat-rows">${g.items.map(it => rowHtml(game, it)).join('')}</div>
-        <button type="button" class="mini-btn" data-add-pack>＋ Pack အသစ်</button>
-      </div>`;
-    });
-    html += `</div>`;
+  liveProductIds().forEach(game => {
+    html += productSectionHtml(game, metaOf(game), products[game]);
   });
   ed.innerHTML = html;
   ed.querySelectorAll('.cat-row').forEach(updateRowProfit);
@@ -931,9 +1075,11 @@ document.getElementById('catalogEditor').addEventListener('input', e => {
 document.getElementById('catalogEditor').addEventListener('click', e => {
   const addPack = e.target.closest('[data-add-pack]');
   if (addPack) {
-    const rowsEl = addPack.closest('.cat-group').querySelector('.cat-rows');
+    const groupEl = addPack.closest('.cat-group');
+    const server = groupEl.querySelector('.cat-group-server').value;
+    const rowsEl = groupEl.querySelector('.cat-rows');
     const tmp = document.createElement('div');
-    tmp.innerHTML = rowHtml(addPack.closest('.cat-product').dataset.game, { label: '', price: '', active: true });
+    tmp.innerHTML = rowHtml(addPack.closest('.cat-product').dataset.game, { label: '', price: '', active: true }, server);
     rowsEl.appendChild(tmp.firstElementChild);
     return;
   }
@@ -941,13 +1087,34 @@ document.getElementById('catalogEditor').addEventListener('click', e => {
   if (addGroup) {
     const prodEl = addGroup.closest('.cat-product');
     const game = prodEl.dataset.game;
+    const opts = platformOptionsFor(prodEl).map(p => `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join('');
     const tmp = document.createElement('div');
     tmp.innerHTML = `<div class="cat-group">
-      <input type="text" class="cat-group-name" value="${escapeHtml(DIGITAL_PRODUCT_NAMES[game])}" placeholder="Group နာမည်">
-      <div class="cat-rows">${rowHtml(game, { label: '', price: '', active: true })}</div>
+      <div class="cat-group-top">
+        <input type="text" class="cat-group-name" value="${escapeHtml(metaOf(game).name || game)}" placeholder="Group နာမည်">
+        <select class="cat-group-server" title="ဒီ Group က ဘယ် Platform အတွက်လဲ"><option value="">— Platform အားလုံး —</option>${opts}</select>
+        <button type="button" class="mini-btn" data-del-group title="ဒီ Group ကို ဖျက်မည်">🗑</button>
+      </div>
+      <div class="cat-rows">${rowHtml(game, { label: '', price: '', active: true }, '')}</div>
       <button type="button" class="mini-btn" data-add-pack>＋ Pack အသစ်</button>
     </div>`;
     prodEl.appendChild(tmp.firstElementChild);
+    return;
+  }
+  const delProd = e.target.closest('[data-del-product]');
+  if (delProd) {
+    const prodEl = delProd.closest('.cat-product');
+    if (document.querySelectorAll('#catalogEditor .cat-product').length <= 1) { showToast('Product တစ်ခုတော့ ချန်ထားရပါမယ်', 'error'); return; }
+    if (!confirm(`"${prodEl.querySelector('.cat-meta-name').value || prodEl.dataset.game}" ကို Catalog ကနေ ဖျက်မှာ သေချာလား? (Save မနှိပ်မချင်း မသေချာသေးပါ)`)) return;
+    prodEl.remove();
+    return;
+  }
+  const delGroup = e.target.closest('[data-del-group]');
+  if (delGroup) {
+    const prodEl = delGroup.closest('.cat-product');
+    if (prodEl.querySelectorAll('.cat-group').length <= 1) { showToast('Group တစ်ခုတော့ ချန်ထားရပါမယ်', 'error'); return; }
+    if (!confirm('ဒီ Group ကို ဖျက်မှာ သေချာလား?')) return;
+    delGroup.closest('.cat-group').remove();
     return;
   }
   const del = e.target.closest('.cat-del');
@@ -961,13 +1128,23 @@ document.getElementById('saveCatalogBtn').addEventListener('click', async () => 
   const btn = document.getElementById('saveCatalogBtn');
   const statusEl = document.getElementById('catalogSaveStatus');
   const products = {};
+  const meta = {};
   const costs = {};
   let error = null;
   document.querySelectorAll('#catalogEditor .cat-product').forEach(prodEl => {
     const game = prodEl.dataset.game;
+    const name = prodEl.querySelector('.cat-meta-name').value.trim();
+    const cat = prodEl.querySelector('.cat-meta-cat').value;
+    const logo = prodEl.querySelector('.cat-meta-logo').value.trim();
+    const field = prodEl.querySelector('.cat-meta-field').value;
+    const platforms = prodEl.querySelector('.cat-meta-platforms').value.split(',').map(s => s.trim()).filter(Boolean);
+    const needsKey = prodEl.querySelector('.cat-meta-needskey').checked;
+    if (!name) { error = 'Product နာမည် ဖြည့်ပေးပါ'; return; }
+    meta[game] = { name, cat, logo, field, needsKey, platforms, active: true };
     const groups = [];
     prodEl.querySelectorAll('.cat-group').forEach(groupEl => {
       const groupName = groupEl.querySelector('.cat-group-name').value.trim();
+      const server = groupEl.querySelector('.cat-group-server').value;
       const items = [];
       groupEl.querySelectorAll('.cat-row').forEach(row => {
         const label = row.querySelector('.cat-label').value.trim();
@@ -977,28 +1154,55 @@ document.getElementById('saveCatalogBtn').addEventListener('click', async () => 
         const active = row.querySelector('.cat-active').checked;
         if (!label || !(sell > 0) || (cost !== null && !(cost >= 0))) { error = 'Pack နာမည် / ရောင်းဈေး / အရင်းဈေး မှားနေပါတယ် — စစ်ပေးပါ'; return; }
         items.push({ label, price: sell, active });
-        if (cost !== null) costs[costKey(game, label)] = cost;
+        if (cost !== null) costs[costKey(game, server, label)] = cost;
       });
-      if (items.length) groups.push({ group: groupName || DIGITAL_PRODUCT_NAMES[game], items });
+      if (items.length) groups.push({ group: groupName || name, server: server || null, items });
     });
-    if (groups.length) products[game] = groups;
+    products[game] = groups;
   });
   if (error) { showToast(error, 'error'); return; }
   btn.disabled = true;
   statusEl.textContent = 'သိမ်းနေသည်...';
   try {
-    await db.collection('config').doc('digitalCatalog').set({ products, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    await db.collection('config').doc('digitalCatalog').set({ products, meta, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
     await db.collection('config').doc('digitalCosts').set({ costs, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-    digitalCatalog = { products };
+    digitalCatalog = { products, meta };
+    digitalMeta = meta;
     digitalCosts = costs;
     statusEl.textContent = '✓ သိမ်းပြီးပါပြီ — ဆိုင်မှာ ဈေးအသစ် ပေါ်ပါပြီ';
     showToast('Digital ဈေးနှုန်းများ သိမ်းပြီးပါပြီ', 'success');
+    renderCatalogEditor();
     renderProfit();
   } catch (err) {
     console.error(err);
     statusEl.textContent = '';
     showToast('သိမ်းခြင်း မအောင်မြင်ပါ: ' + err.message, 'error');
   } finally { btn.disabled = false; }
+});
+document.getElementById('addProductBtn').addEventListener('click', () => {
+  const id = document.getElementById('addProductId').value.trim().toLowerCase();
+  const name = document.getElementById('addProductName').value.trim();
+  if (!/^[a-z0-9]{2,20}$/.test(id)) { showToast('Product id က အင်္ဂလိပ်စာလုံးအသေး/ဂဏန်း ၂–၂၀ လုံးပဲ ဖြစ်ရပါမယ် (ဥပမာ surfshark)', 'error'); return; }
+  if (liveProductIds().indexOf(id) !== -1) { showToast('ဒီ id ရှိပြီးသားပါ', 'error'); return; }
+  if (!name) { showToast('Product နာမည် ဖြည့်ပေးပါ', 'error'); return; }
+  const meta = {
+    name,
+    cat: document.getElementById('addProductCat').value,
+    logo: document.getElementById('addProductLogo').value.trim(),
+    field: document.getElementById('addProductField').value,
+    needsKey: document.getElementById('addProductNeedsKey').checked,
+    platforms: document.getElementById('addProductPlatforms').value.split(',').map(s => s.trim()).filter(Boolean)
+  };
+  const ed = document.getElementById('catalogEditor');
+  const tmp = document.createElement('div');
+  tmp.innerHTML = productSectionHtml(id, meta, [{ group: name, items: [{ label: '', price: '', active: true }] }]);
+  ed.appendChild(tmp.firstElementChild);
+  document.getElementById('addProductId').value = '';
+  document.getElementById('addProductName').value = '';
+  document.getElementById('addProductLogo').value = '';
+  document.getElementById('addProductPlatforms').value = '';
+  showToast(`"${name}" ထည့်ပြီးပါပြီ — Pack တွေ ထည့်ပြီး အောက်က သိမ်းမည်ကို နှိပ်ပါ`, 'success');
+  tmp.firstElementChild.scrollIntoView({ behavior: 'smooth', block: 'center' });
 });
 document.getElementById('typeFilter').addEventListener('change', e => {
   currentTypeFilter = e.target.value;
