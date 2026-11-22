@@ -374,8 +374,8 @@
   .ss-left{display:flex;align-items:center;gap:10px;min-width:0;}
   .ss-diamond{
     width:24px;height:24px;flex-shrink:0;
-    background:linear-gradient(135deg,var(--accent-cyan),var(--accent-blue));
-    clip-path:polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+    background:linear-gradient(135deg,var(--accent-gold),var(--accent-blue));
+    border-radius:50%;
   }
   .ss-label{font-size:11px;color:var(--text-muted);}
   .ss-pack{
@@ -425,8 +425,8 @@
   .ticket-left{display:flex;align-items:center;gap:12px;min-width:0;flex:1 1 auto;overflow:hidden;}
   .ticket-diamond{
     width:34px;height:34px;flex-shrink:0;
-    background:linear-gradient(135deg,var(--accent-cyan),var(--accent-blue));
-    clip-path:polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+    background:linear-gradient(135deg,var(--accent-gold),var(--accent-blue));
+    border-radius:50%;
   }
   /* Wrapper around the label + pack-name lines. This needs min-width:0
      explicitly — without it, a long pack name (e.g. "Monthly Epic Bundle")
@@ -628,6 +628,44 @@
     background:linear-gradient(90deg,var(--accent-blue),var(--accent-cyan));
     box-shadow:0 4px 14px rgba(10,132,255,0.18);
   }
+
+  /* ---------- Digital Product tab (new) ---------- */
+  .shop-mode-tabs{
+    display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 12px;
+  }
+  .shop-mode-tab{
+    padding:12px 10px;border-radius:16px;border:1px solid var(--border-glass);
+    background:var(--panel);color:var(--text-muted);cursor:pointer;
+    font-family:var(--font-display);font-weight:700;font-size:14px;letter-spacing:0.01em;
+    backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);transition:all .18s;
+  }
+  .shop-mode-tab.active{
+    border-color:var(--accent-gold);color:#FFFFFF;
+    background:linear-gradient(90deg,var(--accent-blue),var(--accent-cyan));
+    box-shadow:0 6px 18px rgba(10,132,255,0.18);
+  }
+  .digital-cats{
+    display:none;flex-wrap:wrap;gap:8px;margin:2px 0 14px;
+  }
+  .digital-cats.shown{display:flex;}
+  .digital-cat{
+    padding:8px 16px;border-radius:999px;border:1px solid var(--border-glass);
+    background:var(--panel);color:var(--text-muted);cursor:pointer;
+    font-family:var(--font-display);font-weight:600;font-size:13px;letter-spacing:0.01em;
+    backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);transition:all .18s;
+    white-space:nowrap;
+  }
+  .digital-cat.active{
+    border-color:var(--accent-gold);color:#FFFFFF;
+    background:linear-gradient(90deg,var(--accent-blue),var(--accent-cyan));
+    box-shadow:0 4px 14px rgba(10,132,255,0.18);
+  }
+  .digital-icon{line-height:1;display:flex;align-items:center;justify-content:center;height:52px;width:52px;margin:0 auto;background:#FFFFFF;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,.14);}
+  .digital-icon img{width:32px;height:32px;display:block;}
+  .digital-icon svg{width:30px;height:30px;display:block;}
+  .selected-game-header .digital-icon{height:30px;width:30px;}
+  .selected-game-header .digital-icon img{width:20px;height:20px;}
+  .selected-game-header .digital-icon svg{width:20px;height:20px;}
   .tab-diamond{width:13px;height:13px;vertical-align:-2px;margin:0 1px;display:inline-block;}
 
   .price-notice{
@@ -1629,7 +1667,7 @@
 
   <div class="hero">
     <h1>King Games-Shop</h1>
-    <p>Game Top-up ကို အမြန်ဆုံး၊ စိတ်ချရဆုံး ဝန်ဆောင်မှု</p>
+    <p>Game Top-up နဲ့ Digital Product ကို အမြန်ဆုံး၊ စိတ်ချရဆုံး ဝန်ဆောင်မှု</p>
   </div>
 
   <div class="main-tabs" id="mainTabsRow">
@@ -1653,7 +1691,50 @@
   <form class="card" id="orderForm">
 
     <div id="screenGames" class="wizard-screen active">
-    <div class="section-label"><span class="num">1</span> ဂိမ်း ရွေးရန်</div>
+    <div class="section-label" id="gameSelectLabel"><span class="num">1</span> ဂိမ်း ရွေးရန်</div>
+    <div class="shop-mode-tabs" id="shopModeTabs">
+      <button type="button" class="shop-mode-tab active" data-mode="game">🎮 Game Top-up</button>
+      <button type="button" class="shop-mode-tab" data-mode="digital">💎 Digital Product</button>
+    </div>
+    <div class="digital-cats" id="digitalCats">
+      <button type="button" class="digital-cat active" data-dcat="all">အားလုံး</button>
+      <button type="button" class="digital-cat" data-dcat="telegram">✈️ Telegram</button>
+      <button type="button" class="digital-cat" data-dcat="ai">🤖 AI</button>
+      <button type="button" class="digital-cat" data-dcat="design">🎨 Design</button>
+      <button type="button" class="digital-cat" data-dcat="vpn">🛡️ VPN</button>
+    </div>
+    <div class="server-grid game-select-grid" id="digitalGrid" style="display:none;">
+      <div class="server-card" data-game="telegram" data-dcat="telegram">
+        <div class="server-icon"><span class="digital-icon"><img src="https://cdn.simpleicons.org/telegram/26A5E4" alt="Telegram" loading="lazy" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/telegram.svg'"></span></div>
+        <div class="server-name">Telegram Premium</div>
+        <div class="server-sub">Telegram Premium • Gift</div>
+      </div>
+      <div class="server-card" data-game="gemini" data-dcat="ai">
+        <div class="server-icon"><span class="digital-icon"><img src="https://cdn.simpleicons.org/googlegemini/4285F4" alt="Gemini" loading="lazy" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/googlegemini.svg'"></span></div>
+        <div class="server-name">Gemini AI Pro</div>
+        <div class="server-sub">Google AI Pro • Gemini Advanced</div>
+      </div>
+      <div class="server-card" data-game="chatgpt" data-dcat="ai">
+        <div class="server-icon"><span class="digital-icon"><img src="https://cdn.simpleicons.org/openai/000000" alt="ChatGPT" loading="lazy" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/openai.svg'"></span></div>
+        <div class="server-name">ChatGPT Plus</div>
+        <div class="server-sub">OpenAI • Plus</div>
+      </div>
+      <div class="server-card" data-game="claude" data-dcat="ai">
+        <div class="server-icon"><span class="digital-icon"><img src="https://cdn.simpleicons.org/anthropic/D97757" alt="Claude" loading="lazy" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/anthropic.svg'"></span></div>
+        <div class="server-name">Claude Pro</div>
+        <div class="server-sub">Anthropic • Pro</div>
+      </div>
+      <div class="server-card" data-game="canva" data-dcat="design">
+        <div class="server-icon"><span class="digital-icon"><img src="https://cdn.simpleicons.org/canva/00C4CC" alt="Canva" loading="lazy" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/canva.svg'"></span></div>
+        <div class="server-name">Canva Pro</div>
+        <div class="server-sub">Canva • Pro</div>
+      </div>
+      <div class="server-card" data-game="vpn" data-dcat="vpn">
+        <div class="server-icon"><span class="digital-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></span></div>
+        <div class="server-name">VPN Premium</div>
+        <div class="server-sub">VPN • 1 Device</div>
+      </div>
+    </div>
     <div class="server-grid game-select-grid" id="gameGrid">
       <div class="server-card" data-game="mlbb">
         <div class="server-icon">
@@ -1707,7 +1788,7 @@
       <div class="selected-game-header" id="selectedGameHeader"></div>
 
 
-      <div class="section-label" style="margin-top:20px;"><span class="num">1</span> ကစားသမား အချက်အလက်
+      <div class="section-label" id="accountSectionLabel" style="margin-top:20px;"><span class="num">1</span> ကစားသမား အချက်အလက်
         <button type="button" class="help-btn" id="idHelpBtn" aria-label="Player ID ဘယ်လိုရှာမလဲ">?</button>
       </div>
       <div class="id-help-box" id="idHelpBox">
@@ -1716,7 +1797,7 @@
       </div>
       <div class="row">
         <div class="field">
-          <label for="playerId">Player ID</label>
+          <label for="playerId" id="playerIdLabel">Player ID</label>
           <input type="text" id="playerId" inputmode="numeric" pattern="[0-9]{6,12}" maxlength="12" placeholder="ဥပမာ 123456789" required>
           <div class="field-error" id="playerIdError"></div>
         </div>
@@ -1888,7 +1969,7 @@
       </div>
 
       <div class="modal-recap">
-        <div class="mr-row"><span class="mr-k">Player ID</span><span class="mr-v" id="mrPlayerId">—</span></div>
+        <div class="mr-row"><span class="mr-k" id="mrPlayerIdLabel">Player ID</span><span class="mr-v" id="mrPlayerId">—</span></div>
         <div class="mr-row" id="mrZoneIdRow"><span class="mr-k">Zone ID</span><span class="mr-v" id="mrZoneId">—</span></div>
         <div class="mr-row" id="mrUsernameRow" style="display:none;"><span class="mr-k">Username</span><span class="mr-v mr-username" id="mrUsername">—</span></div>
         <div class="mr-row"><span class="mr-k">Server</span><span class="mr-v" id="mrServer">—</span></div>
@@ -3195,6 +3276,100 @@ let PACKS = [];
 let PACKS_HOK = [];
 let PACKS_PUBG = [];
 let PACKS_MAGICCHESS = [];
+// ---------- Digital Product packs (fallback — Sheet tab မရှိသေးလို့) ----------
+// ဈေးနှုန်းများသည် စမ်းသပ်ဈေး (2026-11-22 ဈေးကွက် ဈေးအခြေခံ) — supplier ဈေး
+// ရပြီးရင် ဒီနေရာမှာ (သို့) Google Sheet tab အသစ်မှာ ပြင်ပါ။ VPN ဈေးက
+// ခန့်မှန်းဈေးသက်သက်ဖြစ်ပြီး supplier နဲ့ အတည်ပြုပြီးမှ ရောင်းပါ။
+const DIGITAL_GAMES = ['telegram', 'gemini', 'chatgpt', 'claude', 'canva', 'vpn'];
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const DIGITAL_INFO = {
+  telegram: { name: 'Telegram Premium', fieldLabel: 'Telegram Username', placeholder: 'ဥပမာ @username', inputmode: 'text', maxLength: 33, packLabel: 'Telegram Premium Pack ရွေးရန်' },
+  gemini: { name: 'Google AI Pro (Gemini)', fieldLabel: 'Gmail', placeholder: 'ဥပမာ name@gmail.com', inputmode: 'email', maxLength: 60, packLabel: 'Gemini AI Pack ရွေးရန်' },
+  chatgpt: { name: 'ChatGPT Plus', fieldLabel: 'Gmail', placeholder: 'ဥပမာ name@gmail.com', inputmode: 'email', maxLength: 60, packLabel: 'ChatGPT Plus Pack ရွေးရန်' },
+  claude: { name: 'Claude Pro', fieldLabel: 'Gmail', placeholder: 'ဥပမာ name@gmail.com', inputmode: 'email', maxLength: 60, packLabel: 'Claude Pro Pack ရွေးရန်' },
+  canva: { name: 'Canva Pro', fieldLabel: 'Email', placeholder: 'ဥပမာ name@gmail.com', inputmode: 'email', maxLength: 60, packLabel: 'Canva Pro Pack ရွေးရန်' },
+  vpn: { name: 'VPN Premium', fieldLabel: 'Email', placeholder: 'ဥပမာ name@gmail.com', inputmode: 'email', maxLength: 60, packLabel: 'VPN Pack ရွေးရန်' }
+};
+const PACKS_TELEGRAM = [
+  { group: 'Telegram Premium 👑', items: [
+    { label: '1 လ', price: 27500 },
+    { label: '3 လ', price: 62000 },
+    { label: '6 လ', price: 85000 },
+    { label: '1 နှစ်', price: 145000 }
+  ] }
+];
+const PACKS_GEMINI = [
+  { group: 'Google AI Pro (Gemini Advanced)', items: [
+    { label: '1 လ', price: 110000 }
+  ] }
+];
+const PACKS_CHATGPT = [
+  { group: 'ChatGPT Plus', items: [
+    { label: '1 လ', price: 110000 }
+  ] }
+];
+const PACKS_CLAUDE = [
+  { group: 'Claude Pro', items: [
+    { label: '1 လ', price: 110000 }
+  ] }
+];
+const PACKS_CANVA = [
+  { group: 'Canva Pro', items: [
+    { label: '1 လ', price: 10000 },
+    { label: '3 လ', price: 27000 },
+    { label: '6 လ', price: 54000 },
+    { label: '1 နှစ်', price: 102000 }
+  ] }
+];
+const PACKS_VPN = [
+  { group: 'VPN Premium 🛡️', items: [
+    { label: '1 လ', price: 20000 },
+    { label: '3 လ', price: 50000 },
+    { label: '1 နှစ်', price: 120000 }
+  ] }
+];
+
+// ---------- Digital catalog from Admin (Firestore) — no Sheet ----------
+// The Admin panel (admin__5-digital.html) keeps digital sell prices in
+// config/digitalCatalog, so a price change applies instantly without
+// touching this file or the Sheet. Shape:
+//   config/digitalCatalog { products: { telegram: [{group, items:[{label, price, active}]}...] } }
+// Fallback chain: Firestore -> localStorage cache (kds_digitalCatalog) ->
+// the PACKS_* lists baked into this file. Costs are NEVER read here — they
+// live in config/digitalCosts (admin only).
+let DIGITAL_CATALOG = null;
+try {
+  const cachedCatalog = JSON.parse(localStorage.getItem('kds_digitalCatalog') || 'null');
+  if (cachedCatalog && typeof cachedCatalog === 'object') DIGITAL_CATALOG = cachedCatalog;
+} catch (e) { /* corrupted cache — ignore, Firestore/fallback take over */ }
+function digitalCatalogPacks(game, fallback) {
+  const entry = DIGITAL_CATALOG && DIGITAL_CATALOG[game];
+  if (!Array.isArray(entry) || !entry.length) return fallback;
+  const cleaned = entry
+    .map(g => ({
+      group: g.group,
+      items: (Array.isArray(g.items) ? g.items : []).filter(it =>
+        it && it.active !== false && typeof it.label === 'string' &&
+        typeof it.price === 'number' && it.price > 0)
+    }))
+    .filter(g => g.items.length);
+  return cleaned.length ? cleaned : fallback;
+}
+async function loadDigitalCatalog() {
+  try {
+    if (typeof db === 'undefined' || !db) return;
+    const snap = await db.collection('config').doc('digitalCatalog').get();
+    if (!snap.exists) return;
+    const products = snap.data() && snap.data().products;
+    if (!products || typeof products !== 'object') return;
+    DIGITAL_CATALOG = products;
+    try { localStorage.setItem('kds_digitalCatalog', JSON.stringify(products)); } catch (e) {}
+    if (typeof currentGame !== 'undefined' && currentGame && DIGITAL_GAMES.indexOf(currentGame) !== -1) buildPackDropdown();
+  } catch (err) {
+    console.error('Digital catalog load failed — fallback prices in use:', err);
+  }
+}
+loadDigitalCatalog();
 // Flat list like PACKS, but each group also carries which Sever (country)
 // it belongs to — e.g. {server:"Malay/ Singapore", group:"2X Diamond", items:[...]}.
 // Populated from the "Ban Sever" sheet tab. BAN_SERVERS is the ordered list
@@ -3697,6 +3872,12 @@ function activePacks() {
   if (currentGame === 'pubg') return PACKS_PUBG;
   if (currentGame === 'mlbbban') return PACKS_BAN;
   if (currentGame === 'magicchess') return PACKS_MAGICCHESS;
+  if (currentGame === 'telegram') return digitalCatalogPacks('telegram', PACKS_TELEGRAM);
+  if (currentGame === 'gemini') return digitalCatalogPacks('gemini', PACKS_GEMINI);
+  if (currentGame === 'chatgpt') return digitalCatalogPacks('chatgpt', PACKS_CHATGPT);
+  if (currentGame === 'claude') return digitalCatalogPacks('claude', PACKS_CLAUDE);
+  if (currentGame === 'canva') return digitalCatalogPacks('canva', PACKS_CANVA);
+  if (currentGame === 'vpn') return digitalCatalogPacks('vpn', PACKS_VPN);
   return PACKS;
 }
 
@@ -3706,6 +3887,12 @@ function gameDisplayName(g) {
   if (g === 'pubg') return 'PUBG UC';
   if (g === 'mlbbban') return 'MLBB Diamond (Ban Sever)';
   if (g === 'magicchess') return 'Magic Chess: Go Go Diamond';
+  if (g === 'telegram') return 'Telegram Premium';
+  if (g === 'gemini') return 'Google AI Pro (Gemini)';
+  if (g === 'chatgpt') return 'ChatGPT Plus';
+  if (g === 'claude') return 'Claude Pro';
+  if (g === 'canva') return 'Canva Pro';
+  if (g === 'vpn') return 'VPN Premium';
   return 'MLBB Diamond';
 }
 
@@ -3750,9 +3937,11 @@ function updatePackLockUI() {
   if (locked && packLockHint) {
     const idZoneOk = idPattern().test(playerIdInput.value.trim())
       && (!gameNeedsServerStep(currentGame) || ZONE_PATTERN.test(zoneIdInput.value.trim()));
-    packLockHint.querySelector('span').textContent = idZoneOk
-      ? 'Username စစ်ဆေးနေဆဲ (သို့) Username မတွေ့ပါ — ID/Zone ID ကို ပြန်စစ်ပေးပါ'
-      : 'Player ID (Zone ID) ကို အရင်ဖြည့်ပါ — ပြီးမှ Pack ရွေးလို့ရပါမည်';
+    packLockHint.querySelector('span').textContent = isDigitalGame(currentGame)
+      ? accountFieldLabel() + ' ကို အရင်ဖြည့်ပါ — ပြီးမှ Pack ရွေးလို့ရပါမည်'
+      : idZoneOk
+        ? 'Username စစ်ဆေးနေဆဲ (သို့) Username မတွေ့ပါ — ID/Zone ID ကို ပြန်စစ်ပေးပါ'
+        : 'Player ID (Zone ID) ကို အရင်ဖြည့်ပါ — ပြီးမှ Pack ရွေးလို့ရပါမည်';
   }
 }
 
@@ -3777,22 +3966,7 @@ function buildPackDropdown() {
 
     const label = document.createElement('div');
     label.className = 'pack-group-label';
-    label.innerHTML = currentGame === 'pubg' ? `
-      <svg viewBox="0 0 32 32" width="14" height="14">
-        <rect x="2.5" y="9" width="27" height="19" rx="3.4" style="fill:var(--accent-gold)"/>
-        <rect x="13.4" y="9" width="5.2" height="19" fill="#FFFFFF" opacity="0.55"/>
-        <rect x="2.5" y="14.6" width="27" height="3.6" fill="#FFFFFF" opacity="0.25"/>
-      </svg>
-      <span class="pgl-bar"></span>${grp.group}
-    ` : `
-      <svg viewBox="0 0 32 32" width="14" height="14">
-        <polygon points="8,4 24,4 29,12 16,28 3,12" style="fill:var(--accent-gold)"/>
-        <polygon points="8,4 15,4 11,12 3,12" fill="#FFFFFF" opacity="0.35"/>
-        <polygon points="3,12 11,12 16,28" fill="#000000" opacity="0.12"/>
-        <polygon points="29,12 21,12 16,28" fill="#000000" opacity="0.22"/>
-      </svg>
-      <span class="pgl-bar"></span>${grp.group}
-    `;
+    label.innerHTML = `<span class="pgl-bar"></span>${grp.group}`;
     packGrid.appendChild(label);
 
     const row = document.createElement('div');
@@ -3803,13 +3977,12 @@ function buildPackDropdown() {
       card.className = 'pack-card';
       card.dataset.value = `${gi}-${ii}`;
       card.innerHTML = `
-        ${packIconHtml(item.icon, currentGame, grp.group, item.label)}
         <div class="pc-label">${item.label}</div>
         <div class="pc-price">${item.price.toLocaleString()} Ks</div>
       `;
       card.addEventListener('click', () => {
         if (!isPlayerInfoValid()) {
-          showToast("ပထမဆုံး Player ID (Zone ID အပါအဝင်) ကို ဖြည့်ပါ", "error");
+          showToast("ပထမဆုံး " + accountFieldLabel() + " ကို ဖြည့်ပါ", "error");
           playerIdInput.focus();
           playerIdInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
           return;
@@ -3845,7 +4018,12 @@ function selectGame(game, cardEl) {
   currentGame = game;
   currentServer = null;
   gameGrid.querySelectorAll('.server-card').forEach(c => c.classList.remove('selected', 'pop'));
+  digitalGrid.querySelectorAll('.server-card').forEach(c => c.classList.remove('selected', 'pop'));
   cardEl.classList.add('selected');
+  // Back to the game wording by default; the digital branch below overrides it.
+  playerIdLabel.textContent = 'Player ID';
+  playerIdInput.setAttribute('inputmode', 'numeric');
+  setAccountLabel(false);
   void cardEl.offsetWidth;
   cardEl.classList.add('pop');
   serverGrid.querySelectorAll('.server-card').forEach(c => c.classList.remove('selected'));
@@ -3945,6 +4123,43 @@ function selectGame(game, cardEl) {
       afterServerSection.classList.add('shown');
       afterServerSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     });
+  } else if (isDigitalGame(game)) {
+    const info = DIGITAL_INFO[game];
+    packSectionLabel.textContent = info.packLabel;
+    zoneIdField.style.display = 'none';
+    zoneIdInput.required = false;
+    zoneIdInput.value = '';
+    // Digital orders need a username/email, not a numeric Player ID.
+    playerIdLabel.textContent = info.fieldLabel;
+    playerIdInput.setAttribute('inputmode', info.inputmode);
+    playerIdInput.pattern = game === 'telegram' ? '@?[A-Za-z0-9_]{5,32}' : '.+@.+\\..+';
+    playerIdInput.maxLength = info.maxLength;
+    playerIdInput.placeholder = info.placeholder;
+    playerIdInput.classList.remove('invalid');
+    playerIdError.classList.remove('shown');
+    // Restore the last digital account typed on this device; clear a stale
+    // numeric game ID so it cannot block the pack grid.
+    try {
+      const savedDigital = localStorage.getItem('kds_digitalAccount') || '';
+      if (savedDigital && (game === 'telegram' ? /^@?[A-Za-z0-9_]{5,32}$/.test(savedDigital) : EMAIL_PATTERN.test(savedDigital))) playerIdInput.value = savedDigital;
+      else if (playerIdInput.value && !idPattern().test(playerIdInput.value)) playerIdInput.value = '';
+    } catch (e) { if (playerIdInput.value && !idPattern().test(playerIdInput.value)) playerIdInput.value = ''; }
+    verifiedUsername = null;
+    usernameCheckEl.classList.remove('shown');
+    // The MLBB "where to find Player ID" help does not apply here.
+    if (idHelpBtnEl) idHelpBtnEl.style.display = 'none';
+    if (idHelpBoxEl) idHelpBoxEl.classList.remove('shown');
+    setAccountLabel(true);
+    restrictedServerNotice.style.display = 'none';
+    serverSection.classList.remove('shown');
+    serverSection.style.display = 'none';
+    // Digital products have no server step — go straight to the pack grid
+    buildPackDropdown();
+    afterServerSection.style.display = 'block';
+    requestAnimationFrame(() => {
+      afterServerSection.classList.add('shown');
+      afterServerSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
   } else {
     packSectionLabel.textContent = 'Token Pack ရွေးရန်';
     zoneIdField.style.display = 'none';
@@ -3969,6 +4184,60 @@ function selectGame(game, cardEl) {
 
 gameGrid.querySelectorAll('.server-card').forEach(card => {
   card.addEventListener('click', () => selectGame(card.dataset.game, card));
+});
+
+/* ---------- Digital Product tab (new) ----------
+   Top tab above the game grid: Game Top-up <-> Digital Product.
+   Inside Digital Product, category pills filter the product cards
+   (Telegram / AI / Design / VPN). A product card reuses the exact same
+   wizard as a game (selectGame -> packs -> payment -> receipt), only the
+   account field changes (Telegram @username, Gmail/Email for the rest). */
+function isDigitalGame(g) { return DIGITAL_GAMES.indexOf(g) !== -1; }
+function accountFieldLabel() {
+  if (currentGame && DIGITAL_INFO[currentGame]) return DIGITAL_INFO[currentGame].fieldLabel;
+  return 'Player ID';
+}
+const digitalGrid = document.getElementById('digitalGrid');
+const shopModeTabs = document.getElementById('shopModeTabs');
+const digitalCats = document.getElementById('digitalCats');
+const gameSelectLabel = document.getElementById('gameSelectLabel');
+const playerIdLabel = document.getElementById('playerIdLabel');
+const accountSectionLabel = document.getElementById('accountSectionLabel');
+const idHelpBtnEl = document.getElementById('idHelpBtn');
+const idHelpBoxEl = document.getElementById('idHelpBox');
+let currentShopMode = 'game';
+let currentDigitalCat = 'all';
+function setAccountLabel(isDigital) {
+  if (!accountSectionLabel) return;
+  const node = Array.prototype.slice.call(accountSectionLabel.childNodes).find(function (n) { return n.nodeType === 3 && n.textContent.trim(); });
+  if (node) node.textContent = isDigital ? ' အကောင့် အချက်အလက်' : ' ကစားသမား အချက်အလက်';
+  if (idHelpBtnEl) idHelpBtnEl.style.display = isDigital ? 'none' : '';
+}
+function setShopMode(mode) {
+  currentShopMode = mode;
+  document.querySelectorAll('.shop-mode-tab').forEach(function (b) { b.classList.toggle('active', b.dataset.mode === mode); });
+  const digital = mode === 'digital';
+  if (gameSelectLabel) gameSelectLabel.innerHTML = '<span class="num">1</span> ' + (digital ? 'Digital Product ရွေးရန်' : 'ဂိမ်း ရွေးရန်');
+  if (digitalCats) digitalCats.classList.toggle('shown', digital);
+  if (gameGrid) gameGrid.style.display = digital ? 'none' : '';
+  if (digitalGrid) digitalGrid.style.display = digital ? '' : 'none';
+}
+function filterDigitalCats(cat) {
+  currentDigitalCat = cat;
+  document.querySelectorAll('.digital-cat').forEach(function (b) { b.classList.toggle('active', b.dataset.dcat === cat); });
+  if (!digitalGrid) return;
+  digitalGrid.querySelectorAll('.server-card').forEach(function (c) {
+    c.style.display = (cat === 'all' || c.dataset.dcat === cat) ? '' : 'none';
+  });
+}
+document.querySelectorAll('.shop-mode-tab').forEach(function (btn) {
+  btn.addEventListener('click', function () { if (currentShopMode !== btn.dataset.mode) setShopMode(btn.dataset.mode); });
+});
+document.querySelectorAll('.digital-cat').forEach(function (btn) {
+  btn.addEventListener('click', function () { filterDigitalCats(btn.dataset.dcat); });
+});
+digitalGrid.querySelectorAll('.server-card').forEach(function (card) {
+  card.addEventListener('click', function () { selectGame(card.dataset.game, card); });
 });
 
 /* ---------- 3-page app shell: Home / Orders / Support ---------- */
@@ -4740,11 +5009,15 @@ const ID_PATTERN_PUBG = /^[0-9]{6,12}$/;
 function idPattern() {
   if (currentGame === 'hok') return ID_PATTERN_HOK;
   if (currentGame === 'pubg') return ID_PATTERN_PUBG;
+  if (currentGame === 'telegram') return /^@?[A-Za-z0-9_]{5,32}$/;
+  if (isDigitalGame(currentGame)) return EMAIL_PATTERN;
   return ID_PATTERN_MLBB;
 }
 function idErrorMessage() {
   if (currentGame === 'hok') return "Player ID မှားနေပါသည် — ဂဏန်း ၆-၂၀ လုံးသာ ရှိရပါမည်";
   if (currentGame === 'pubg') return "Player ID မှားနေပါသည် — ဂဏန်း ၆-၁၂ လုံးသာ ရှိရပါမည်";
+  if (currentGame === 'telegram') return "Telegram Username မှားနေပါသည် — @ နဲ့စပြီး စာလုံး ၅-၃၂ လုံး ရှိရပါမည်";
+  if (isDigitalGame(currentGame)) return "Email မှားနေပါသည် — ဥပမာ name@gmail.com";
   return "Player ID မှားနေပါသည် — ဂဏန်း ၆-၁၂ လုံးသာ ရှိရပါမည်";
 }
 const ZONE_PATTERN = /^[0-9]{3,5}$/;
@@ -4796,7 +5069,9 @@ try {
 
 function rememberIds() {
   try {
-    if (playerIdInput.value.trim()) localStorage.setItem('kds_playerId', playerIdInput.value.trim());
+    if (!playerIdInput.value.trim()) return;
+    if (isDigitalGame(currentGame)) localStorage.setItem('kds_digitalAccount', playerIdInput.value.trim());
+    else localStorage.setItem('kds_playerId', playerIdInput.value.trim());
     if (zoneIdInput.value.trim()) localStorage.setItem('kds_zoneId', zoneIdInput.value.trim());
   } catch (e) { /* ignore */ }
 }
@@ -5042,6 +5317,8 @@ termsModal.addEventListener('click', (e) => { if (e.target === termsModal) close
 function openConfirmModal() {
   const { playerId, zoneId, item } = pendingOrder;
   document.getElementById('mrPlayerId').textContent = playerId;
+  const mrLabel = document.getElementById('mrPlayerIdLabel');
+  if (mrLabel) mrLabel.textContent = accountFieldLabel();
 
   const zoneIdRow = document.getElementById('mrZoneIdRow');
   if (gameNeedsServerStep(currentGame)) {
@@ -5081,7 +5358,7 @@ form.addEventListener('submit', (e) => {
   const zoneId = gameNeedsServerStep(currentGame) ? zoneIdInput.value.trim() : '';
   const file = compressedFile || screenshotInput.files[0];
 
-  if (!currentGame) { showToast("ဂိမ်း ရွေးချယ်ပေးပါ", "error"); return; }
+  if (!currentGame) { showToast("ဂိမ်း / Digital Product ရွေးချယ်ပေးပါ", "error"); return; }
   if (!idPattern().test(playerId)) { showToast(idErrorMessage(), "error"); return; }
   if (gameNeedsServerStep(currentGame) && !ZONE_PATTERN.test(zoneId)) { showToast("Zone ID မှားနေပါသည် — ဂဏန်း ၃-၅ လုံးသာ ထည့်ပါ", "error"); return; }
   if (gameNeedsServerStep(currentGame) && !verifiedUsername && !usernameLookupFailed) { showToast("Username မစစ်ရသေးပါ — ID/Zone ID ကို ပြန်ရိုက်ပြီး Username ရလာအောင် စောင့်ပေးပါ", "error"); return; }
@@ -5145,6 +5422,7 @@ finalConfirmBtn.addEventListener('click', async () => {
         orderId,
         ownerUid: currentUid || null,
         game: currentGame,
+        productType: isDigitalGame(currentGame) ? 'digital' : 'game',
         server: gameNeedsServerStep(currentGame) ? currentServer : null,
         playerId,
         zoneId: gameNeedsServerStep(currentGame) ? zoneId : null,
@@ -5173,7 +5451,7 @@ finalConfirmBtn.addEventListener('click', async () => {
       `🆕 Order အသစ် #${orderId}\n` +
       `🎮 ${gameDisplayName(currentGame)}\n` +
       `🖥️ Sever: ${serverDisplayName}\n` +
-      `👤 Player ID: ${playerId}${verifiedUsername ? ' (' + verifiedUsername + ')' : ''}\n` +
+      `👤 ${accountFieldLabel()}: ${playerId}${verifiedUsername ? ' (' + verifiedUsername + ')' : ''}\n` +
       (gameNeedsServerStep(currentGame) ? `🌍 Zone ID: ${zoneId}\n` : '') +
       `💎 Pack: ${item.label} x${qty}\n` +
       `💰 စုစုပေါင်း: ${totalPrice.toLocaleString()} Ks\n` +
@@ -5202,7 +5480,7 @@ finalConfirmBtn.addEventListener('click', async () => {
       <div class="os-row"><span class="os-k">Server</span><span class="os-v">${escapeHtml(serverDisplayName)}</span></div>
       <div class="os-row"><span class="os-k">Pack</span><span class="os-v">${escapeHtml(item.label)} x${qty}</span></div>
       <div class="os-row"><span class="os-k">စုစုပေါင်း</span><span class="os-v">${totalPrice.toLocaleString()} Ks</span></div>
-      <div class="os-row"><span class="os-k">Player ID</span><span class="os-v">${escapeHtml(playerId)}${verifiedUsername ? ' (' + escapeHtml(verifiedUsername) + ')' : ''}</span></div>
+      <div class="os-row"><span class="os-k">${escapeHtml(accountFieldLabel())}</span><span class="os-v">${escapeHtml(playerId)}${verifiedUsername ? ' (' + escapeHtml(verifiedUsername) + ')' : ''}</span></div>
       ${gameNeedsServerStep(currentGame) ? `<div class="os-row"><span class="os-k">Zone ID</span><span class="os-v">${escapeHtml(zoneId)}</span></div>` : ''}
     `;
     form.style.display = 'none';
