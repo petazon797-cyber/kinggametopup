@@ -423,6 +423,16 @@
 
     <!-- ============ ORDERS PANEL ============ -->
     <div id="ordersPanel">
+      <div class="card" id="shopStatusCard" style="border:2px solid var(--success);">
+        <div class="section-label">🏪 ဆိုင်ဖွင့် / ပိတ်</div>
+        <div id="shopStatusBig" style="font-size:17px;font-weight:800;margin-bottom:10px;">🟢 ဆိုင်ဖွင့်ထားတယ်</div>
+        <div class="key-form">
+          <label class="cat-meta-key"><input type="checkbox" id="shopOpenToggle" checked> ဆိုင်ဖွင့်ထားတယ်</label>
+          <input type="text" id="shopClosedMsgInput" class="cat-group-name" placeholder="ပိတ်ထားတဲ့ အကြောင်းပြချက် — ဥပမာ ဒီည ၁၀ နာရီမှ ပြန်ဖွင့်ပါမယ်" style="margin-bottom:0;">
+          <button type="button" class="submit-btn" id="saveShopStatusBtn" style="width:auto;padding:11px 22px;font-size:14px;">💾 သိမ်းမည်</button>
+        </div>
+        <p class="hint" style="margin-top:10px;">ဆိုင်ပိတ်ထားရင် ဝယ်သူ Order အသစ် တင်လို့မရတော့ဘူး — Order Status စစ်တာနဲ့ အရင် Order တွေရဲ့ Key ကြည့်တာတော့ ဆက်လုပ်လို့ရတယ်။</p>
+      </div>
       <div class="stats">
         <div class="stat-card"><div class="num" id="statTotal">0</div><div class="lbl">Total</div></div>
         <div class="stat-card pending"><div class="num" id="statPending">0</div><div class="lbl">Pending</div></div>
@@ -608,6 +618,7 @@ auth.onAuthStateChanged(user => {
     startListeningOrders();
     loadBanners();
     loadDigitalData();
+    loadShopStatus();
   } else {
     loginScreen.style.display = 'block';
     dashboard.style.display = 'none';
@@ -933,6 +944,44 @@ async function loadDigitalData() {
   renderProfit();
 }
 
+/* ---------- Shop open / close ---------- */
+// config/shopStatus: { open, message, updatedAt }. Public read (the
+// storefront shows the closed banner from it), admin-only write.
+function renderShopStatus(open, message) {
+  const big = document.getElementById('shopStatusBig');
+  const toggle = document.getElementById('shopOpenToggle');
+  const msgInput = document.getElementById('shopClosedMsgInput');
+  const card = document.getElementById('shopStatusCard');
+  if (!big || !toggle) return;
+  toggle.checked = open !== false;
+  if (msgInput && document.activeElement !== msgInput) msgInput.value = message || '';
+  big.textContent = open !== false ? '🟢 ဆိုင်ဖွင့်ထားတယ်' : '🔴 ဆိုင်ပိတ်ထားပါတယ်';
+  if (card) card.style.borderColor = open !== false ? 'var(--success)' : '#ff453a';
+}
+async function loadShopStatus() {
+  try {
+    const snap = await db.collection('config').doc('shopStatus').get();
+    if (snap.exists) {
+      const d = snap.data() || {};
+      renderShopStatus(d.open, d.message);
+    } else {
+      renderShopStatus(true, '');
+    }
+  } catch (err) { console.error('shopStatus load failed:', err); renderShopStatus(true, ''); }
+}
+document.getElementById('saveShopStatusBtn').addEventListener('click', async () => {
+  const open = document.getElementById('shopOpenToggle').checked;
+  const message = document.getElementById('shopClosedMsgInput').value.trim();
+  const btn = document.getElementById('saveShopStatusBtn');
+  btn.disabled = true;
+  try {
+    await db.collection('config').doc('shopStatus').set({ open, message, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    renderShopStatus(open, message);
+    showToast(open ? 'ဆိုင်ဖွင့်လိုက်ပါပြီ' : 'ဆိုင်ပိတ်လိုက်ပါပြီ', 'success');
+  } catch (err) { console.error(err); showToast('သိမ်းခြင်း မအောင်မြင်ပါ: ' + err.message, 'error'); }
+  btn.disabled = false;
+});
+
 /* ---------- Profit ---------- */
 function digitalCompletedOrders() {
   return allOrders.filter(o => o.productType === 'digital' && o.status === 'completed');
@@ -1007,9 +1056,12 @@ function rowHtml(game, item, server) {
   </div>`;
 }
 function updateRowProfit(row) {
-  const sell = Number(row.querySelector('.cat-sell').value);
-  const costRaw = row.querySelector('.cat-cost').value.trim();
+  const sellEl = row.querySelector('.cat-sell');
+  const costEl = row.querySelector('.cat-cost');
   const el = row.querySelector('.cat-profit');
+  if (!sellEl || !costEl || !el) return;
+  const sell = Number(sellEl.value);
+  const costRaw = costEl.value.trim();
   if (!sell || costRaw === '' || !(Number(costRaw) >= 0)) { el.textContent = '—'; el.classList.add('none'); return; }
   const p = sell - Number(costRaw);
   el.textContent = (p >= 0 ? '+' : '') + p.toLocaleString() + ' Ks';
@@ -1066,7 +1118,9 @@ function renderCatalogEditor() {
     html += productSectionHtml(game, metaOf(game), products[game]);
   });
   ed.innerHTML = html;
-  ed.querySelectorAll('.cat-row').forEach(updateRowProfit);
+  // NOTE: the header row also has class .cat-row but no price inputs —
+  // updateRowProfit would throw on it, so exclude it here.
+  ed.querySelectorAll('.cat-row:not(.cat-head-row)').forEach(updateRowProfit);
 }
 document.getElementById('catalogEditor').addEventListener('input', e => {
   const row = e.target.closest('.cat-row');
@@ -1196,13 +1250,14 @@ document.getElementById('addProductBtn').addEventListener('click', () => {
   const ed = document.getElementById('catalogEditor');
   const tmp = document.createElement('div');
   tmp.innerHTML = productSectionHtml(id, meta, [{ group: name, items: [{ label: '', price: '', active: true }] }]);
-  ed.appendChild(tmp.firstElementChild);
+  const section = tmp.firstElementChild;
+  ed.appendChild(section);
   document.getElementById('addProductId').value = '';
   document.getElementById('addProductName').value = '';
   document.getElementById('addProductLogo').value = '';
   document.getElementById('addProductPlatforms').value = '';
   showToast(`"${name}" ထည့်ပြီးပါပြီ — Pack တွေ ထည့်ပြီး အောက်က သိမ်းမည်ကို နှိပ်ပါ`, 'success');
-  tmp.firstElementChild.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  section.scrollIntoView({ behavior: 'smooth', block: 'center' });
 });
 document.getElementById('typeFilter').addEventListener('change', e => {
   currentTypeFilter = e.target.value;
