@@ -182,7 +182,7 @@
   .logout-btn:active{transform:scale(0.96);}
 
   /* ---------- Top-level page tabs (Orders / Banners) ---------- */
-  .page-tabs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px;max-width:420px;}
+  .page-tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:22px;max-width:640px;}
   .page-tab{
     padding:14px 10px;border-radius:18px;border:1px solid var(--border-glass);
     background:var(--panel);color:var(--text-muted);cursor:pointer;
@@ -320,6 +320,39 @@
   .toast.error{border-color:rgba(239,68,68,0.5);color:var(--danger);}
   .toast.success{border-color:rgba(24,169,87,0.5);color:var(--success);}
 
+  /* ---------- Digital panel: profit + catalog editor ---------- */
+  .type-filter-row{display:flex;align-items:center;gap:8px;margin-bottom:16px;color:var(--text-muted);font-size:13px;}
+  .type-filter-row select{padding:8px 12px;border-radius:999px;border:1px solid var(--border-glass);background:var(--panel);color:var(--text-primary);font-family:var(--font-display);font-size:13px;font-weight:600;outline:none;cursor:pointer;}
+  .stat-card.profit .num{color:var(--success);}
+  .stat-card.cost .num{color:#FF9F0A;}
+  .profit-note{font-size:12px;color:var(--text-muted);line-height:1.6;margin:-8px 0 20px;}
+  .profit-table{width:100%;border-collapse:collapse;font-size:13px;}
+  .profit-table th{text-align:left;color:var(--text-muted);font-size:11px;text-transform:uppercase;letter-spacing:.4px;padding:8px 6px;border-bottom:1px solid var(--border-glass);}
+  .profit-table td{padding:9px 6px;border-bottom:1px solid var(--border-glass);font-family:var(--font-display);font-weight:600;}
+  .profit-table td.num, .profit-table th.num{text-align:right;}
+  .profit-table tr:last-child td{border-bottom:none;}
+  .cat-product{margin-bottom:18px;}
+  .cat-product h3{font-family:var(--font-display);font-size:15px;font-weight:700;}
+  .cat-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;}
+  .cat-group{margin-bottom:14px;}
+  .cat-group-name{width:100%;padding:9px 10px;border-radius:12px;background:var(--input-bg);border:1px solid var(--border-glass);color:var(--text-primary);font-family:var(--font-display);font-size:13.5px;font-weight:700;margin-bottom:8px;outline:none;}
+  .cat-group-name:focus{border-color:var(--accent-cyan);}
+  .cat-row{display:grid;grid-template-columns:1.2fr 1fr 1fr auto auto auto;gap:8px;align-items:center;margin-bottom:8px;}
+  .cat-row input[type=text], .cat-row input[type=number]{width:100%;padding:9px 10px;border-radius:12px;background:var(--input-bg);border:1px solid var(--border-glass);color:var(--text-primary);font-family:var(--font-body);font-size:13.5px;outline:none;min-width:0;}
+  .cat-row input:focus{border-color:var(--accent-cyan);}
+  .cat-row .cat-profit{font-family:var(--font-display);font-size:13px;font-weight:700;color:var(--success);white-space:nowrap;min-width:86px;text-align:right;}
+  .cat-row .cat-profit.none{color:var(--text-muted);font-weight:500;}
+  .cat-row input[type=checkbox]{width:18px;height:18px;accent-color:var(--accent-blue);cursor:pointer;}
+  .cat-row.cat-head-row span{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;font-weight:700;}
+  .cat-del{background:transparent;border:1px solid var(--danger);color:var(--danger);border-radius:999px;padding:7px 11px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body);}
+  .mini-btn{background:var(--panel);border:1px solid var(--border-glass);color:var(--text-primary);border-radius:999px;padding:8px 14px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:var(--font-body);}
+  .save-row{display:flex;gap:10px;align-items:center;margin-top:6px;flex-wrap:wrap;}
+  .save-row .save-status{font-size:13px;color:var(--text-muted);}
+  @media (max-width:800px){
+    .cat-row{grid-template-columns:1fr 1fr 1fr;}
+    .cat-row.cat-head-row{display:none;}
+  }
+
   @media (max-width:800px){
     .stats{grid-template-columns:repeat(2,1fr);}
     .order-card{grid-template-columns:1fr;}
@@ -369,6 +402,7 @@
 
     <div class="page-tabs">
       <div class="page-tab active" id="ordersPageTab">📦 Orders</div>
+      <div class="page-tab" id="digitalPageTab">💎 Digital</div>
       <div class="page-tab" id="bannersPageTab">🖼️ Banners</div>
     </div>
 
@@ -387,8 +421,42 @@
         <div class="tab" data-filter="rejected">Rejected</div>
         <div class="tab" data-filter="all">All</div>
       </div>
+      <div class="type-filter-row">
+        <label for="typeFilter">အမျိုးအစား:</label>
+        <select id="typeFilter">
+          <option value="all">အားလုံး (Game + Digital)</option>
+          <option value="game">🎮 Game</option>
+          <option value="digital">💎 Digital</option>
+        </select>
+      </div>
 
       <div id="ordersList"></div>
+    </div>
+
+    <!-- ============ DIGITAL PANEL ============ -->
+    <div id="digitalPanel" style="display:none;">
+      <div class="stats">
+        <div class="stat-card"><div class="num" id="statDigRevenue">0</div><div class="lbl">Digital ရောင်းရငွေ (Ks)</div></div>
+        <div class="stat-card cost"><div class="num" id="statDigCost">0</div><div class="lbl">အရင်း (Ks)</div></div>
+        <div class="stat-card profit"><div class="num" id="statDigProfit">0</div><div class="lbl">အမြတ် (Ks)</div></div>
+        <div class="stat-card completed"><div class="num" id="statDigSold">0</div><div class="lbl">ရောင်းပြီး (Orders)</div></div>
+      </div>
+      <p class="profit-note">အမြတ်ကို ရောင်းပြီး (Completed) Digital Order တွေကနေပဲ တွက်ပါတယ် — နောက်ဆုံး Order 300 အထိသာ ကြည့်ပါတယ်။ အရင်းဈေး မထည့်ထားတဲ့ Pack ဆိုရင် အမြတ်ထဲ ထည့်မတွက်ဘဲ "အရင်း မသိ" လို့ ပြပါမယ်။</p>
+
+      <div class="card">
+        <div class="section-label">Product တစ်ခုချင်းစီရဲ့ အမြတ်</div>
+        <div id="profitTableWrap"><div class="empty-msg">Loading...</div></div>
+      </div>
+
+      <div class="card">
+        <div class="section-label">Digital Product ဈေးနှုန်း သတ်မှတ်ရန်</div>
+        <p class="hint" style="margin-bottom:14px;">ရောင်းဈေးက ဆိုင်မှာ ချက်ချင်းပြောင်းပါတယ်။ အရင်းဈေးက Admin ပဲမြင်ရပါတယ် — ဝယ်သူ မမြင်ရပါဘူး။ Pack ကို ပိတ်ထားရင် ဆိုင်မှာ မပြတော့ပါဘူး။ ပြင်ပြီးရင် အောက်က <b>သိမ်းမည်</b> ကို နှိပ်ပါ။</p>
+        <div id="catalogEditor"><div class="empty-msg">Loading...</div></div>
+        <div class="save-row">
+          <button type="button" class="submit-btn" id="saveCatalogBtn" style="width:auto;padding:13px 28px;font-size:15px;">💾 ဈေးနှုန်းများ သိမ်းမည်</button>
+          <span class="save-status" id="catalogSaveStatus"></span>
+        </div>
+      </div>
     </div>
 
     <!-- ============ BANNERS PANEL ============ -->
@@ -508,6 +576,7 @@ auth.onAuthStateChanged(user => {
     document.getElementById('whoAmI').textContent = user.email;
     startListeningOrders();
     loadBanners();
+    loadDigitalData();
   } else {
     loginScreen.style.display = 'block';
     dashboard.style.display = 'none';
@@ -517,28 +586,29 @@ auth.onAuthStateChanged(user => {
 
 /* ---------- Page tabs: Orders <-> Banners ---------- */
 const ordersPageTab = document.getElementById('ordersPageTab');
+const digitalPageTab = document.getElementById('digitalPageTab');
 const bannersPageTab = document.getElementById('bannersPageTab');
 const ordersPanel = document.getElementById('ordersPanel');
+const digitalPanel = document.getElementById('digitalPanel');
 const bannersPanel = document.getElementById('bannersPanel');
 
-ordersPageTab.addEventListener('click', () => {
-  ordersPageTab.classList.add('active');
-  bannersPageTab.classList.remove('active');
-  ordersPanel.style.display = 'block';
-  bannersPanel.style.display = 'none';
-});
-bannersPageTab.addEventListener('click', () => {
-  bannersPageTab.classList.add('active');
-  ordersPageTab.classList.remove('active');
-  bannersPanel.style.display = 'block';
-  ordersPanel.style.display = 'none';
-});
+function showAdminPage(page) {
+  const pages = { orders: [ordersPageTab, ordersPanel], digital: [digitalPageTab, digitalPanel], banners: [bannersPageTab, bannersPanel] };
+  Object.keys(pages).forEach(k => {
+    pages[k][0].classList.toggle('active', k === page);
+    pages[k][1].style.display = k === page ? 'block' : 'none';
+  });
+}
+ordersPageTab.addEventListener('click', () => showAdminPage('orders'));
+digitalPageTab.addEventListener('click', () => showAdminPage('digital'));
+bannersPageTab.addEventListener('click', () => showAdminPage('banners'));
 
 /* =========================================================
    ORDERS
    ========================================================= */
 let allOrders = [];
 let currentFilter = 'pending';
+let currentTypeFilter = 'all';
 
 function startListeningOrders() {
   unsubscribe = db.collection('orders')
@@ -558,6 +628,7 @@ function renderStats() {
   document.getElementById('statPending').textContent = allOrders.filter(o => o.status === 'pending').length;
   document.getElementById('statCompleted').textContent = allOrders.filter(o => o.status === 'completed').length;
   document.getElementById('statRejected').textContent = allOrders.filter(o => o.status === 'rejected').length;
+  renderProfit();
 }
 
 document.querySelectorAll('.tabs .tab').forEach(tab => {
@@ -576,7 +647,12 @@ function fmtTime(ts) {
 
 function renderOrders() {
   const list = document.getElementById('ordersList');
-  const filtered = currentFilter === 'all' ? allOrders : allOrders.filter(o => o.status === currentFilter);
+  const filtered = allOrders.filter(o => {
+    if (currentFilter !== 'all' && o.status !== currentFilter) return false;
+    if (currentTypeFilter === 'game' && o.productType === 'digital') return false;
+    if (currentTypeFilter === 'digital' && o.productType !== 'digital') return false;
+    return true;
+  });
 
   if (filtered.length === 0) {
     list.innerHTML = `<div class="empty-state">Order မရှိသေးပါ</div>`;
@@ -591,12 +667,12 @@ function renderOrders() {
           <div class="v">#${o.orderId || o.id.slice(0,8)}</div>
         </div>
         <div class="col">
-          <div class="k">Player / Zone</div>
-          <div class="v">${escapeHtml(o.playerId)}${o.zoneId ? ' / ' + escapeHtml(o.zoneId) : ''}${o.username ? `<div style="font-size:11px;color:var(--success);margin-top:2px;">${escapeHtml(o.username)}</div>` : ''}</div>
+          <div class="k">${digitalAccountLabel(o)}</div>
+          <div class="v">${digitalAccountValue(o)}</div>
         </div>
         <div class="col">
           <div class="k">Pack</div>
-          <div class="v">${escapeHtml(o.packLabel)}${o.quantity && o.quantity > 1 ? ` x${o.quantity}` : ''}</div>
+          <div class="v">${escapeHtml(o.packLabel)}${o.quantity && o.quantity > 1 ? ` x${o.quantity}` : ''}${o.productType === 'digital' ? `<div style="font-size:11px;color:var(--text-muted);margin-top:2px;">💎 ${escapeHtml(DIGITAL_PRODUCT_NAMES[o.game] || o.game || '')}</div>` : ''}</div>
         </div>
         <div class="col">
           <div class="k">Total</div>
@@ -611,6 +687,7 @@ function renderOrders() {
         </div>
       </div>
       ${o.email ? `<div style="font-size:11.5px;color:var(--text-muted);margin-top:6px;">✉️ ${escapeHtml(o.email)}</div>` : ''}
+      ${digitalProfitLine(o)}
       <div class="order-actions">
         ${o.status === 'pending' ? `
           <button class="act-btn approve" data-action="completed" data-id="${o.id}">✓ Approve</button>
@@ -647,17 +724,286 @@ async function deleteOrder(docId, label, btn) {
 async function updateStatus(docId, newStatus, btn) {
   btn.disabled = true;
   try {
-    await db.collection('orders').doc(docId).update({
+    const update = {
       status: newStatus,
       reviewedAt: firebase.firestore.FieldValue.serverTimestamp(),
       reviewedBy: auth.currentUser.email
-    });
+    };
+    // Digital order completed -> stamp its cost + profit now, so later cost
+    // changes never rewrite history. Re-open/reject clears the stamp.
+    const order = allOrders.find(o => o.id === docId);
+    if (order && order.productType === 'digital') {
+      if (newStatus === 'completed') {
+        const cost = costOf(order.game, order.packLabel);
+        if (cost !== null) {
+          const qty = order.quantity || 1;
+          const revenue = order.totalPrice || (order.packPrice || 0) * qty;
+          update.costPrice = cost;
+          update.profit = revenue - cost * qty;
+        }
+      } else {
+        update.costPrice = firebase.firestore.FieldValue.delete();
+        update.profit = firebase.firestore.FieldValue.delete();
+      }
+    }
+    await db.collection('orders').doc(docId).update(update);
   } catch (err) {
     console.error(err);
     showToast("Update fail ဖြစ်ပါတယ်: " + err.message, 'error');
     btn.disabled = false;
   }
 }
+
+/* =========================================================
+   DIGITAL PRODUCTS — admin-managed prices + profit (no Sheet)
+   Firestore:
+     config/digitalCatalog — { products: { telegram: [{group, items:[{label, price, active}]}...] } }
+       Public read: the storefront loads sell prices from here.
+       Admin-only write. If the doc is missing/unreachable the storefront
+       falls back to the prices baked into its own file.
+     config/digitalCosts — { costs: { "telegram|1လ": 20000, ... } }
+       Admin-only read/write. The storefront NEVER reads this doc, so
+       cost prices stay invisible to customers.
+   Profit counts only Completed digital orders. Marking an order completed
+   stamps its per-unit cost + total profit onto the order doc, so later
+   cost changes never rewrite history. Re-opening/rejecting clears the stamp.
+   ========================================================= */
+const DIGITAL_PRODUCT_IDS = ['telegram', 'gemini', 'chatgpt', 'claude', 'canva', 'vpn'];
+const DIGITAL_PRODUCT_NAMES = {
+  telegram: 'Telegram Premium', gemini: 'Google AI Pro (Gemini)', chatgpt: 'ChatGPT Plus',
+  claude: 'Claude Pro', canva: 'Canva Pro', vpn: 'VPN Premium'
+};
+const DEFAULT_DIGITAL_CATALOG = {
+  telegram: [{ group: 'Telegram Premium 👑', items: [
+    { label: '1 လ', price: 27500, active: true },
+    { label: '3 လ', price: 62000, active: true },
+    { label: '6 လ', price: 85000, active: true },
+    { label: '1 နှစ်', price: 145000, active: true } ] }],
+  gemini: [{ group: 'Google AI Pro (Gemini Advanced)', items: [
+    { label: '1 လ', price: 110000, active: true } ] }],
+  chatgpt: [{ group: 'ChatGPT Plus', items: [
+    { label: '1 လ', price: 110000, active: true } ] }],
+  claude: [{ group: 'Claude Pro', items: [
+    { label: '1 လ', price: 110000, active: true } ] }],
+  canva: [{ group: 'Canva Pro', items: [
+    { label: '1 လ', price: 10000, active: true },
+    { label: '3 လ', price: 27000, active: true },
+    { label: '6 လ', price: 54000, active: true },
+    { label: '1 နှစ်', price: 102000, active: true } ] }],
+  vpn: [{ group: 'VPN Premium 🛡️', items: [
+    { label: '1 လ', price: 20000, active: true },
+    { label: '3 လ', price: 50000, active: true },
+    { label: '1 နှစ်', price: 120000, active: true } ] }]
+};
+let digitalCatalog = null;
+let digitalCosts = {};
+
+function costKey(game, label) { return game + '|' + label; }
+function costOf(game, label) {
+  const v = digitalCosts[costKey(game, label)];
+  return (typeof v === 'number' && v >= 0) ? v : null;
+}
+function catalogProducts() {
+  const src = (digitalCatalog && digitalCatalog.products) || DEFAULT_DIGITAL_CATALOG;
+  return JSON.parse(JSON.stringify(src));
+}
+
+async function loadDigitalData() {
+  try {
+    const catSnap = await db.collection('config').doc('digitalCatalog').get();
+    if (catSnap.exists) digitalCatalog = catSnap.data();
+  } catch (err) { console.error('digitalCatalog load failed:', err); }
+  try {
+    const costSnap = await db.collection('config').doc('digitalCosts').get();
+    if (costSnap.exists) digitalCosts = (costSnap.data() && costSnap.data().costs) || {};
+  } catch (err) { console.error('digitalCosts load failed:', err); }
+  renderCatalogEditor();
+  renderProfit();
+}
+
+/* ---------- Profit ---------- */
+function digitalCompletedOrders() {
+  return allOrders.filter(o => o.productType === 'digital' && o.status === 'completed');
+}
+function orderProfit(o) {
+  const qty = o.quantity || 1;
+  const revenue = o.totalPrice || (o.packPrice || 0) * qty;
+  if (typeof o.profit === 'number') return { revenue, cost: revenue - o.profit, profit: o.profit, known: true };
+  const cost = costOf(o.game, o.packLabel);
+  if (cost === null) return { revenue, cost: null, profit: null, known: false };
+  const c = cost * qty;
+  return { revenue, cost: c, profit: revenue - c, known: true };
+}
+function renderProfit() {
+  const revEl = document.getElementById('statDigRevenue');
+  if (!revEl) return;
+  const done = digitalCompletedOrders();
+  let revenue = 0, cost = 0, profit = 0, unknown = 0;
+  const byProduct = {};
+  done.forEach(o => {
+    const p = orderProfit(o);
+    revenue += p.revenue;
+    const key = o.game || 'unknown';
+    if (!byProduct[key]) byProduct[key] = { orders: 0, revenue: 0, cost: 0, profit: 0, unknown: 0 };
+    byProduct[key].orders += 1;
+    byProduct[key].revenue += p.revenue;
+    if (p.known) { byProduct[key].cost += p.cost; byProduct[key].profit += p.profit; cost += p.cost; profit += p.profit; }
+    else { byProduct[key].unknown += 1; unknown += 1; }
+  });
+  revEl.textContent = revenue.toLocaleString();
+  document.getElementById('statDigCost').textContent = cost.toLocaleString();
+  document.getElementById('statDigProfit').textContent = profit.toLocaleString();
+  document.getElementById('statDigSold').textContent = done.length;
+  const wrap = document.getElementById('profitTableWrap');
+  if (!done.length) {
+    wrap.innerHTML = '<div class="empty-msg">ရောင်းပြီး Digital Order မရှိသေးပါ</div>';
+    return;
+  }
+  const rows = DIGITAL_PRODUCT_IDS.filter(id => byProduct[id]).map(id => {
+    const b = byProduct[id];
+    return `<tr><td>${escapeHtml(DIGITAL_PRODUCT_NAMES[id])}</td><td class="num">${b.orders}</td><td class="num">${b.revenue.toLocaleString()}</td><td class="num">${b.cost.toLocaleString()}</td><td class="num" style="color:var(--success);">${b.profit.toLocaleString()}</td><td class="num">${b.unknown ? 'အရင်း မသိ ' + b.unknown + ' ခု' : '—'}</td></tr>`;
+  }).join('');
+  wrap.innerHTML = `<table class="profit-table"><thead><tr><th>Product</th><th class="num">Orders</th><th class="num">ရောင်းရငွေ</th><th class="num">အရင်း</th><th class="num">အမြတ်</th><th class="num">မှတ်ချက်</th></tr></thead><tbody>${rows}</tbody></table>${unknown ? `<p class="hint">အရင်းဈေး မထည့်ထားတဲ့ Order ${unknown} ခုကို အမြတ်ထဲ ထည့်မတွက်ထားပါ — အရင်းဈေး ထည့်ပေးမှ အမြတ်မှန်ပါမယ်။</p>` : ''}`;
+}
+function digitalProfitLine(o) {
+  if (o.productType !== 'digital' || o.status !== 'completed') return '';
+  const p = orderProfit(o);
+  if (!p.known) return `<div style="font-size:11.5px;color:var(--text-muted);margin-top:6px;">💰 အမြတ်: အရင်းဈေး မထည့်ထားသေးပါ</div>`;
+  return `<div style="font-size:11.5px;color:var(--text-muted);margin-top:6px;">💰 အရင်း ${p.cost.toLocaleString()} Ks · အမြတ် <b style="color:var(--success);">${p.profit.toLocaleString()} Ks</b></div>`;
+}
+function digitalAccountLabel(o) {
+  if (o.productType !== 'digital') return 'Player / Zone';
+  return o.game === 'telegram' ? 'Telegram Username' : 'Email';
+}
+function digitalAccountValue(o) {
+  if (o.productType !== 'digital') {
+    return `${escapeHtml(o.playerId)}${o.zoneId ? ' / ' + escapeHtml(o.zoneId) : ''}${o.username ? `<div style="font-size:11px;color:var(--success);margin-top:2px;">${escapeHtml(o.username)}</div>` : ''}`;
+  }
+  return escapeHtml(o.playerId);
+}
+
+/* ---------- Catalog editor ---------- */
+function rowHtml(game, item) {
+  const cost = costOf(game, item.label);
+  return `<div class="cat-row">
+    <input type="text" class="cat-label" value="${escapeHtml(item.label)}" placeholder="Pack နာမည် (ဥပမာ 1 လ)">
+    <input type="number" class="cat-sell" value="${item.price}" min="0" step="500" placeholder="ရောင်းဈေး">
+    <input type="number" class="cat-cost" value="${cost === null ? '' : cost}" min="0" step="500" placeholder="အရင်းဈေး">
+    <span class="cat-profit none">—</span>
+    <input type="checkbox" class="cat-active" ${item.active !== false ? 'checked' : ''} title="ဆိုင်မှာ ပြမည်">
+    <button type="button" class="cat-del" title="ဒီ Pack ကို ဖျက်မည်">✕</button>
+  </div>`;
+}
+function updateRowProfit(row) {
+  const sell = Number(row.querySelector('.cat-sell').value);
+  const costRaw = row.querySelector('.cat-cost').value.trim();
+  const el = row.querySelector('.cat-profit');
+  if (!sell || costRaw === '' || !(Number(costRaw) >= 0)) { el.textContent = '—'; el.classList.add('none'); return; }
+  const p = sell - Number(costRaw);
+  el.textContent = (p >= 0 ? '+' : '') + p.toLocaleString() + ' Ks';
+  el.classList.remove('none');
+}
+function renderCatalogEditor() {
+  const ed = document.getElementById('catalogEditor');
+  if (!ed) return;
+  const products = catalogProducts();
+  let html = `<div class="cat-row cat-head-row"><span>Pack</span><span>ရောင်းဈေး (Ks)</span><span>အရင်းဈေး (Ks)</span><span style="text-align:right;">အမြတ်</span><span>ပြမည်</span><span></span></div>`;
+  DIGITAL_PRODUCT_IDS.forEach(game => {
+    const groups = products[game] || [{ group: DIGITAL_PRODUCT_NAMES[game], items: [] }];
+    html += `<div class="cat-product" data-game="${game}">
+      <div class="cat-head"><h3>${escapeHtml(DIGITAL_PRODUCT_NAMES[game])}</h3><button type="button" class="mini-btn" data-add-group>＋ Group အသစ်</button></div>`;
+    groups.forEach(g => {
+      html += `<div class="cat-group">
+        <input type="text" class="cat-group-name" value="${escapeHtml(g.group)}" placeholder="Group နာမည်">
+        <div class="cat-rows">${g.items.map(it => rowHtml(game, it)).join('')}</div>
+        <button type="button" class="mini-btn" data-add-pack>＋ Pack အသစ်</button>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  ed.innerHTML = html;
+  ed.querySelectorAll('.cat-row').forEach(updateRowProfit);
+}
+document.getElementById('catalogEditor').addEventListener('input', e => {
+  const row = e.target.closest('.cat-row');
+  if (row) updateRowProfit(row);
+});
+document.getElementById('catalogEditor').addEventListener('click', e => {
+  const addPack = e.target.closest('[data-add-pack]');
+  if (addPack) {
+    const rowsEl = addPack.closest('.cat-group').querySelector('.cat-rows');
+    const tmp = document.createElement('div');
+    tmp.innerHTML = rowHtml(addPack.closest('.cat-product').dataset.game, { label: '', price: '', active: true });
+    rowsEl.appendChild(tmp.firstElementChild);
+    return;
+  }
+  const addGroup = e.target.closest('[data-add-group]');
+  if (addGroup) {
+    const prodEl = addGroup.closest('.cat-product');
+    const game = prodEl.dataset.game;
+    const tmp = document.createElement('div');
+    tmp.innerHTML = `<div class="cat-group">
+      <input type="text" class="cat-group-name" value="${escapeHtml(DIGITAL_PRODUCT_NAMES[game])}" placeholder="Group နာမည်">
+      <div class="cat-rows">${rowHtml(game, { label: '', price: '', active: true })}</div>
+      <button type="button" class="mini-btn" data-add-pack>＋ Pack အသစ်</button>
+    </div>`;
+    prodEl.appendChild(tmp.firstElementChild);
+    return;
+  }
+  const del = e.target.closest('.cat-del');
+  if (del) {
+    const rowsEl = del.closest('.cat-rows');
+    if (rowsEl.querySelectorAll('.cat-row').length <= 1) { showToast('Pack တစ်ခုတော့ ချန်ထားရပါမယ်', 'error'); return; }
+    del.closest('.cat-row').remove();
+  }
+});
+document.getElementById('saveCatalogBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('saveCatalogBtn');
+  const statusEl = document.getElementById('catalogSaveStatus');
+  const products = {};
+  const costs = {};
+  let error = null;
+  document.querySelectorAll('#catalogEditor .cat-product').forEach(prodEl => {
+    const game = prodEl.dataset.game;
+    const groups = [];
+    prodEl.querySelectorAll('.cat-group').forEach(groupEl => {
+      const groupName = groupEl.querySelector('.cat-group-name').value.trim();
+      const items = [];
+      groupEl.querySelectorAll('.cat-row').forEach(row => {
+        const label = row.querySelector('.cat-label').value.trim();
+        const sell = Number(row.querySelector('.cat-sell').value);
+        const costRaw = row.querySelector('.cat-cost').value.trim();
+        const cost = costRaw === '' ? null : Number(costRaw);
+        const active = row.querySelector('.cat-active').checked;
+        if (!label || !(sell > 0) || (cost !== null && !(cost >= 0))) { error = 'Pack နာမည် / ရောင်းဈေး / အရင်းဈေး မှားနေပါတယ် — စစ်ပေးပါ'; return; }
+        items.push({ label, price: sell, active });
+        if (cost !== null) costs[costKey(game, label)] = cost;
+      });
+      if (items.length) groups.push({ group: groupName || DIGITAL_PRODUCT_NAMES[game], items });
+    });
+    if (groups.length) products[game] = groups;
+  });
+  if (error) { showToast(error, 'error'); return; }
+  btn.disabled = true;
+  statusEl.textContent = 'သိမ်းနေသည်...';
+  try {
+    await db.collection('config').doc('digitalCatalog').set({ products, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    await db.collection('config').doc('digitalCosts').set({ costs, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    digitalCatalog = { products };
+    digitalCosts = costs;
+    statusEl.textContent = '✓ သိမ်းပြီးပါပြီ — ဆိုင်မှာ ဈေးအသစ် ပေါ်ပါပြီ';
+    showToast('Digital ဈေးနှုန်းများ သိမ်းပြီးပါပြီ', 'success');
+    renderProfit();
+  } catch (err) {
+    console.error(err);
+    statusEl.textContent = '';
+    showToast('သိမ်းခြင်း မအောင်မြင်ပါ: ' + err.message, 'error');
+  } finally { btn.disabled = false; }
+});
+document.getElementById('typeFilter').addEventListener('change', e => {
+  currentTypeFilter = e.target.value;
+  renderOrders();
+});
 
 /* =========================================================
    BANNERS
