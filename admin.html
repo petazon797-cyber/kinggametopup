@@ -182,7 +182,7 @@
   .logout-btn:active{transform:scale(0.96);}
 
   /* ---------- Top-level page tabs (Orders / Banners) ---------- */
-  .page-tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:22px;max-width:640px;}
+  .page-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:22px;max-width:640px;}
   .page-tab{
     padding:14px 10px;border-radius:18px;border:1px solid var(--border-glass);
     background:var(--panel);color:var(--text-muted);cursor:pointer;
@@ -419,6 +419,7 @@
       <div class="page-tab active" id="ordersPageTab">📦 Orders</div>
       <div class="page-tab" id="digitalPageTab">💎 Digital</div>
       <div class="page-tab" id="bannersPageTab">🖼️ Banners</div>
+      <div class="page-tab" id="walletPageTab">👛 Wallet</div>
     </div>
 
     <!-- ============ ORDERS PANEL ============ -->
@@ -475,7 +476,7 @@
 
       <div class="card">
         <div class="section-label">Digital Product ဈေးနှုန်း သတ်မှတ်ရန်</div>
-        <p class="hint" style="margin-bottom:14px;">ရောင်းဈေးက ဆိုင်မှာ ချက်ချင်းပြောင်းပါတယ်။ အရင်းဈေးက Admin ပဲမြင်ရပါတယ် — ဝယ်သူ မမြင်ရပါဘူး။ Pack ကို ပိတ်ထားရင် ဆိုင်မှာ <b>“ပစ္စည်းပြတ်နေပါတယ်”</b> လို့ မီးခိုးရောင်နဲ့ ပြပါမယ်။ Key လိုတဲ့ Product (VPN) တွေက Order ရမှ Key ဝယ်ပေးတာမို့ Stock ဖြည့်စရာ မလိုပါဘူး — Order ပြီးရင် Order Card ကနေ Key ထည့်ပေးပါ။ ပြင်ပြီးရင် အောက်က <b>သိမ်းမည်</b> ကို နှိပ်ပါ။</p>
+        <p class="hint" style="margin-bottom:14px;">ရောင်းဈေးက ဆိုင်မှာ ချက်ချင်းပြောင်းပါတယ်။ အရင်းဈေးက Admin ပဲမြင်ရပါတယ် — ဝယ်သူ မမြင်ရပါဘူး။ Pack ကို ပိတ်ထားရင် ဆိုင်မှာ <b>“ပစ္စည်းပြတ်နေပါတယ်”</b> လို့ မီးခိုးရောင်နဲ့ ပြပါမယ်။ Key လိုတဲ့ Product (VPN) တွေက Stock ရှိရင် Approve လုပ်တာနဲ့ Key အလိုအလျောက် ပေးပါတယ် — Stock ကုန်နေရင် Order ပြီးရင် Order Card ကနေ Key ထည့်ပေးပါ။ ပြင်ပြီးရင် အောက်က <b>သိမ်းမည်</b> ကို နှိပ်ပါ။</p>
         <div id="catalogEditor"><div class="empty-msg">Loading...</div></div>
         <div class="save-row">
           <button type="button" class="submit-btn" id="saveCatalogBtn" style="width:auto;padding:13px 28px;font-size:15px;">💾 ဈေးနှုန်းများ သိမ်းမည်</button>
@@ -483,6 +484,19 @@
         </div>
       </div>
     </div>
+
+      <div class="card">
+        <div class="section-label">🔑 Key Stock — ဖြည့်ရန်</div>
+        <p class="hint" style="margin-bottom:14px;">Key လိုတဲ့ Product (VPN) တွေအတွက် Key/Code တွေ ကြိုဖြည့်ထားပါ — Stock ရှိရင် Order Approve လုပ်တာနဲ့ စနစ်က သူ့အလိုလို အဟောင်းဆုံး Key ကို ပေးပါမယ်။ Stock ကုန်နေရင် အရင်အတိုင်း Order Card ကနေ Manual Key ထည့်ပေးပါ။ Key တွေကို Admin ပဲမြင်ရပါတယ် — ဝယ်သူ မမြင်ရပါဘူး။</p>
+        <div class="key-form">
+          <select id="stockProduct" class="cat-group-name" style="margin-bottom:0;"></select>
+          <select id="stockServer" class="cat-group-name" style="margin-bottom:0;"></select>
+          <select id="stockPack" class="cat-group-name" style="margin-bottom:0;"></select>
+          <textarea id="stockKeysInput" class="cat-group-name" rows="3" placeholder="Key တစ်ကြောင်းချင်းစီ — ဥပမာ&#10;XXXX-XXXX-XXXX&#10;YYYY-YYYY-YYYY" style="margin-bottom:0;resize:vertical;"></textarea>
+          <button type="button" class="mini-btn" id="addStockBtn">➕ Stock ထည့်မည်</button>
+        </div>
+        <div id="stockCountsList" style="margin-top:12px;"><div class="empty-msg">Stock မရှိသေးပါ</div></div>
+      </div>
 
       <div class="card">
         <div class="section-label">Product အသစ် ထည့်ရန်</div>
@@ -533,6 +547,23 @@
         <div class="banner-list" id="bannerList">
           <div class="empty-msg">Loading...</div>
         </div>
+      </div>
+    </div>
+
+    <!-- ============ WALLET PANEL ============ -->
+    <div id="walletPanel" style="display:none;">
+      <div class="card">
+        <div class="section-label">💰 ငွေဖြည့် ပမာဏ ခလုတ်များ (Admin သတ်မှတ်ချက်)</div>
+        <p class="hint" style="margin-bottom:14px;">ဝယ်သူဘက်မှာ ပြမယ့် ငွေဖြည့် ပမာဏ ခလုတ်တွေ — ကော်မာနဲ့ ခြားပြီး ရိုက်ပါ။ ဥပမာ <b>50,500,1000,5000,10000</b> (Ks)။ သိမ်းပြီးရင် ဆိုင်မှာ ချက်ချင်း ပြောင်းပါမယ်။</p>
+        <div class="key-form">
+          <input type="text" id="walletAmountsInput" class="cat-group-name" value="50,500,1000,5000,10000" style="margin-bottom:0;">
+          <button type="button" class="submit-btn" id="saveWalletAmountsBtn" style="width:auto;padding:11px 22px;font-size:14px;">💾 ပမာဏများ သိမ်းမည်</button>
+          <span class="save-status" id="walletAmountsStatus"></span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-label">👛 ငွေဖြည့် တောင်းဆိုမှုများ</div>
+        <div id="topupRequestsList"><div class="empty-msg">Loading...</div></div>
       </div>
     </div>
 
@@ -619,6 +650,7 @@ auth.onAuthStateChanged(user => {
     loadBanners();
     loadDigitalData();
     loadShopStatus();
+    loadWalletAdmin();
   } else {
     loginScreen.style.display = 'block';
     dashboard.style.display = 'none';
@@ -630,12 +662,14 @@ auth.onAuthStateChanged(user => {
 const ordersPageTab = document.getElementById('ordersPageTab');
 const digitalPageTab = document.getElementById('digitalPageTab');
 const bannersPageTab = document.getElementById('bannersPageTab');
+const walletPageTab = document.getElementById('walletPageTab');
 const ordersPanel = document.getElementById('ordersPanel');
 const digitalPanel = document.getElementById('digitalPanel');
 const bannersPanel = document.getElementById('bannersPanel');
+const walletPanel = document.getElementById('walletPanel');
 
 function showAdminPage(page) {
-  const pages = { orders: [ordersPageTab, ordersPanel], digital: [digitalPageTab, digitalPanel], banners: [bannersPageTab, bannersPanel] };
+  const pages = { orders: [ordersPageTab, ordersPanel], digital: [digitalPageTab, digitalPanel], banners: [bannersPageTab, bannersPanel], wallet: [walletPageTab, walletPanel] };
   Object.keys(pages).forEach(k => {
     pages[k][0].classList.toggle('active', k === page);
     pages[k][1].style.display = k === page ? 'block' : 'none';
@@ -644,6 +678,7 @@ function showAdminPage(page) {
 ordersPageTab.addEventListener('click', () => showAdminPage('orders'));
 digitalPageTab.addEventListener('click', () => showAdminPage('digital'));
 bannersPageTab.addEventListener('click', () => showAdminPage('banners'));
+walletPageTab.addEventListener('click', () => showAdminPage('wallet'));
 
 /* =========================================================
    ORDERS
@@ -730,6 +765,7 @@ function renderOrders() {
       </div>
       ${o.email ? `<div style="font-size:11.5px;color:var(--text-muted);margin-top:6px;">✉️ ${escapeHtml(o.email)}</div>` : ''}
       ${digitalProfitLine(o)}
+      ${o.paymentMethod === 'wallet' ? `<div style="font-size:12px;margin-top:6px;">👛 Wallet နဲ့ ဝယ်သည်${walletLoaded ? ' — ဝယ်သူ လက်ကျန် <b>' + balanceFor(o.ownerUid).toLocaleString() + ' Ks</b>' : ''}</div>` : ''}
       ${digitalKeyLine(o)}
       <div class="order-actions">
         ${o.status === 'pending' ? `
@@ -809,8 +845,13 @@ async function updateStatus(docId, newStatus, btn) {
           update.costPrice = cost;
           update.profit = revenue - cost * qty;
         }
-        // Buy-on-demand: no key stock — the Admin buys the key after the
-        // order and pastes it into the order card (manual key field).
+        // Key stock: if a key is stocked for this pack, assign the oldest
+        // one now (FIFO). Out of stock -> leave it for manual key entry
+        // (buy-on-demand), exactly as before.
+        if (!order.licenseKey) {
+          const stockedKey = takeKeyFromStock(order.game, order.server, order.packLabel);
+          if (stockedKey) update.licenseKey = stockedKey;
+        }
       } else {
         update.costPrice = firebase.firestore.FieldValue.delete();
         update.profit = firebase.firestore.FieldValue.delete();
@@ -940,8 +981,22 @@ async function loadDigitalData() {
     const costSnap = await db.collection('config').doc('digitalCosts').get();
     if (costSnap.exists) digitalCosts = (costSnap.data() && costSnap.data().costs) || {};
   } catch (err) { console.error('digitalCosts load failed:', err); }
+  try {
+    const keysSnap = await db.collection('config').doc('digitalKeys').get();
+    if (keysSnap.exists) digitalKeys = (keysSnap.data() && keysSnap.data().keys) || {};
+  } catch (err) { console.error('digitalKeys load failed:', err); }
+  try {
+    const wSnap = await db.collection('config').doc('walletSettings').get();
+    if (wSnap.exists && Array.isArray((wSnap.data() || {}).amounts)) {
+      walletAmounts = (wSnap.data().amounts || []).map(Number).filter(n => n > 0);
+      const wInput = document.getElementById('walletAmountsInput');
+      if (wInput && walletAmounts.length) wInput.value = walletAmounts.join(',');
+    }
+  } catch (err) { console.error('walletSettings load failed:', err); }
   renderCatalogEditor();
   renderProfit();
+  refreshStockCounts();
+  initStockForm();
 }
 
 /* ---------- Shop open / close ---------- */
@@ -978,6 +1033,186 @@ document.getElementById('saveShopStatusBtn').addEventListener('click', async () 
     await db.collection('config').doc('shopStatus').set({ open, message, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
     renderShopStatus(open, message);
     showToast(open ? 'ဆိုင်ဖွင့်လိုက်ပါပြီ' : 'ဆိုင်ပိတ်လိုက်ပါပြီ', 'success');
+  } catch (err) { console.error(err); showToast('သိမ်းခြင်း မအောင်မြင်ပါ: ' + err.message, 'error'); }
+  btn.disabled = false;
+});
+
+/* =========================================================
+   WALLET + KEY STOCK
+   Wallet balance is DERIVED (approved top-ups minus wallet-paid
+   orders), so no balance document exists and nobody can edit a
+   balance directly. Stock keys live in config/digitalKeys
+   (admin-only); only COUNTS are published in digitalCatalog.stock
+   so the storefront can show the "instant" badge.
+   ========================================================= */
+let digitalKeys = {};          // { "game|server|label": ["KEY1", ...] }
+let digitalStockCounts = {};   // { "game|server|label": n } — mirrored into digitalCatalog.stock
+let walletAmounts = [50, 500, 1000, 5000, 10000];
+let allTopups = [];
+let walletUnsub = null;
+let walletLoaded = false;
+
+function stockKey(game, server, label) { return game + '|' + (server || '') + '|' + label; }
+function stockCountFor(game, server, label) {
+  const arr = digitalKeys[stockKey(game, server, label)];
+  return Array.isArray(arr) ? arr.length : 0;
+}
+function refreshStockCounts() {
+  digitalStockCounts = {};
+  Object.keys(digitalKeys).forEach(k => { digitalStockCounts[k] = digitalKeys[k].length; });
+  const list = document.getElementById('stockCountsList');
+  if (list) {
+    const rows = Object.keys(digitalStockCounts).filter(k => digitalStockCounts[k] > 0).sort();
+    if (!rows.length) { list.innerHTML = '<div class="empty-msg">Stock မရှိသေးပါ</div>'; }
+    else {
+      list.innerHTML = rows.map(k => {
+        const parts = k.split('|');
+        const name = liveProductName(parts[0]) + (parts[1] ? ' • ' + escapeHtml(parts[1]) : '') + ' • ' + escapeHtml(parts[2]);
+        return `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 2px;border-bottom:1px solid var(--border-glass);font-size:13px;"><span>${name}</span><span><b>${digitalStockCounts[k]} ခု</b> <button type="button" class="mini-btn" data-clear-stock="${escapeHtml(k)}">🗑 ရှင်းမည်</button></span></div>`;
+      }).join('');
+      list.querySelectorAll('[data-clear-stock]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          if (!confirm('ဒီ Pack ရဲ့ Stock အားလုံး ဖျက်မှာ သေချာလား?')) return;
+          delete digitalKeys[btn.dataset.clearStock];
+          refreshStockCounts();
+          await saveStock();
+        });
+      });
+    }
+  }
+}
+async function saveStock() {
+  try {
+    await db.collection('config').doc('digitalKeys').set({ keys: digitalKeys, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    await db.collection('config').doc('digitalCatalog').set({ stock: digitalStockCounts }, { merge: true });
+  } catch (err) { console.error(err); showToast('Stock သိမ်းခြင်း မအောင်မြင်ပါ: ' + err.message, 'error'); }
+}
+// Take the oldest key (FIFO) for an order; returns '' when out of stock.
+function takeKeyFromStock(game, server, label) {
+  const k = stockKey(game, server, label);
+  const arr = digitalKeys[k];
+  if (!Array.isArray(arr) || !arr.length) return '';
+  const key = arr.shift();
+  refreshStockCounts();
+  saveStock();
+  return key;
+}
+function initStockForm() {
+  const prodSel = document.getElementById('stockProduct');
+  const servSel = document.getElementById('stockServer');
+  const packSel = document.getElementById('stockPack');
+  if (!prodSel || !servSel || !packSel) return;
+  const keyProducts = liveProductIds().filter(g => metaOf(g) && metaOf(g).needsKey);
+  prodSel.innerHTML = keyProducts.map(g => `<option value="${escapeHtml(g)}">${escapeHtml(metaOf(g).name || g)}</option>`).join('');
+  const fillServers = () => {
+    const g = prodSel.value;
+    const plats = (metaOf(g) && metaOf(g).platforms) || [];
+    servSel.innerHTML = plats.length
+      ? plats.map(p => `<option value="${escapeHtml(p)}">${escapeHtml(p)}</option>`).join('')
+      : '<option value="">— Platform မရှိ —</option>';
+    fillPacks();
+  };
+  const fillPacks = () => {
+    const g = prodSel.value;
+    const server = servSel.value;
+    const groups = (catalogProducts()[g] || []).filter(gr => !server || !gr.server || gr.server === server);
+    const labels = [];
+    groups.forEach(gr => (gr.items || []).forEach(it => { if (it.label && !labels.includes(it.label)) labels.push(it.label); }));
+    packSel.innerHTML = labels.length
+      ? labels.map(l => `<option value="${escapeHtml(l)}">${escapeHtml(l)}</option>`).join('')
+      : '<option value="">— Pack မရှိသေးပါ —</option>';
+  };
+  prodSel.onchange = fillServers;
+  servSel.onchange = fillPacks;
+  fillServers();
+}
+document.getElementById('addStockBtn').addEventListener('click', async () => {
+  const g = document.getElementById('stockProduct').value;
+  const server = document.getElementById('stockServer').value;
+  const label = document.getElementById('stockPack').value;
+  const raw = document.getElementById('stockKeysInput').value.split('\n').map(s => s.trim()).filter(Boolean);
+  if (!g || !label) { showToast('Product နဲ့ Pack ရွေးပေးပါ', 'error'); return; }
+  if (!raw.length) { showToast('Key ရိုက်ထည့်ပေးပါ — တစ်ကြောင်းကို တစ်ခု', 'error'); return; }
+  const k = stockKey(g, server, label);
+  if (!Array.isArray(digitalKeys[k])) digitalKeys[k] = [];
+  const before = digitalKeys[k].length;
+  raw.forEach(key => { if (!digitalKeys[k].includes(key)) digitalKeys[k].push(key); });
+  document.getElementById('stockKeysInput').value = '';
+  refreshStockCounts();
+  await saveStock();
+  showToast(`Stock ထည့်ပြီးပါပြီ — ${digitalKeys[k].length - before} ခု အသစ် (စုစုပေါင်း ${digitalKeys[k].length} ခု)`, 'success');
+});
+
+/* ---------- Wallet: top-up requests + amounts ---------- */
+function balanceFor(uid) {
+  if (!uid) return 0;
+  const topped = allTopups.filter(t => t.ownerUid === uid && t.status === 'approved').reduce((s, t) => s + (Number(t.amount) || 0), 0);
+  const spent = allOrders.filter(o => o.ownerUid === uid && o.paymentMethod === 'wallet' && (o.status === 'pending' || o.status === 'completed')).reduce((s, o) => s + (Number(o.totalPrice) || (Number(o.packPrice) || 0) * (Number(o.quantity) || 1)), 0);
+  return topped - spent;
+}
+function loadWalletAdmin() {
+  if (walletUnsub) return;
+  try {
+    walletUnsub = db.collection('topups').onSnapshot(snap => {
+      allTopups = snap.docs.map(d => { const t = d.data() || {}; return { ...t, id: d.id, createdAtMs: t.createdAt && t.createdAt.toDate ? t.createdAt.toDate().getTime() : 0 }; });
+      walletLoaded = true;
+      renderTopupRequests();
+      renderOrders();
+    }, err => console.error('Top-ups listen failed:', err));
+  } catch (err) { console.error('Wallet admin load failed:', err); }
+}
+function renderTopupRequests() {
+  const list = document.getElementById('topupRequestsList');
+  if (!list) return;
+  if (!allTopups.length) { list.innerHTML = '<div class="empty-msg">တောင်းဆိုမှု မရှိသေးပါ</div>'; return; }
+  const sorted = [...allTopups].sort((a, b) => (b.createdAtMs || 0) - (a.createdAtMs || 0));
+  list.innerHTML = sorted.slice(0, 100).map(t => `
+    <div class="order-card">
+      <div class="order-main">
+        <div class="col"><div class="k">ပမာဏ</div><div class="v">${(Number(t.amount) || 0).toLocaleString()} Ks</div></div>
+        <div class="col"><div class="k">နည်းလမ်း</div><div class="v">${escapeHtml(t.paymentMethod || '')}</div></div>
+        <div class="col"><div class="k">ဝယ်သူ</div><div class="v">${escapeHtml((t.ownerUid || '').slice(0, 8))}…<div style="font-size:11px;color:var(--text-muted);margin-top:2px;">လက်ကျန် ${balanceFor(t.ownerUid).toLocaleString()} Ks</div></div></div>
+        <div class="col"><div class="k">Status / Time</div><div class="v"><span class="badge ${t.status}">${t.status}</span><div style="font-size:11px;color:var(--text-muted);margin-top:4px;">${fmtTime(t.createdAt)}</div></div></div>
+      </div>
+      <div class="order-actions">
+        ${t.status === 'pending' ? `
+          <button class="act-btn approve" data-topup-approve="${t.id}">✓ Approve</button>
+          <button class="act-btn reject" data-topup-reject="${t.id}">✕ Reject</button>
+        ` : ''}
+      </div>
+    </div>
+  `).join('');
+  list.querySelectorAll('[data-topup-approve]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      try {
+        await db.collection('topups').doc(btn.dataset.topupApprove).update({ status: 'approved', reviewedAt: firebase.firestore.FieldValue.serverTimestamp(), reviewedBy: auth.currentUser.email });
+        showToast('ငွေဖြည့်ခြင်း Approve လုပ်ပြီးပါပြီ — ဝယ်သူ Balance ထဲ ရောက်ပါပြီ', 'success');
+      } catch (err) { console.error(err); showToast('Approve မအောင်မြင်ပါ: ' + err.message, 'error'); btn.disabled = false; }
+    });
+  });
+  list.querySelectorAll('[data-topup-reject]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('ဒီ ငွေဖြည့်တောင်းဆိုမှုကို Reject လုပ်မှာ သေချာလား?')) return;
+      btn.disabled = true;
+      try {
+        await db.collection('topups').doc(btn.dataset.topupReject).update({ status: 'rejected', reviewedAt: firebase.firestore.FieldValue.serverTimestamp(), reviewedBy: auth.currentUser.email });
+        showToast('Reject လုပ်ပြီးပါပြီ', 'success');
+      } catch (err) { console.error(err); showToast('Reject မအောင်မြင်ပါ: ' + err.message, 'error'); btn.disabled = false; }
+    });
+  });
+}
+document.getElementById('saveWalletAmountsBtn').addEventListener('click', async () => {
+  const raw = document.getElementById('walletAmountsInput').value.split(',').map(s => Number(s.trim())).filter(n => n > 0);
+  if (!raw.length) { showToast('ပမာဏ မှန်အောင် ရိုက်ပါ — ဥပမာ 50,500,1000,5000,10000', 'error'); return; }
+  const btn = document.getElementById('saveWalletAmountsBtn');
+  const st = document.getElementById('walletAmountsStatus');
+  btn.disabled = true;
+  try {
+    await db.collection('config').doc('walletSettings').set({ amounts: raw, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    walletAmounts = raw;
+    if (st) st.textContent = '✓ သိမ်းပြီးပါပြီ';
+    showToast('ငွေဖြည့် ပမာဏများ သိမ်းပြီးပါပြီ', 'success');
   } catch (err) { console.error(err); showToast('သိမ်းခြင်း မအောင်မြင်ပါ: ' + err.message, 'error'); }
   btn.disabled = false;
 });
@@ -1218,7 +1453,7 @@ document.getElementById('saveCatalogBtn').addEventListener('click', async () => 
   btn.disabled = true;
   statusEl.textContent = 'သိမ်းနေသည်...';
   try {
-    await db.collection('config').doc('digitalCatalog').set({ products, meta, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    await db.collection('config').doc('digitalCatalog').set({ products, meta, stock: digitalStockCounts, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
     await db.collection('config').doc('digitalCosts').set({ costs, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
     digitalCatalog = { products, meta };
     digitalMeta = meta;
