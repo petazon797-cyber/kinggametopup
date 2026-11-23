@@ -468,6 +468,11 @@
         <div class="stat-card completed"><div class="num" id="statDigSold">0</div><div class="lbl">ရောင်းပြီး (Orders)</div></div>
       </div>
       <p class="profit-note">အမြတ်ကို ရောင်းပြီး (Completed) Digital Order တွေကနေပဲ တွက်ပါတယ် — နောက်ဆုံး Order 300 အထိသာ ကြည့်ပါတယ်။ အရင်းဈေး မထည့်ထားတဲ့ Pack ဆိုရင် အမြတ်ထဲ ထည့်မတွက်ဘဲ "အရင်း မသိ" လို့ ပြပါမယ်။</p>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:-4px 0 18px;">
+        <button type="button" class="mini-btn" id="clearProfitBtn" style="border-color:rgba(220,38,38,.45);color:#DC2626;">🧹 အမြတ်စာရင်း ရှင်းမည်</button>
+        <button type="button" class="mini-btn" id="clearAllTestOrdersBtn" style="border-color:rgba(220,38,38,.45);color:#DC2626;">🧹 Test Order အားလုံး ရှင်းမည်</button>
+        <span style="font-size:12px;color:var(--text-muted);">အမြတ်ရှင်းတာက Completed Digital Order ပဲ ဖျက်တယ် — Test Order အားလုံး ရှင်းတာက Game + Digital၊ အခြေအနေမရွေး ဖျက်တယ်။ ရောင်းဈေး၊ အရင်းဈေးနဲ့ Key Stock က မပျက်ဘူး။</span>
+      </div>
 
       <div class="card">
         <div class="section-label">Product တစ်ခုချင်းစီရဲ့ အမြတ်</div>
@@ -1261,6 +1266,46 @@ function renderProfit() {
   }).join('');
   wrap.innerHTML = `<table class="profit-table"><thead><tr><th>Product</th><th class="num">Orders</th><th class="num">ရောင်းရငွေ</th><th class="num">အရင်း</th><th class="num">အမြတ်</th><th class="num">မှတ်ချက်</th></tr></thead><tbody>${rows}</tbody></table>${unknown ? `<p class="hint">အရင်းဈေး မထည့်ထားတဲ့ Order ${unknown} ခုကို အမြတ်ထဲ ထည့်မတွက်ထားပါ — အရင်းဈေး ထည့်ပေးမှ အမြတ်မှန်ပါမယ်။</p>` : ''}`;
 }
+// Clear test profit: delete the Completed digital orders the profit is
+// computed from, so revenue/cost/profit go back to 0. Prices, costs and
+// Key Stock are untouched. The orders onSnapshot re-renders the profit.
+document.getElementById('clearProfitBtn').addEventListener('click', async () => {
+  const done = digitalCompletedOrders();
+  if (!done.length) { showToast('ရှင်းစရာ Completed Digital Order မရှိပါ', 'error'); return; }
+  if (!confirm(`Completed Digital Order ${done.length} ခု ဖျက်မည် — အရင်း/အမြတ် 0 ပြန်ဖြစ်မည်။ ရောင်းဈေး၊ အရင်းဈေးနဲ့ Key Stock က မပျက်ပါဘူး။ သေချာလား?`)) return;
+  const btn = document.getElementById('clearProfitBtn');
+  btn.disabled = true;
+  try {
+    const batch = db.batch();
+    done.forEach(o => batch.delete(db.collection('orders').doc(o.id)));
+    await batch.commit();
+    showToast(`Completed Digital Order ${done.length} ခု ဖျက်ပြီးပါပြီ — အမြတ် 0 ပြန်ဖြစ်ပါပြီ`, 'success');
+  } catch (err) {
+    console.error(err);
+    showToast('မအောင်မြင်ပါ: ' + err.message, 'error');
+    btn.disabled = false;
+  }
+});
+// Clear ALL test orders: every loaded order (game + digital, any
+// status). Confirm shows the total count first. Prices, costs and Key
+// Stock are untouched.
+document.getElementById('clearAllTestOrdersBtn').addEventListener('click', async () => {
+  const all = allOrders.slice();
+  if (!all.length) { showToast('ရှင်းစရာ Order မရှိပါ', 'error'); return; }
+  if (!confirm(`Order ${all.length} ခု လုံး ဖျက်မည် — Game + Digital၊ အခြေအနေမရွေး။ ဒါကို ပြန်ရအောင်လုပ်လို့ မရတော့ပါဘူး။ သေချာလား?`)) return;
+  const btn = document.getElementById('clearAllTestOrdersBtn');
+  btn.disabled = true;
+  try {
+    const batch = db.batch();
+    all.forEach(o => batch.delete(db.collection('orders').doc(o.id)));
+    await batch.commit();
+    showToast(`Order ${all.length} ခု ဖျက်ပြီးပါပြီ`, 'success');
+  } catch (err) {
+    console.error(err);
+    showToast('မအောင်မြင်ပါ: ' + err.message, 'error');
+    btn.disabled = false;
+  }
+});
 function digitalProfitLine(o) {
   if (o.productType !== 'digital' || o.status !== 'completed') return '';
   const p = orderProfit(o);
