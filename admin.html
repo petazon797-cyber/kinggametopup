@@ -490,6 +490,10 @@
       </div>
     </div>
 
+    <!-- Stock + Add Product: shared section, shown only on the Orders and
+         Digital tabs (see showAdminPage). It used to sit outside every
+         panel because of a stray closing div, so it showed on all four tabs. -->
+    <div id="stockProductSection" style="margin-top:16px;">
       <div class="card">
         <div class="section-label">🔑 Key Stock — ဖြည့်ရန်</div>
         <p class="hint" style="margin-bottom:14px;">Key လိုတဲ့ Product (VPN) တွေအတွက် Key/Code တွေ ကြိုဖြည့်ထားပါ — Stock ရှိရင် Order Approve လုပ်တာနဲ့ စနစ်က သူ့အလိုလို အဟောင်းဆုံး Key ကို ပေးပါမယ်။ Stock ကုန်နေရင် အရင်အတိုင်း Order Card ကနေ Manual Key ထည့်ပေးပါ။ Key တွေကို Admin ပဲမြင်ရပါတယ် — ဝယ်သူ မမြင်ရပါဘူး။</p>
@@ -679,6 +683,9 @@ function showAdminPage(page) {
     pages[k][0].classList.toggle('active', k === page);
     pages[k][1].style.display = k === page ? 'block' : 'none';
   });
+  // Stock + Add Product section: visible on Orders and Digital only.
+  const sps = document.getElementById('stockProductSection');
+  if (sps) sps.style.display = (page === 'orders' || page === 'digital') ? 'block' : 'none';
 }
 ordersPageTab.addEventListener('click', () => showAdminPage('orders'));
 digitalPageTab.addEventListener('click', () => showAdminPage('digital'));
